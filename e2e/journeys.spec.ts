@@ -8,7 +8,7 @@ import {
   runDeskAgentWithIntent,
 } from "./helpers/baseline";
 
-test.describe("RazorFlow journeys", () => {
+test.describe("Peffle journeys", () => {
   test.beforeEach(async ({ page }) => {
     await prepareE2EBaseline(page);
   });

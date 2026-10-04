@@ -1,9 +1,9 @@
 ---
-description: Mandatory design toolkit and quality loop for RazorFlow
+description: Mandatory design toolkit and quality loop for Peffle
 alwaysApply: true
 ---
 
-# RazorFlow Toolkit
+# Peffle Toolkit
 
 Use these together, never as a grab bag of tricks:
 
@@ -15,4 +15,4 @@ Use these together, never as a grab bag of tricks:
 
 Loop: design → implement → run → Playwright → inspect → fix. Do not ship a flow that only compiles.
 
-Selective Awesome Design roles: agentic (outcomes), enterprise/ant (data hierarchy), levels (conversion), premium/sleek/refined (restraint), geometric (structure). Never copy another skill's palette or typeface into RazorFlow.
+Selective Awesome Design roles: agentic (outcomes), enterprise/ant (data hierarchy), levels (conversion), premium/sleek/refined (restraint), geometric (structure). Never copy another skill's palette or typeface into Peffle.

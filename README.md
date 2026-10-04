@@ -1,8 +1,8 @@
-# RazorFlow
+# Peffle
 
 AI merchant commerce agent for the Razorpay Buildathon (AI Growth & Agentic Commerce).
 
-RazorFlow turns buyer intent into a **policy-governed, auditable sale** on Razorpay. It is not a chatbot. The server owns catalog truth, policy enforcement, checkout amounts, and payment capture.
+Peffle turns buyer intent into a **policy-governed, auditable sale** on Razorpay. It is not a chatbot. The server owns catalog truth, policy enforcement, checkout amounts, and payment capture.
 
 **Commerce pipeline:** Understand → Identify → Decide → Govern → Transact → Recover
 
@@ -16,7 +16,7 @@ Peffle (`peffle@0.1.7`) sits on the live agent tool path and `checkout.create`. 
 
 ---
 
-## What RazorFlow does today
+## What Peffle does today
 
 | Capability | Summary |
 | --- | --- |
@@ -372,7 +372,7 @@ Payment E2E reaches the Razorpay Checkout boundary when Test Mode keys are prese
 
 ## Design principles
 
-- **Original RazorFlow identity** — trust-first fintech UI; settlement teal accent; no generic AI-purple SaaS chrome
+- **Original Peffle identity** — trust-first fintech UI; settlement teal accent; no generic AI-purple SaaS chrome
 - **Server authority** — catalog, merchant policy, amounts, and capture state live in PostgreSQL; Peffle authorizes checkout execution immediately before Razorpay order creation
 - **Auditable agent** — user-safe explanations only; no chain-of-thought in UI or audit payloads
 - **Honest metrics** — GMV from verified captures only

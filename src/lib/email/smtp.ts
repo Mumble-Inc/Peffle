@@ -14,7 +14,7 @@ function smtpFromAddress(): string {
   return (
     process.env.SMTP_FROM?.trim() ||
     process.env.SMTP_USER?.trim() ||
-    "noreply@razorflow.local"
+    "noreply@peffle.local"
   );
 }
 

@@ -90,7 +90,7 @@ export function AdminPoliciesDashboard() {
     <div className="rf-admin-page">
       <PageHeader
         title="Merchant policies"
-        description={`RazorFlow commercial guardrails for ${policies.merchant}. Peffle execution limits live on Control — they are a separate policy layer.`}
+        description={`Merchant commercial guardrails for ${policies.merchant}. Execution limits live on Control — they are a separate policy layer.`}
       />
 
       {saved ? (

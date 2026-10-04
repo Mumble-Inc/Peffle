@@ -127,7 +127,7 @@ describe("Peffle checkout execution guard", () => {
     await prisma.$disconnect();
   });
 
-  it("allows checkout after RazorFlow validation and records a completed ledger event", async () => {
+  it("allows checkout after merchant validation and records a completed ledger event", async () => {
     resetPeffleForTests({ storagePath: ":memory:", policy: allowCheckoutPolicy });
     const { sessionId } = await readyHaloCheckout();
 
@@ -217,7 +217,7 @@ describe("Peffle checkout execution guard", () => {
     expect(createRazorpayOrder).toHaveBeenCalledOnce();
   });
 
-  it("still enforces RazorFlow merchant policy independently of Peffle", async () => {
+  it("still enforces merchant policy independently of Peffle", async () => {
     resetPeffleForTests({ storagePath: ":memory:", policy: allowCheckoutPolicy });
     const { sessionId, decisionId } = await readyHaloCheckout();
 

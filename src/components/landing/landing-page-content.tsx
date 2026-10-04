@@ -36,9 +36,9 @@ export function LandingPageContent({
               AI commerce without giving AI a blank cheque.
             </h1>
             <p className="rf-vp-lede">
-              Peffle is the last gate before money moves. RazorFlow recommends from your catalog and
-              enforces merchant policy. Peffle then authorizes execution — spend caps, kill switch, and
-              an audit ledger — before Razorpay ever sees an order.
+              Peffle recommends from your catalog and enforces merchant policy, then authorizes
+              execution — spend caps, kill switch, and an audit ledger — before Razorpay ever sees an
+              order.
             </p>
             <div className="rf-vp-actions">
               <Link href="/desk" className="rf-btn rf-btn-primary rf-motion-colors inline-flex min-h-11 items-center rounded-[8px] px-5 text-sm font-medium text-white">
@@ -61,7 +61,7 @@ export function LandingPageContent({
             Commerce, then execution control
           </h2>
           <p className="rf-land-section-lede">
-            RazorFlow runs discovery and merchant policy. Peffle decides whether the agent may execute.
+            Peffle runs discovery and merchant policy, then decides whether the agent may execute.
             Razorpay only receives an order after both layers pass.
           </p>
           <LandingWorkflowRail />

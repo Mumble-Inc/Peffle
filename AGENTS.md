@@ -8,6 +8,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# RazorFlow agent notes
+# Peffle agent notes
 
 Use `design-taste-frontend`, `web-design-guidelines`, the Awesome Design library in `.agents/awesome-design`, `image-to-code`, and Playwright together. Liquid glass is one technique, not the whole identity. Consult `DESIGN.md` before changing UI.

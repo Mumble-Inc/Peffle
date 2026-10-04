@@ -11,4 +11,4 @@ Traffic below is a live local path. Enforcement is process-scoped SQLite, not a 
 7. Revive. Ask for a refund on a captured order. Status is **APPROVAL_REQUIRED** (token stays on the server).
 8. Approve on Control. The retry redeems the one-time token and the refund row is written.
 
-Merchant policy (margin floor, discount ceiling) still runs **before** `peffle.guard`. `20% off` is blocked by RazorFlow, not by Peffle.
+Merchant policy (margin floor, discount ceiling) still runs **before** `peffle.guard`. `20% off` is blocked by merchant policy, not by Peffle.

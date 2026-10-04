@@ -1,4 +1,4 @@
-# RazorFlow design system
+# Peffle design system
 
 Original identity for a merchant commerce agent. Not a dashboard template, not a chatbot, not a glass demo.
 

@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from "@/lib/brand";
 import { recordDevEmail } from "@/lib/email/dev-outbox";
 import { buildVerificationCodeEmailHtml } from "@/lib/email/verification-code-email";
 import { isSmtpConfigured, SmtpEmailProvider } from "@/lib/email/smtp";
@@ -62,8 +63,8 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
   const link = buildPasswordResetEmailLink(token);
   await getEmailProvider().send({
     to,
-    subject: "Reset your RazorFlow password",
-    html: `<p>Reset your RazorFlow password using the link below. This link expires soon and can only be used once.</p><p><a href="${link}">Reset password</a></p>`,
-    text: `Reset your RazorFlow password: ${link}`,
+    subject: `Reset your ${PRODUCT_NAME} password`,
+    html: `<p>Reset your ${PRODUCT_NAME} password using the link below. This link expires soon and can only be used once.</p><p><a href="${link}">Reset password</a></p>`,
+    text: `Reset your ${PRODUCT_NAME} password: ${link}`,
   });
 }

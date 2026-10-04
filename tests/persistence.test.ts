@@ -25,7 +25,7 @@ const defaultPolicy = {
   requireBudgetFit: true,
 };
 
-describe("RazorFlow persistence slice", () => {
+describe("Peffle persistence slice", () => {
   beforeAll(async () => {
     await prisma.$connect();
     await updatePersistedPolicies(defaultPolicy);

@@ -1,6 +1,6 @@
 # Architecture
 
-RazorFlow is a Next.js App Router app with a server-side deterministic commerce agent, PostgreSQL persistence via Prisma, and Razorpay order creation on the server.
+Peffle is a Next.js App Router app with a server-side deterministic commerce agent, PostgreSQL persistence via Prisma, and Razorpay order creation on the server.
 
 ## Commerce pipeline
 

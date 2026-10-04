@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s · Peffle",
   },
   description:
-    "AI commerce without giving AI a blank cheque. Peffle guards agent checkout before Razorpay; RazorFlow runs catalog, policy, and capture.",
+    "AI commerce without giving AI a blank cheque. Peffle guards agent checkout before Razorpay, with catalog, merchant policy, and verified capture on the same desk.",
 };
 
 export default function RootLayout({

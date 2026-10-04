@@ -1,6 +1,6 @@
 const STAGES = [
   { step: "01", title: "Understand", body: "Parse buyer intent, budget, and constraints before any SKU is shown." },
-  { step: "02", title: "Decide", body: "Rank catalog and apply RazorFlow merchant policy — margin, discount, order cap." },
+  { step: "02", title: "Decide", body: "Rank catalog and apply merchant policy — margin, discount, order cap." },
   { step: "03", title: "Guard", body: "Peffle authorizes checkout.create: spend cap, kill switch, execution policy." },
   { step: "04", title: "Transact", body: "Only then create a Razorpay order. Capture stays HMAC-verified." },
   { step: "05", title: "Recover", body: "Re-evaluate failed payments before a governed retry." },
