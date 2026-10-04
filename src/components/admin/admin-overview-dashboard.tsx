@@ -6,6 +6,7 @@ import { Storefront } from "@phosphor-icons/react";
 import type { AdminActivityItem } from "@/lib/services/admin-audit";
 import type { AdminOverviewData } from "@/lib/services/admin-dashboard";
 import { Money } from "@/components/money";
+import { AdminPeffleControl } from "@/components/admin/admin-peffle-control";
 import {
   AdminPageLoading,
   EmptyState,
@@ -38,33 +39,21 @@ export function AdminOverviewDashboard() {
     void load();
   }, []);
 
-  if (loading) return <AdminPageLoading label="Loading overview metrics…" />;
-  if (error || !data) {
-    return (
-      <div className="rf-admin-page">
-        <header className="rf-admin-page-header">
-          <div>
-            <h1>Overview</h1>
-            <p>{error ?? "Overview unavailable."}</p>
-          </div>
-        </header>
-      </div>
-    );
-  }
+  if (loading) return <AdminPageLoading label="Loading Peffle control…" />;
 
-  const hasCommerce =
-    data.commerce.orderCount > 0 ||
-    data.commerce.capturedPayments > 0 ||
-    data.commerce.gmvInr > 0;
+  const hasCommerce = Boolean(
+    data &&
+      (data.commerce.orderCount > 0 ||
+        data.commerce.capturedPayments > 0 ||
+        data.commerce.gmvInr > 0),
+  );
 
   return (
     <div className="rf-admin-page">
       <header className="rf-admin-page-header">
         <div>
-          <h1>Overview</h1>
-          <p translate="no">
-            {data.merchant.name} · metrics from verified checkout activity for this merchant
-          </p>
+          <h1>Control</h1>
+          <p translate="no">{data?.merchant.name ?? "Merchant"} · checkout.create</p>
         </div>
         <Link
           href="/desk"
@@ -75,19 +64,24 @@ export function AdminOverviewDashboard() {
         </Link>
       </header>
 
-      {!hasCommerce ? (
-        <EmptyState
-          title="No governed sales yet"
-          description="Captured GMV, orders, and conversion will appear after the first buyer completes checkout on the desk."
-        />
-      ) : (
+      {error && !data ? (
+        <p className="mb-4 text-sm text-danger" role="alert">
+          {error}
+        </p>
+      ) : null}
+
+      <AdminPeffleControl />
+
+      {data ? (
+        <div className="rf-peffle-commerce">
+      {hasCommerce ? (
         <div className="rf-command-layout">
           <div className="rf-command-primary">
             <p className="rf-command-primary-label">Captured GMV</p>
             <p className="rf-command-primary-value">
               <Money value={data.commerce.gmvInr} />
             </p>
-            <p className="rf-command-primary-hint">Verified Razorpay captures only</p>
+            <p className="rf-command-primary-hint">Verified Razorpay captures</p>
           </div>
           <div className="rf-command-secondary">
             <div className="rf-command-metric">
@@ -116,14 +110,13 @@ export function AdminOverviewDashboard() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       <section className="rf-admin-block" aria-labelledby="commerce-activity">
         <div>
           <h2 id="commerce-activity" className="rf-admin-block-title">
             Commerce activity
           </h2>
-          <p className="rf-admin-block-desc">Recent audit events from checkout and policy evaluation.</p>
         </div>
         <ActivityList
           items={data.recentActivity}
@@ -136,7 +129,6 @@ export function AdminOverviewDashboard() {
           <h2 id="catalog-health" className="rf-admin-block-title">
             Catalog health
           </h2>
-          <p className="rf-admin-block-desc">Inventory posture for active products.</p>
         </div>
         <div className="rf-command-secondary max-w-3xl">
           <div className="rf-command-metric">
@@ -167,13 +159,9 @@ export function AdminOverviewDashboard() {
           <h2 id="agent-activity" className="rf-admin-block-title">
             Agent activity
           </h2>
-          <p className="rf-admin-block-desc">Recommendation and guardrail signals from live sessions.</p>
         </div>
         {data.agent.decisions === 0 ? (
-          <EmptyState
-            title="No agent decisions yet"
-            description="Run the buyer desk to generate recommendations. Offers, policy blocks, and attach metrics will appear here."
-          />
+          <EmptyState title="No desk decisions yet" description="Signals appear after a live session." />
         ) : (
           <div className="rf-command-secondary max-w-2xl">
             <div className="rf-command-metric">
@@ -199,6 +187,8 @@ export function AdminOverviewDashboard() {
           </div>
         )}
       </section>
+        </div>
+      ) : null}
     </div>
   );
 }

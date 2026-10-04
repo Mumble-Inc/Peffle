@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AdminPortalClient } from "@/components/admin/admin-portal-client";
 
 export const metadata: Metadata = {
-  title: "Admin",
+  title: "Control",
 };
 
 export default function AdminPage() {
