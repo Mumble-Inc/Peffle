@@ -1,0 +1,769 @@
+/* Peffle Desk workspace — desktop commerce shell */
+
+.rf-peffle-desk {
+  --desk-sidebar: 15.25rem;
+  --desk-rail: 22.75rem;
+  --desk-topbar: 3.65rem;
+  --desk-radius: 8px;
+  --desk-hero-emphasis: #b7c4ea;
+  display: grid;
+  grid-template-columns: var(--desk-sidebar) minmax(0, 1fr);
+  min-height: 100dvh;
+  background: #07090c;
+  color: var(--rf-ink);
+}
+
+.rf-peffle-desk-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #1a2028;
+  background: #080b0f;
+  padding: 1.15rem 0.85rem 0.9rem;
+  min-height: 100dvh;
+}
+
+.rf-peffle-desk-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0 0.35rem 1.15rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.rf-peffle-desk-brand-copy p:first-child {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.rf-peffle-desk-brand-copy p:last-child {
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  color: var(--rf-muted);
+  letter-spacing: 0.01em;
+}
+
+.rf-peffle-desk-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.rf-peffle-desk-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 2.35rem;
+  padding: 0 0.7rem;
+  border-radius: 8px;
+  color: #9aa3ad;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.rf-peffle-desk-nav a[data-active="true"] {
+  background: #171e27;
+  color: var(--rf-ink);
+}
+
+.rf-peffle-desk-nav a:hover {
+  color: var(--rf-ink);
+}
+
+.rf-peffle-desk-sidebar-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.rf-peffle-demo-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #1f2830;
+  background: #0e141a;
+  border-radius: 10px;
+  padding: 0.7rem 0.75rem;
+  color: inherit;
+}
+
+.rf-peffle-demo-card[data-on="true"] {
+  border-color: color-mix(in oklab, var(--rf-success) 35%, #1f2830);
+}
+
+.rf-peffle-demo-dot {
+  margin-top: 0.3rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--rf-muted);
+  flex-shrink: 0;
+}
+
+.rf-peffle-demo-card[data-on="true"] .rf-peffle-demo-dot {
+  background: var(--rf-success);
+}
+
+.rf-peffle-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.15rem 0.35rem;
+}
+
+.rf-peffle-avatar {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 999px;
+  background: #1a222b;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.rf-peffle-desk-frame {
+  display: grid;
+  grid-template-rows: var(--desk-topbar) minmax(0, 1fr);
+  min-width: 0;
+  min-height: 100dvh;
+}
+
+.rf-peffle-desk-topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.15rem;
+  border-bottom: 1px solid #1a2028;
+  background: #090c10;
+}
+
+.rf-peffle-command {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  height: 2.4rem;
+  max-width: 44rem;
+  padding: 0 0.75rem 0 0.9rem;
+  border: 1px solid #242c35;
+  border-radius: 10px;
+  background: #10161c;
+}
+
+.rf-peffle-command input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--rf-ink);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.rf-peffle-command kbd {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  color: var(--rf-muted);
+  border: 1px solid #2a333d;
+  border-radius: 5px;
+  padding: 0.12rem 0.35rem;
+}
+
+.rf-peffle-run {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.rf-peffle-top-actions .rf-workspace-switch {
+  display: none;
+}
+
+.rf-peffle-top-actions button span {
+  display: none;
+}
+
+.rf-peffle-top-actions button {
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  justify-content: center;
+  border-radius: 999px;
+}
+
+.rf-peffle-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rf-peffle-merchant-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.1rem;
+  padding: 0 0.7rem;
+  border: 1px solid #242c35;
+  border-radius: 8px;
+  background: #10161c;
+  font-size: 0.8125rem;
+  color: var(--rf-ink);
+}
+
+.rf-peffle-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid #242c35;
+  border-radius: 8px;
+  background: #10161c;
+  color: #9aa3ad;
+}
+
+.rf-peffle-desk-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--desk-rail);
+  min-height: 0;
+}
+
+.rf-peffle-desk-canvas {
+  min-width: 0;
+  overflow: auto;
+  padding: 1.35rem 1.5rem 2.5rem;
+}
+
+.rf-peffle-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 17.5rem;
+  border-radius: 12px;
+  border: 1px solid #1c242d;
+  padding: 2.15rem 2rem 1.5rem;
+  background: #0c1116;
+}
+
+.rf-peffle-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.rf-peffle-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 72% 40%;
+  opacity: 0.42;
+  filter: saturate(0.75) contrast(1.05);
+}
+
+.rf-peffle-hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(7 9 12 / 0.94) 0%, rgb(7 9 12 / 0.72) 42%, rgb(7 9 12 / 0.28) 100%),
+    linear-gradient(180deg, rgb(7 9 12 / 0.15), rgb(7 9 12 / 0.55));
+}
+
+.rf-peffle-hero-kicker {
+  font-size: 0.6875rem;
+  font-weight: 550;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8b959f;
+}
+
+.rf-peffle-hero h1 {
+  max-width: 16ch;
+  margin-top: 0.7rem;
+  font-size: clamp(2.15rem, 4.2vw, 3.15rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.rf-peffle-hero h1 span {
+  color: var(--desk-hero-emphasis);
+}
+
+.rf-peffle-hero-lead {
+  margin-top: 0.85rem;
+  max-width: 42ch;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #a7b0b9;
+}
+
+.rf-peffle-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.rf-peffle-chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid #2a333c;
+  border-radius: 999px;
+  background: rgb(12 16 21 / 0.72);
+  color: #d7dde3;
+  font-size: 0.75rem;
+}
+
+.rf-peffle-catalog-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 0.75rem 1rem;
+  margin-top: 1.65rem;
+  margin-bottom: 1rem;
+}
+
+.rf-peffle-catalog-head h2 {
+  font-size: 1.125rem;
+  font-weight: 550;
+  letter-spacing: -0.02em;
+}
+
+.rf-peffle-catalog-count {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--rf-muted);
+  font-size: 0.8rem;
+}
+
+.rf-peffle-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rf-peffle-filter-search {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border: 1px solid #2a333c !important;
+  border-radius: 999px !important;
+}
+
+.rf-peffle-catalog-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rf-peffle-filters button,
+.rf-peffle-filters select {
+  min-height: 1.85rem;
+  padding: 0 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #8b959f;
+  font-size: 0.75rem;
+}
+
+.rf-peffle-filters button[data-active="true"] {
+  border-color: #2a333c;
+  background: #12181f;
+  color: var(--rf-ink);
+}
+
+.rf-peffle-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.rf-peffle-product-grid[data-layout="list"] {
+  grid-template-columns: 1fr;
+}
+
+.rf-peffle-product-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #1c242d;
+  border-radius: 10px;
+  background: #10161c;
+  overflow: hidden;
+}
+
+.rf-peffle-product-card[data-primary="true"] {
+  border-color: color-mix(in oklab, var(--rf-accent) 28%, #1c242d);
+}
+
+.rf-peffle-product-media {
+  position: relative;
+  aspect-ratio: 1.15 / 1;
+  background: #0c1116;
+}
+
+.rf-peffle-product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rf-peffle-bookmark {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(8 11 15 / 0.62);
+  color: #c9d0d6;
+}
+
+.rf-peffle-product-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.75rem 0.8rem;
+}
+
+.rf-peffle-product-body h3 {
+  font-size: 0.875rem;
+  font-weight: 550;
+  letter-spacing: -0.015em;
+}
+
+.rf-peffle-product-type {
+  font-size: 0.75rem;
+  color: var(--rf-muted);
+}
+
+.rf-peffle-product-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.rf-peffle-product-price {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.rf-peffle-product-add {
+  min-height: 1.65rem !important;
+  min-width: auto;
+  padding: 0 0.7rem !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: #eceae4 !important;
+  color: #111418 !important;
+  font-size: 0.75rem !important;
+  font-weight: 550;
+  gap: 0 !important;
+}
+
+.rf-peffle-product-add svg {
+  display: none;
+}
+
+.rf-peffle-product-add:disabled {
+  opacity: 0.45;
+}
+
+.rf-peffle-desk-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid #1a2028;
+  background: #0a0e12;
+}
+
+.rf-peffle-rail-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid #1a2028;
+}
+
+.rf-peffle-rail-tabs button {
+  min-height: 2.6rem;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #8b959f;
+  font-size: 0.8125rem;
+}
+
+.rf-peffle-rail-tabs button[data-active="true"] {
+  color: var(--rf-ink);
+  border-bottom-color: var(--rf-ink);
+}
+
+.rf-peffle-rail-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  padding: 1rem 1rem 0.75rem;
+}
+
+.rf-peffle-chat-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+}
+
+.rf-peffle-bubble {
+  max-width: 94%;
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.rf-peffle-bubble[data-from="user"] {
+  align-self: flex-end;
+  background: #151c24;
+  color: #dfe4e9;
+}
+
+.rf-peffle-bubble[data-from="agent"] {
+  align-self: stretch;
+  background: transparent;
+  padding: 0;
+  color: #c5ccd3;
+}
+
+.rf-peffle-agent-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  color: #9aa3ad;
+}
+
+.rf-peffle-mini-recs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.rf-peffle-mini-rec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.rf-peffle-mini-rec img {
+  width: 100%;
+  height: 3.6rem;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #0c1116;
+}
+
+.rf-peffle-disclosure {
+  border-top: 1px solid #1a2028;
+}
+
+.rf-peffle-disclosure summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 2.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: #c5ccd3;
+}
+
+.rf-peffle-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.rf-peffle-chat-composer {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #1a2028;
+}
+
+.rf-peffle-chat-composer input {
+  flex: 1;
+  min-height: 2.35rem;
+  padding: 0 0.75rem;
+  border: 1px solid #242c35;
+  border-radius: 10px;
+  background: #10161c;
+  color: var(--rf-ink);
+  font-size: 0.8125rem;
+}
+
+.rf-peffle-guard {
+  margin: 0.65rem 0.85rem 0.9rem;
+  border: 1px solid #1c242d;
+  border-radius: 12px;
+  background: #10161c;
+  padding: 0.85rem 0.9rem 0.95rem;
+}
+
+.rf-peffle-guard[data-blocked="true"] {
+  border-color: color-mix(in oklab, var(--rf-danger) 45%, #1c242d);
+}
+
+.rf-peffle-guard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.rf-peffle-guard-meter {
+  height: 0.35rem;
+  margin: 0.85rem 0 0.9rem;
+  border-radius: 999px;
+  background: #1a222b;
+  overflow: hidden;
+}
+
+.rf-peffle-guard-meter span {
+  display: block;
+  height: 100%;
+  background: var(--rf-success);
+}
+
+.rf-peffle-guard-meter-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0 0.85rem;
+}
+
+.rf-peffle-guard-meter-row .rf-peffle-guard-meter {
+  flex: 1;
+  margin: 0;
+}
+
+.rf-peffle-guard-cap {
+  font-size: 0.75rem;
+  color: #c5ccd3;
+  white-space: nowrap;
+}
+
+.rf-peffle-guard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 0.65rem;
+}
+
+.rf-peffle-guard-stats dt {
+  font-size: 0.6875rem;
+  color: var(--rf-muted);
+}
+
+.rf-peffle-guard-stats dd {
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  font-weight: 550;
+}
+
+.rf-peffle-stop {
+  margin-bottom: 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--rf-danger) 12%, #10161c);
+}
+
+@media (max-width: 1180px) {
+  .rf-peffle-product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .rf-peffle-catalog-head {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .rf-peffle-desk {
+    grid-template-columns: 1fr;
+  }
+
+  .rf-peffle-desk-sidebar {
+    min-height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .rf-peffle-desk-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .rf-peffle-desk-sidebar-foot {
+    margin-top: 0;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .rf-peffle-desk-body {
+    grid-template-columns: 1fr;
+  }
+
+  .rf-peffle-desk-rail {
+    border-left: 0;
+    border-top: 1px solid #1a2028;
+    min-height: 28rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .rf-peffle-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rf-peffle-hero {
+    min-height: 14rem;
+    padding: 1.4rem 1.1rem 1.15rem;
+  }
+
+  .rf-peffle-desk-canvas {
+    padding: 1rem 0.9rem 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-peffle-desk * {
+    transition: none !important;
+  }
+}

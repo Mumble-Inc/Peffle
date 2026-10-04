@@ -3,6 +3,7 @@ import { IBM_Plex_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import "./os-layout.css";
 import "./mobile-layout.css";
+import "./desk-workspace.css";
 
 const outfit = Outfit({
   variable: "--font-outfit",

@@ -71,18 +71,7 @@ function StageRow({ label, outcome }: { label: string; outcome: string }) {
   );
 }
 
-export function PeffleGuardTrace({
-  sessionId,
-  on: enabled,
-  refreshNonce,
-  planner,
-}: {
-  sessionId: string | null;
-  on: boolean;
-  refreshNonce: number;
-  planner: "gemini" | "deterministic" | null;
-}) {
-  const reduce = useReducedMotion();
+export function useDemoTrace(enabled: boolean, sessionId: string | null, refreshNonce: number) {
   const [payload, setPayload] = useState<DemoTracePayload | null>(null);
 
   const refresh = useCallback(async () => {
@@ -115,6 +104,23 @@ export function PeffleGuardTrace({
       document.removeEventListener("visibilitychange", onVis);
     };
   }, [enabled, refresh, refreshNonce, sessionId]);
+
+  return payload;
+}
+
+export function PeffleGuardTrace({
+  sessionId,
+  on: enabled,
+  refreshNonce,
+  planner,
+}: {
+  sessionId: string | null;
+  on: boolean;
+  refreshNonce: number;
+  planner: "gemini" | "deterministic" | null;
+}) {
+  const reduce = useReducedMotion();
+  const payload = useDemoTrace(enabled, sessionId, refreshNonce);
 
   if (!enabled) return null;
 

@@ -3,7 +3,9 @@ import { isDemoModeEnabled } from "@/lib/peffle/demo-trace";
 import type { BuyerCapability } from "@/lib/services/buyer-identity";
 import { buildDemoPrompts, pickPrimaryCatalogProduct, type DemoPrompt } from "@/lib/agent/demo-prompts";
 import { buildPolicyCopy, type PolicyCopyItem } from "@/lib/policy/copy";
+import type { MerchantPolicies, PublicProduct } from "@/lib/agent/types";
 import { getActiveCatalog } from "@/lib/services/catalog";
+import { toPublicProduct } from "@/lib/services/catalog-map";
 import { getDeskActiveSessionState, type DeskActiveSessionState } from "@/lib/services/desk-session-state";
 import { getMerchantPoliciesForAgent } from "@/lib/services/policies";
 import { resolveDemoMerchant } from "@/lib/services/merchant";
@@ -15,6 +17,8 @@ export type DeskContext = {
   };
   demoPrompts: DemoPrompt[];
   intentPlaceholder: string;
+  catalog: PublicProduct[];
+  policies: MerchantPolicies;
   auth: {
     sessionId: string | null;
     email: string | null;
@@ -50,6 +54,8 @@ export async function getDeskContext(options?: {
     },
     demoPrompts: buildDemoPrompts(catalog, { maxDiscountPct: agentPolicies.maxDiscountPct }),
     intentPlaceholder: `Describe what you need, your budget, and any discount request. Example: ${categoryHint} under ₹${sampleBudget.toLocaleString("en-IN")}…`,
+    catalog: catalog.map(toPublicProduct),
+    policies: agentPolicies,
     auth: {
       sessionId: options?.sessionId ?? null,
       email: options?.email ?? null,

@@ -6,6 +6,7 @@ export type {
   ParsedIntent,
   PolicyVerdict,
   Product,
+  PublicProduct,
 } from "./types";
 export type { StructuredIntent, IntentExclusion } from "./structured-intent";
 export type { IntentProvider, IntentExtractionResult } from "./intent-types";

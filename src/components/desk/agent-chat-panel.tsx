@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Input } from "@/components/ui/design-system";
+import { PaperPlaneRight } from "@phosphor-icons/react";
 
 type ChatPayload = {
   reply: string;
@@ -35,33 +35,40 @@ export function AgentChatPanel({
       if (payload.planner === "gemini" || payload.planner === "deterministic") {
         onTurn?.({ planner: payload.planner });
       }
+      setMessage("");
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="mb-4 border-t border-line/60 pt-4" data-testid="agent-chat">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted">Ask the agent</p>
-      <div className="mt-2 flex gap-2">
-        <Input
+    <div data-testid="agent-chat">
+      <div className="rf-peffle-chat-composer">
+        <input
           data-testid="agent-chat-input"
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="e.g. give me ₹200 off"
+          placeholder="Ask Peffle anything..."
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              void send();
+            }
+          }}
         />
-        <Button
+        <button
           type="button"
-          variant="secondary"
           data-testid="agent-chat-send"
           disabled={busy || !sessionId}
           onClick={() => void send()}
+          className="rf-peffle-icon-btn"
+          aria-label="Send"
         >
-          Send
-        </Button>
+          <PaperPlaneRight className="size-4" />
+        </button>
       </div>
       {reply ? (
-        <p className="mt-2 text-sm text-ink-soft" data-testid="agent-chat-reply">
+        <p className="mt-2 text-[0.8125rem] text-ink-soft" data-testid="agent-chat-reply">
           {reply}
         </p>
       ) : null}

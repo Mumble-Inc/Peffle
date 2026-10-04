@@ -1,39 +1,38 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import {
-  Clock,
-  Lock,
-  MagnifyingGlass,
-  ShieldCheck,
-  Wallet,
-  Warning,
-  XCircle,
-  Sparkle,
-} from "@phosphor-icons/react";
+import { CaretDown, GearSix, Headphones, MagnifyingGlass, Warning, XCircle } from "@phosphor-icons/react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AccountAuthModal, type AccountAuthMode } from "@/components/auth/account-auth-modal";
+import { AccountTopBarActions } from "@/components/auth/account-top-bar-actions";
+import { useAuthSession } from "@/components/auth/use-auth-session";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import {
   isSequentialBrowseMode,
   ProductRecommendationBrowser,
 } from "@/components/desk/product-recommendation-browser";
 import { AgentProcessingView } from "@/components/desk/agent-processing-view";
-import { CompletedTransaction, PaymentNotCompleted } from "@/components/desk/completed-transaction";
-import { PeffleBlockedPanel } from "@/components/desk/peffle-blocked";
-import { AgentChatPanel } from "@/components/desk/agent-chat-panel";
-import { DemoModeToggle, PeffleGuardTrace, readDemoModeOn } from "@/components/desk/peffle-guard-trace";
-import { DeskStageRail } from "@/components/desk/desk-stage-rail";
+import { readDemoModeOn, useDemoTrace } from "@/components/desk/peffle-guard-trace";
 import { useAgentProcessingPresentation } from "@/components/desk/use-agent-processing";
 import type { Phase } from "@/components/desk/desk-types";
+import { DeskCatalogGrid } from "@/components/desk/workspace/desk-catalog-grid";
+import { DeskContextRail, type DeskRailTab } from "@/components/desk/workspace/desk-context-rail";
+import { DeskHero, pickHeroProduct } from "@/components/desk/workspace/desk-hero";
+import { DeskSidebar } from "@/components/desk/workspace/desk-sidebar";
+import { PeffleGuardMeter } from "@/components/desk/workspace/peffle-guard-meter";
 import { Money } from "@/components/money";
-import { StatusChip } from "@/components/status-chip";
-import { Button, Panel, Textarea } from "@/components/ui/design-system";
-import { DeskShell } from "@/components/shell/desk-shell";
-import { type AgentResult, type DiscoverySummary, type PolicyVerdict, type Product, type StructuredIntent, intentDisplayNeed, intentMaxBudgetInr } from "@/lib/agent";
+import { Button } from "@/components/ui/design-system";
+import {
+  type AgentResult,
+  type DiscoverySummary,
+  type MerchantPolicies,
+  type Product,
+  type PublicProduct,
+  type StructuredIntent,
+} from "@/lib/agent";
 import type { DemoPrompt } from "@/lib/agent/demo-prompts";
-import { TransactionCart } from "@/components/desk/transaction-cart";
 import { useCart } from "@/hooks/use-cart";
 import { openRazorpayCheckout } from "@/lib/razorpay/checkout";
 import type { CapturedPaymentView } from "@/lib/desk/payment-display";
@@ -82,7 +81,6 @@ export function DeskApp() {
   const [intent, setIntent] = useState("");
   const [merchantName, setMerchantName] = useState("Merchant");
   const [demoPrompts, setDemoPrompts] = useState<DemoPrompt[]>([]);
-  const [intentPlaceholder, setIntentPlaceholder] = useState("Describe what you need, your budget, and any discount request…");
   const [contextReady, setContextReady] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [decisionId, setDecisionId] = useState<string | null>(null);
@@ -102,8 +100,14 @@ export function DeskApp() {
   const [demoModeOn, setDemoModeOn] = useState(false);
   const [demoRefreshNonce, setDemoRefreshNonce] = useState(0);
   const [lastPlanner, setLastPlanner] = useState<"gemini" | "deterministic" | null>(null);
+  const [catalog, setCatalog] = useState<PublicProduct[]>([]);
+  const [policies, setPolicies] = useState<MerchantPolicies | null>(null);
+  const [railTab, setRailTab] = useState<DeskRailTab>("chat");
+  const intentRef = useRef<HTMLInputElement>(null);
+  const auth = useAuthSession();
 
   const { cart, loading: cartLoading, refresh: refreshCart, updateQuantity, removeLine } = useCart(sessionId);
+  const demoTrace = useDemoTrace(demoModeAvailable && demoModeOn, sessionId, demoRefreshNonce);
 
   const refreshAuthState = useCallback(() => {
     window.dispatchEvent(new Event("razorflow:auth-changed"));
@@ -137,6 +141,8 @@ export function DeskApp() {
           merchant: { name: string };
           demoPrompts: DemoPrompt[];
           intentPlaceholder: string;
+          catalog?: PublicProduct[];
+          policies?: MerchantPolicies;
           demoModeAvailable?: boolean;
           activeSession?: {
             sessionId: string;
@@ -149,7 +155,8 @@ export function DeskApp() {
         };
         setMerchantName(payload.merchant.name);
         setDemoPrompts(payload.demoPrompts);
-        setIntentPlaceholder(payload.intentPlaceholder);
+        setCatalog(payload.catalog ?? []);
+        setPolicies(payload.policies ?? null);
         setDemoModeAvailable(payload.demoModeAvailable === true);
         setDemoModeOn(payload.demoModeAvailable === true && readDemoModeOn());
         if (payload.activeSession) {
@@ -171,6 +178,17 @@ export function DeskApp() {
     void loadContext();
   }, []);
 
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        intentRef.current?.focus();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
@@ -181,6 +199,7 @@ export function DeskApp() {
     setDecisionId(null);
     setOrderId(null);
     setRecovery(null);
+    setRailTab("chat");
     agentProcessing.start();
     setPhase("reading");
     try {
@@ -509,372 +528,228 @@ export function DeskApp() {
   }
 
   const transactionLocked = phase === "captured" || phase === "processing";
+  const cartSkus = new Set(cart.lines.map((line) => line.sku));
+  const hero = pickHeroProduct(catalog);
+  const sequential = result != null && isSequentialBrowseMode(result);
+  const highlightedSku = sequential ? null : (result?.primary?.sku ?? hero?.sku ?? null);
+
+  function handleCartChange() {
+    void refreshCart();
+  }
 
   return (
-    <DeskShell
-      merchantName={merchantName}
-      sessionId={sessionId}
-      actions={
-        <DemoModeToggle available={demoModeAvailable} on={demoModeOn} onChange={setDemoModeOn} />
-      }
-    >
-      <div className="rf-desk-layout">
-        <DeskStageRail phase={phase} hasResult={result != null} />
-        <div className="rf-desk-workspace">
-        <div className="rf-desk-stage">
-          <Panel title="Buyer intent" step="01" fill className="min-w-0">
-            <form id="desk-intent-form" className="flex flex-1 flex-col gap-4" onSubmit={onSubmit}>
-              <div>
-                <label htmlFor="intent" className="text-sm font-medium text-ink">
-                  Customer request
-                </label>
-                <Textarea
-                  id="intent"
-                  name="intent"
-                  data-testid="intent-input"
-                  value={intent}
-                  onChange={(event) => setIntent(event.target.value)}
-                  rows={3}
-                  spellCheck={false}
-                  autoComplete="off"
-                  className="mt-1.5"
-                  placeholder={intentPlaceholder}
-                  disabled={!contextReady}
-                />
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">Quick prompts</p>
-                <div className="flex flex-wrap gap-2">
-                  {demoPrompts.map((prompt) => (
-                    <button
-                      key={prompt.id}
-                      type="button"
-                      data-testid={`demo-prompt-${prompt.id}`}
-                      onClick={() => setIntent(prompt.text)}
-                      className="min-h-9 rounded-[8px] border border-line/80 bg-canvas-2/50 px-3 text-sm text-ink-soft transition-colors hover:border-line hover:text-ink"
-                    >
-                      {prompt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <dl className="space-y-0 border-t border-line/60 pt-3 text-sm">
-                <div className="rf-kv-row border-b border-line/40">
-                  <dt className="flex items-center gap-2 text-ink-soft">
-                    <Wallet className="size-3.5 text-accent" aria-hidden />
-                    Budget
-                  </dt>
-                  <dd className="font-medium">
-                    {result?.intent ? (
-                      intentMaxBudgetInr(result.intent) != null ? (
-                        <Money value={intentMaxBudgetInr(result.intent)!} />
-                      ) : (
-                        "Not stated"
-                      )
-                    ) : (
-                      "—"
-                    )}
-                  </dd>
-                </div>
-                <div className="rf-kv-row border-b border-line/40">
-                  <dt className="flex items-center gap-2 text-ink-soft">
-                    <MagnifyingGlass className="size-3.5 text-accent" aria-hidden />
-                    Need
-                  </dt>
-                  <dd className="font-medium">{result?.intent ? intentDisplayNeed(result.intent) : "—"}</dd>
-                </div>
-                <div className="rf-kv-row">
-                  <dt className="flex items-center gap-2 text-ink-soft">
-                    <Clock className="size-3.5 text-accent" aria-hidden />
-                    Timeline
-                  </dt>
-                  <dd className="font-medium">{result?.intent ? "Immediate" : "—"}</dd>
-                </div>
-              </dl>
-
-              {error && phase !== "failed" ? (
-                <p className="text-sm text-danger" role="alert">
-                  {error}
-                </p>
-              ) : null}
-
-              <div className="mt-auto pt-1">
-                <Button
-                  type="submit"
-                  data-testid="run-agent"
-                  disabled={busy || intent.trim().length < 4}
-                  className="w-full"
-                >
-                  {agentBusy ? "Running agent…" : "Run agent"}
-                </Button>
-              </div>
-            </form>
-          </Panel>
-        </div>
-
-        <div className="rf-desk-stage">
-          <Panel
-            title="Agent decision"
-            step="02"
-            variant="decision"
-            fill
-            className="min-w-0"
-            action={
-              result?.status === "ready" ? (
-                <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent">
-                  Offer ready
-                </span>
-              ) : null
-            }
-          >
-            <div className="flex flex-1 flex-col" data-testid="recommendation">
-              <div aria-live="polite" className="sr-only">
-                {agentBusy ? "Agent processing" : phaseCopy[phase]}
-              </div>
-              <AnimatePresence mode="wait">
-                {agentBusy ? (
-                  <motion.div
-                    key="agent-processing"
-                    className="flex flex-1 flex-col"
-                    initial={false}
-                    animate={{ opacity: 1 }}
-                    exit={reduce ? undefined : { opacity: 0 }}
-                    transition={{ duration: reduce ? 0 : 0.22, ease: [0.33, 1, 0.68, 1] }}
-                  >
-                    <AgentProcessingView completedCount={agentProcessing.completedCount} />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key={`agent-result-${result?.status ?? "none"}-${result?.intent.query ?? "idle"}-${phase}`}
-                    className="flex flex-1 flex-col"
-                    initial={reduce ? false : { opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={reduce ? undefined : { opacity: 0, y: -4 }}
-                    transition={{ duration: reduce ? 0 : 0.38, ease: [0.33, 1, 0.68, 1] }}
-                  >
-                    {!result || phase === "idle" ? (
-                      <EmptyDecision />
-                    ) : result.status === "empty" || phase === "empty" ? (
-                      <div className="rf-desk-empty-state" data-testid="discovery-empty">
-                        <div className="rf-desk-empty-state-icon">
-                          <Warning className="size-5" aria-hidden />
-                        </div>
-                        <p className="text-base font-medium text-ink">No catalog match</p>
-                        <p className="max-w-[36ch] text-sm text-muted">
-                          {result.explanations[0]?.reason ??
-                            "No product fits this request. Widen the budget or adjust the category."}
-                        </p>
-                      </div>
-                    ) : (
-                      <DecisionBody
-                        result={result}
-                        sessionId={sessionId}
-                        cartSkus={new Set(cart.lines.map((line) => line.sku))}
-                        onCartChange={() => void refreshCart()}
-                      />
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </Panel>
-        </div>
-
-        <div className="rf-desk-stage rf-desk-stage-transact">
-          <Panel
-            title="Transaction"
-            step="03"
-            variant="transact"
-            fill
-            className="min-w-0"
-            data-testid="transaction-rail"
-            action={
-                <StatusChip
-                  label={phaseCopy[phase]}
-                  tone={
-                    phase === "failed" || phase === "blocked"
-                      ? "danger"
-                      : phase === "captured"
-                        ? "success"
-                        : "warning"
-                  }
-                  live={busy}
-                />
-              }
+    <div className="rf-peffle-desk">
+      <DeskSidebar
+        merchantName={merchantName}
+        demoAvailable={demoModeAvailable}
+        demoOn={demoModeOn}
+        onDemoChange={setDemoModeOn}
+        email={auth.email}
+        capability={auth.capability}
+      />
+      <div className="rf-peffle-desk-frame">
+        <header className="rf-peffle-desk-topbar">
+          <form id="desk-intent-form" className="rf-peffle-command" onSubmit={onSubmit}>
+            <MagnifyingGlass className="size-4 shrink-0 text-muted" aria-hidden />
+            <label htmlFor="intent" className="sr-only">
+              Search products, compare, or ask Peffle
+            </label>
+            <input
+              ref={intentRef}
+              id="intent"
+              name="intent"
+              data-testid="intent-input"
+              value={intent}
+              onChange={(event) => setIntent(event.target.value)}
+              spellCheck={false}
+              autoComplete="off"
+              placeholder="Search products, compare, or ask Peffle..."
+              disabled={!contextReady}
+            />
+            <kbd>⌘ K</kbd>
+            <button
+              type="submit"
+              data-testid="run-agent"
+              disabled={busy || intent.trim().length < 4}
+              className="rf-peffle-run"
             >
-              <div className="flex flex-1 flex-col">
-                <ul className="space-y-0 text-sm">
-                  {(result?.policies.length ? result.policies : defaultChecks).map((item: PolicyVerdict) => (
-                    <li key={item.id} className="rf-kv-row border-b border-line/40 last:border-0">
-                      <span className="text-ink-soft">{item.label}</span>
-                      <span
-                        className={
-                          item.detail === "Waiting"
-                            ? "text-muted"
-                            : item.result === "blocked"
-                              ? "text-danger"
-                              : "text-success"
-                        }
-                      >
-                        {item.result === "blocked" ? "Blocked" : item.detail}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+              {agentBusy ? "Running agent…" : "Run agent"}
+            </button>
+          </form>
+          <div className="rf-peffle-top-actions">
+            <button type="button" className="rf-peffle-merchant-chip" translate="no">
+              <Headphones className="size-4 text-muted" aria-hidden />
+              {merchantName}
+              <CaretDown className="size-3.5 text-muted" aria-hidden />
+            </button>
+            <Link href="/admin/policies" className="rf-peffle-icon-btn" aria-label="Settings">
+              <GearSix className="size-4" />
+            </Link>
+            <AccountTopBarActions sessionId={sessionId} />
+          </div>
+        </header>
 
-                <div className="mt-3 border-t border-line/60 pt-3" data-testid="policy-result">
-                  <p className="flex items-start gap-2 text-sm">
-                    {result?.status === "blocked" || result?.status === "empty" ? (
-                      <Warning className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden="true" />
-                    ) : (
-                      <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                    )}
-                    <span
-                      className={
-                        result?.status === "blocked" || result?.status === "empty"
-                          ? "text-danger"
-                          : "text-success"
-                      }
-                    >
-                      {result?.status === "blocked"
-                        ? result.blockedReason
-                        : result?.status === "empty"
-                          ? (result.explanations[0]?.reason ?? "No matching products in catalog.")
-                          : result?.status === "ready"
-                            ? "Allowed. Merchant policy satisfied. Protected by Peffle at checkout."
-                            : "Policy has not run yet."}
-                    </span>
-                  </p>
-                </div>
+        <div className="rf-peffle-desk-body">
+          <div className="rf-peffle-desk-canvas">
+            <DeskHero
+              heroImage={hero?.image ?? null}
+              heroAlt={hero?.imageAlt ?? "Northline Audio catalog"}
+              merchantName={merchantName}
+              demoPrompts={demoPrompts}
+              onChip={(text) => setIntent(text)}
+            />
 
-                <TransactionCart
-                  cart={cart}
-                  loading={cartLoading}
-                  readOnly={phase === "captured"}
-                  onUpdateQuantity={updateQuantity}
-                  onRemoveLine={removeLine}
-                />
+            <div aria-live="polite" className="sr-only">
+              {agentBusy ? "Agent processing" : phaseCopy[phase]}
+            </div>
 
-                {cart.lines.length > 0 ? (
-                  <div className="mt-4 border-t border-line/60 pt-4">
-                    {result && result.discountPct > 0 ? (
-                      <dl className="space-y-2 text-sm">
-                        <div className="rf-kv-row py-0">
-                          <dt className="text-muted">Discount</dt>
-                          <dd className="font-medium text-success tabular">−{result.discountPct}%</dd>
-                        </div>
-                      </dl>
-                    ) : null}
-                    <p className="mt-3 text-xs font-medium uppercase tracking-wide text-muted">Total</p>
-                    <p className="mt-1 text-3xl font-semibold tracking-tight tabular" data-testid="checkout-total">
-                      <Money value={cart.subtotal} />
-                    </p>
-                  </div>
-                ) : null}
-
-                <div className="rf-desk-transact-actions mt-auto pt-4">
-                  {demoModeAvailable ? (
-                    <PeffleGuardTrace
-                      sessionId={sessionId}
-                      on={demoModeOn}
-                      refreshNonce={demoRefreshNonce}
-                      planner={lastPlanner}
-                    />
-                  ) : null}
-                  <AgentChatPanel
-                    sessionId={sessionId}
-                    onTurn={(turn) => {
-                      setLastPlanner(turn.planner);
-                      setDemoRefreshNonce((n) => n + 1);
-                    }}
-                  />
-                  {phase === "captured" && capturedPayment ? (
-                    <CompletedTransaction
-                      payment={capturedPayment}
-                      onStartNewSale={() => void startNewSale()}
-                    />
-                  ) : phase === "failed" && peffleBlock ? (
-                    <PeffleBlockedPanel
-                      block={peffleBlock}
-                      onDismiss={() => {
-                        setFailureOverlayOpen(false);
-                        setPhase("ready");
-                        setPeffleBlock(null);
-                        setError(null);
-                      }}
-                    />
-                  ) : phase === "failed" ? (
-                    <PaymentNotCompleted
-                      message={error ?? "Payment not completed."}
-                      onTryAgain={tryPaymentAgain}
-                    />
-                  ) : (
-                    <>
-                  <button
-                    type="button"
-                    data-testid="authorize"
-                    disabled={result?.status !== "ready" || cart.itemCount === 0 || busy || transactionLocked}
-                    onClick={() => authorize(false)}
-                    className="rf-btn rf-motion-colors flex min-h-11 w-full items-center justify-center rounded-[8px] bg-accent text-sm font-medium text-white hover:bg-accent-hover enabled:active:scale-[0.98] disabled:opacity-50"
-                  >
-                    {phase === "processing" ? (
-                      "Guarding with Peffle…"
-                    ) : result?.status === "ready" && cart.itemCount > 0 ? (
-                      <>
-                        Authorize <Money value={cart.subtotal} />
-                      </>
-                    ) : (
-                      "Authorize"
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="simulate-decline"
-                    disabled={result?.status !== "ready" || cart.itemCount === 0 || busy || transactionLocked}
-                    onClick={() => authorize(true)}
-                    className="mt-2 flex min-h-11 w-full items-center justify-center rounded-[8px] border border-line text-sm text-ink-soft hover:text-ink disabled:opacity-50"
-                  >
-                    Simulate decline
-                  </button>
-                  <p className="mt-3 flex items-center gap-2 text-xs text-muted">
-                    <Lock className="size-3.5 shrink-0" aria-hidden="true" />
-                    Peffle authorizes checkout before Razorpay. Capture is confirmed only after server
-                    verification.
-                  </p>
-                    </>
-                  )}
-                </div>
+            {agentBusy ? (
+              <div className="mt-6 rounded-[12px] border border-line bg-surface p-4">
+                <AgentProcessingView completedCount={agentProcessing.completedCount} />
               </div>
-            </Panel>
-        </div>
+            ) : null}
 
-        <AnimatePresence>
-          {phase === "failed" && failureOverlayOpen && result ? (
-            <PaymentOverlay
-              phase={phase}
-              checkoutTotal={cart.subtotal}
+            {error && phase !== "failed" ? (
+              <p className="mt-4 text-sm text-danger" role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            {result && (result.status === "empty" || phase === "empty") ? (
+              <div className="rf-desk-empty-state mt-6" data-testid="discovery-empty">
+                <div className="rf-desk-empty-state-icon">
+                  <Warning className="size-5" aria-hidden />
+                </div>
+                <p className="text-base font-medium text-ink">No catalog match</p>
+                <p className="max-w-[36ch] text-sm text-muted">
+                  {result.explanations[0]?.reason ??
+                    "No product fits this request. Widen the budget or adjust the category."}
+                </p>
+              </div>
+            ) : null}
+
+            {result && sequential ? (
+              <div className="mt-6 rounded-[12px] border border-line bg-surface p-4">
+                <ProductRecommendationBrowser
+                  result={result}
+                  sessionId={sessionId}
+                  cartSkus={cartSkus}
+                  onCartChange={handleCartChange}
+                />
+              </div>
+            ) : null}
+
+            {result?.attach && !sequential ? (
+              <div
+                className="mt-6 flex flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:flex-row sm:items-center"
+                data-testid="suggested-accessory"
+              >
+                <Image
+                  src={result.attach.image}
+                  alt={result.attach.imageAlt}
+                  width={56}
+                  height={56}
+                  className="size-14 rounded-[8px] bg-canvas-2 object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted">Suggested accessory</p>
+                  <p className="font-medium" translate="no">
+                    {result.attach.name}
+                  </p>
+                  <p className="text-sm text-muted">
+                    <Money value={result.attach.price} />
+                  </p>
+                </div>
+                <AddToCartButton
+                  sessionId={sessionId}
+                  sku={result.attach.sku}
+                  inCart={cartSkus.has(result.attach.sku)}
+                  onAdded={handleCartChange}
+                />
+              </div>
+            ) : null}
+
+            <DeskCatalogGrid
+              catalog={catalog}
+              sessionId={sessionId}
+              cartSkus={cartSkus}
+              highlightedSku={highlightedSku}
+              onCartChange={handleCartChange}
+            />
+          </div>
+
+          <div className="flex min-h-0 flex-col">
+            <DeskContextRail
+              tab={railTab}
+              onTabChange={setRailTab}
+              intent={intent}
               result={result}
-              error={error}
+              cart={cart}
+              cartLoading={cartLoading}
+              sessionId={sessionId}
+              phase={phase}
+              policies={policies}
+              demoModeAvailable={demoModeAvailable}
+              demoModeOn={demoModeOn}
+              demoRefreshNonce={demoRefreshNonce}
+              lastPlanner={lastPlanner}
+              capturedPayment={capturedPayment}
               peffleBlock={peffleBlock}
-              recovery={recovery}
-              onRetry={() => authorize(false)}
-              onReviewBasket={() => {
-                setRecovery(null);
+              error={error}
+              busy={busy}
+              transactionLocked={transactionLocked}
+              onUpdateQuantity={updateQuantity}
+              onRemoveLine={removeLine}
+              onAuthorize={() => authorize(false)}
+              onSimulateDecline={() => authorize(true)}
+              onStartNewSale={() => void startNewSale()}
+              onTryAgain={tryPaymentAgain}
+              onDismissBlock={() => {
                 setFailureOverlayOpen(false);
                 setPhase("ready");
-                setError("Basket needs a fresh agent check before payment can continue.");
+                setPeffleBlock(null);
+                setError(null);
               }}
-              onClose={() => {
-                setRecovery(null);
-                setFailureOverlayOpen(false);
+              onChatTurn={(turn) => {
+                setLastPlanner(turn.planner);
+                setDemoRefreshNonce((n) => n + 1);
               }}
             />
-          ) : null}
-        </AnimatePresence>
+            <PeffleGuardMeter
+              policies={policies}
+              result={result}
+              cart={cart}
+              trace={demoTrace}
+              blocked={result?.status === "blocked" || Boolean(peffleBlock)}
+              blockedReason={result?.blockedReason ?? error}
+            />
+          </div>
+        </div>
       </div>
-      </div>
+
+      <AnimatePresence>
+        {phase === "failed" && failureOverlayOpen && result ? (
+          <PaymentOverlay
+            phase={phase}
+            checkoutTotal={cart.subtotal}
+            result={result}
+            error={error}
+            peffleBlock={peffleBlock}
+            recovery={recovery}
+            onRetry={() => authorize(false)}
+            onReviewBasket={() => {
+              setRecovery(null);
+              setFailureOverlayOpen(false);
+              setPhase("ready");
+              setError("Basket needs a fresh agent check before payment can continue.");
+            }}
+            onClose={() => {
+              setRecovery(null);
+              setFailureOverlayOpen(false);
+            }}
+          />
+        ) : null}
+      </AnimatePresence>
       <AccountAuthModal
         open={accountModalOpen}
         initialMode={accountModalMode}
@@ -883,7 +758,7 @@ export function DeskApp() {
         onAuthenticated={() => void continueAfterAccountAuth()}
         onAuthStateChange={() => refreshAuthState()}
       />
-    </DeskShell>
+    </div>
   );
 }
 
@@ -903,126 +778,6 @@ function mapApiResponseToAgentResult(payload: AgentApiResponse): AgentResult {
     policies: payload.policies,
     blockedReason: payload.blockedReason,
   };
-}
-
-const defaultChecks = [
-  { id: "budget", label: "Budget fit", result: "allowed" as const, detail: "Waiting" },
-  { id: "margin", label: "Margin floor", result: "allowed" as const, detail: "Waiting" },
-  { id: "order-cap", label: "Order cap", result: "allowed" as const, detail: "Waiting" },
-  { id: "attach", label: "Cross-sell rule", result: "allowed" as const, detail: "Waiting" },
-];
-
-function EmptyDecision() {
-  return (
-    <div className="rf-desk-empty-state">
-      <div className="rf-desk-empty-state-icon">
-        <Sparkle className="size-5" aria-hidden />
-      </div>
-      <p className="text-base font-medium text-ink">Run the agent to see a recommendation</p>
-      <p className="max-w-[36ch] text-sm text-muted">
-        The agent will rank your catalog, explain the choice, and surface attach offers with merchant guardrails applied.
-      </p>
-    </div>
-  );
-}
-
-function DecisionBody({
-  result,
-  sessionId,
-  cartSkus,
-  onCartChange,
-}: {
-  result: AgentResult;
-  sessionId: string | null;
-  cartSkus: Set<string>;
-  onCartChange?: () => void;
-}) {
-  if (!result.primary) return null;
-
-  if (isSequentialBrowseMode(result)) {
-    return (
-      <ProductRecommendationBrowser
-        result={result}
-        sessionId={sessionId}
-        cartSkus={cartSkus}
-        onCartChange={onCartChange}
-      />
-    );
-  }
-
-  const inCart = cartSkus.has(result.primary.sku);
-
-  return (
-    <div>
-      <article className="flex gap-4">
-        <Image
-          src={result.primary.image}
-          alt={result.primary.imageAlt}
-          width={120}
-          height={120}
-          className="size-24 rounded-[12px] bg-canvas-2 object-cover md:size-28"
-        />
-        <div className="min-w-0 flex-1">
-          <h3 className="text-xl font-semibold tracking-tight" translate="no" data-testid="product-name">
-            {result.primary.name}
-          </h3>
-          <p className="mt-1 text-sm text-muted">{result.primary.blurb}</p>
-          <p className="mt-3 text-2xl font-semibold text-accent">
-            <Money value={result.primary.price} />
-          </p>
-          <div className="mt-4">
-            <AddToCartButton
-              sessionId={sessionId}
-              sku={result.primary.sku}
-              inCart={inCart}
-              onAdded={onCartChange}
-            />
-          </div>
-        </div>
-      </article>
-      <blockquote className="mt-6 border-l-2 border-accent pl-4 text-[15px] leading-relaxed text-ink">
-        {result.explanations[0]?.reason}
-      </blockquote>
-      <dl className="mt-6 grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <dt className="text-muted">Primary price</dt>
-          <dd className="mt-1 text-lg font-semibold">
-            <Money value={result.primary.price} />
-          </dd>
-        </div>
-        <div>
-          <dt className="text-muted">Margin</dt>
-          <dd className="mt-1 text-lg font-semibold">{result.marginPct.toFixed(1)}%</dd>
-        </div>
-      </dl>
-      {result.attach ? (
-        <div
-          className="mt-6 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center"
-          data-testid="suggested-accessory"
-        >
-          <Image
-            src={result.attach.image}
-            alt={result.attach.imageAlt}
-            width={56}
-            height={56}
-            className="size-14 rounded-[8px] bg-canvas-2 object-cover"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted">Suggested accessory</p>
-            <p className="font-medium" translate="no">
-              {result.attach.name}
-            </p>
-            <p className="text-sm text-muted">
-              <Money value={result.attach.price} /> · attach rate{" "}
-              {Math.round((result.primary.attachRate ?? 0) * 100)}%
-            </p>
-            <p className="mt-1 text-sm text-ink-soft">{result.explanations[1]?.reason}</p>
-          </div>
-          <AddToCartButton sessionId={sessionId} sku={result.attach.sku} inCart={cartSkus.has(result.attach.sku)} onAdded={onCartChange} />
-        </div>
-      ) : null}
-    </div>
-  );
 }
 
 function PaymentOverlay({
@@ -1062,7 +817,7 @@ function PaymentOverlay({
           onClick={(event) => event.stopPropagation()}
         >
           <h2 className="text-lg font-semibold tracking-tight" data-testid="peffle-blocked-dialog">
-            {peffleBlock.code === "PEFFLE_AGENT_KILLED" ? "Agent disabled" : "Peffle blocked this action"}
+            Peffle stopped this action
           </h2>
           <p className="mt-3 text-3xl font-semibold tracking-tight tabular">
             <Money value={peffleBlock.amountPaise / 100} />

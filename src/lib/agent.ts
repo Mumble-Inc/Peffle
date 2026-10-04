@@ -17,4 +17,6 @@ export {
   type StructuredIntent,
   type PolicyVerdict,
   type Product,
+  type PublicProduct,
+  type MerchantPolicies,
 } from "./agent/index";
