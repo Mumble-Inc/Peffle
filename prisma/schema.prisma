@@ -69,6 +69,11 @@ enum AuditEventType {
   PRODUCT_INVENTORY_CHANGED
   PRODUCT_PRICE_CHANGED
   POLICY_UPDATED
+  AGENT_TOOL_ALLOWED
+  AGENT_TOOL_BLOCKED
+  AGENT_TOOL_APPROVAL_REQUIRED
+  AGENT_TOOL_APPROVED
+  AGENT_TOOL_DENIED
 }
 
 enum DecisionStatus {
@@ -116,6 +121,7 @@ model Product {
   primaryDecisions      AgentDecision[] @relation("PrimaryProduct")
   attachDecisions       AgentDecision[] @relation("AttachProduct")
   cartLines             CartLine[]
+  discounts             SessionDiscount[]
   orderLineItems        OrderLineItem[]
 
   @@unique([merchantId, sku])
@@ -154,6 +160,7 @@ model BuyerSession {
   decisions   AgentDecision[]
   orders      Order[]
   cartLines   CartLine[]
+  discounts   SessionDiscount[]
   auditEvents AuditEvent[]
   identity    BuyerIdentity?
 
@@ -216,6 +223,7 @@ model Order {
   session   BuyerSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   decision  AgentDecision  @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   payments  Payment[]
+  refunds   Refund[]
   lineItems OrderLineItem[]
 
   @@index([sessionId])
@@ -359,6 +367,36 @@ model MerchantStaffEmail {
 
   @@unique([merchantId, email])
   @@index([merchantId])
+}
+
+model SessionDiscount {
+  id            String   @id @default(cuid())
+  sessionId     String
+  productId     String
+  amountPaise   Int
+  peffleEventId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  session BuyerSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  product Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, productId])
+  @@index([sessionId])
+}
+
+model Refund {
+  id               String   @id @default(cuid())
+  orderId          String
+  amountPaise      Int
+  status           String
+  peffleEventId    String?
+  razorpayRefundId String?
+  createdAt        DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
 }
 
 model CartLine {
