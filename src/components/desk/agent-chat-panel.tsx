@@ -5,11 +5,17 @@ import { Button, Input } from "@/components/ui/design-system";
 
 type ChatPayload = {
   reply: string;
-  planner: string;
+  planner: "gemini" | "deterministic";
   tools: Array<{ ok: boolean; tool: string; reasonCode: string; message: string }>;
 };
 
-export function AgentChatPanel({ sessionId }: { sessionId: string | null }) {
+export function AgentChatPanel({
+  sessionId,
+  onTurn,
+}: {
+  sessionId: string | null;
+  onTurn?: (turn: { planner: "gemini" | "deterministic" }) => void;
+}) {
   const [message, setMessage] = useState("");
   const [reply, setReply] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -26,6 +32,9 @@ export function AgentChatPanel({ sessionId }: { sessionId: string | null }) {
       });
       const payload = (await response.json()) as ChatPayload & { error?: string };
       setReply(payload.reply ?? payload.error ?? "No reply");
+      if (payload.planner === "gemini" || payload.planner === "deterministic") {
+        onTurn?.({ planner: payload.planner });
+      }
     } finally {
       setBusy(false);
     }

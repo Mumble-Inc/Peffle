@@ -23,6 +23,7 @@ import { AgentProcessingView } from "@/components/desk/agent-processing-view";
 import { CompletedTransaction, PaymentNotCompleted } from "@/components/desk/completed-transaction";
 import { PeffleBlockedPanel } from "@/components/desk/peffle-blocked";
 import { AgentChatPanel } from "@/components/desk/agent-chat-panel";
+import { DemoModeToggle, PeffleGuardTrace, readDemoModeOn } from "@/components/desk/peffle-guard-trace";
 import { DeskStageRail } from "@/components/desk/desk-stage-rail";
 import { useAgentProcessingPresentation } from "@/components/desk/use-agent-processing";
 import type { Phase } from "@/components/desk/desk-types";
@@ -97,6 +98,10 @@ export function DeskApp() {
   const [capturedPayment, setCapturedPayment] = useState<CapturedPaymentView | null>(null);
   const [failureOverlayOpen, setFailureOverlayOpen] = useState(false);
   const [peffleBlock, setPeffleBlock] = useState<PeffleCheckoutBlock | null>(null);
+  const [demoModeAvailable, setDemoModeAvailable] = useState(false);
+  const [demoModeOn, setDemoModeOn] = useState(false);
+  const [demoRefreshNonce, setDemoRefreshNonce] = useState(0);
+  const [lastPlanner, setLastPlanner] = useState<"gemini" | "deterministic" | null>(null);
 
   const { cart, loading: cartLoading, refresh: refreshCart, updateQuantity, removeLine } = useCart(sessionId);
 
@@ -132,6 +137,7 @@ export function DeskApp() {
           merchant: { name: string };
           demoPrompts: DemoPrompt[];
           intentPlaceholder: string;
+          demoModeAvailable?: boolean;
           activeSession?: {
             sessionId: string;
             decisionId: string;
@@ -144,6 +150,8 @@ export function DeskApp() {
         setMerchantName(payload.merchant.name);
         setDemoPrompts(payload.demoPrompts);
         setIntentPlaceholder(payload.intentPlaceholder);
+        setDemoModeAvailable(payload.demoModeAvailable === true);
+        setDemoModeOn(payload.demoModeAvailable === true && readDemoModeOn());
         if (payload.activeSession) {
           const active = payload.activeSession;
           setSessionId(active.sessionId);
@@ -238,6 +246,7 @@ export function DeskApp() {
     };
 
     if (!response.ok) {
+      setDemoRefreshNonce((n) => n + 1);
       if (response.status === 403 && payload.code === "VERIFICATION_REQUIRED") {
         const err = new Error(payload.error ?? "Email verification required");
         (err as Error & { code?: string }).code = "VERIFICATION_REQUIRED";
@@ -257,6 +266,7 @@ export function DeskApp() {
     }
 
     setOrderId(payload.orderId);
+    setDemoRefreshNonce((n) => n + 1);
     if (payload.decisionId) {
       setDecisionId(payload.decisionId);
     }
@@ -504,6 +514,9 @@ export function DeskApp() {
     <DeskShell
       merchantName={merchantName}
       sessionId={sessionId}
+      actions={
+        <DemoModeToggle available={demoModeAvailable} on={demoModeOn} onChange={setDemoModeOn} />
+      }
     >
       <div className="rf-desk-layout">
         <DeskStageRail phase={phase} hasResult={result != null} />
@@ -762,7 +775,21 @@ export function DeskApp() {
                 ) : null}
 
                 <div className="rf-desk-transact-actions mt-auto pt-4">
-                  <AgentChatPanel sessionId={sessionId} />
+                  {demoModeAvailable ? (
+                    <PeffleGuardTrace
+                      sessionId={sessionId}
+                      on={demoModeOn}
+                      refreshNonce={demoRefreshNonce}
+                      planner={lastPlanner}
+                    />
+                  ) : null}
+                  <AgentChatPanel
+                    sessionId={sessionId}
+                    onTurn={(turn) => {
+                      setLastPlanner(turn.planner);
+                      setDemoRefreshNonce((n) => n + 1);
+                    }}
+                  />
                   {phase === "captured" && capturedPayment ? (
                     <CompletedTransaction
                       payment={capturedPayment}

@@ -20,6 +20,7 @@ webServerEnv.GEMINI_API_KEY = "";
 webServerEnv.RAZORPAY_WEBHOOK_SECRET =
   process.env.RAZORPAY_WEBHOOK_SECRET?.trim() || "razorflow-e2e-webhook-secret";
 webServerEnv.RAZORFLOW_STUB_RAZORPAY_REFUND = "1";
+webServerEnv.DEMO_MODE = "1";
 process.env.RAZORPAY_WEBHOOK_SECRET = webServerEnv.RAZORPAY_WEBHOOK_SECRET;
 try {
   fs.unlinkSync(webServerEnv.PEFFLE_STORAGE);

@@ -1,3 +1,5 @@
+import { isStaffOrAdmin } from "@/lib/auth/capability";
+import { isDemoModeEnabled } from "@/lib/peffle/demo-trace";
 import type { BuyerCapability } from "@/lib/services/buyer-identity";
 import { buildDemoPrompts, pickPrimaryCatalogProduct, type DemoPrompt } from "@/lib/agent/demo-prompts";
 import { buildPolicyCopy, type PolicyCopyItem } from "@/lib/policy/copy";
@@ -19,6 +21,7 @@ export type DeskContext = {
     emailVerified: boolean;
     capability: BuyerCapability;
   };
+  demoModeAvailable: boolean;
   activeSession: DeskActiveSessionState | null;
 };
 
@@ -53,6 +56,7 @@ export async function getDeskContext(options?: {
       emailVerified: options?.emailVerified ?? false,
       capability: options?.capability ?? "anonymous",
     },
+    demoModeAvailable: isDemoModeEnabled() && isStaffOrAdmin(options?.capability ?? "anonymous"),
     activeSession,
   };
 }

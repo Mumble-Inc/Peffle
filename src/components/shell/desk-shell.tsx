@@ -7,6 +7,7 @@ type DeskShellProps = {
   merchantName: string;
   sessionLabel?: string | null;
   sessionId?: string | null;
+  actions?: ReactNode;
   children: ReactNode;
 };
 
@@ -14,6 +15,7 @@ export function DeskShell({
   merchantName,
   sessionLabel,
   sessionId = null,
+  actions,
   children,
 }: DeskShellProps) {
   return (
@@ -23,6 +25,7 @@ export function DeskShell({
         merchantName={merchantName}
         sessionLabel={sessionLabel ? `Session ${sessionLabel}` : null}
         sessionId={sessionId}
+        actions={actions}
       />
       <main id="content" className="rf-page-content px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6">
         {children}

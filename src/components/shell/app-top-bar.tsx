@@ -18,6 +18,7 @@ type AppTopBarProps = {
   pageTitle?: string;
   secondary?: ReactNode;
   sessionId?: string | null;
+  actions?: ReactNode;
 };
 
 function isPublicNavActive(pathname: string, href: string, exact?: boolean) {
@@ -32,6 +33,7 @@ export function AppTopBar({
   pageTitle,
   secondary,
   sessionId = null,
+  actions,
 }: AppTopBarProps) {
   const collapsed = useScrollCollapse(variant === "public");
   const pathname = usePathname();
@@ -93,6 +95,7 @@ export function AppTopBar({
               </div>
             ) : (
               <div className="flex items-center gap-2">
+                {actions}
                 <AccountTopBarActions sessionId={sessionId} />
                 {variant === "desk" ? (
                   showStaffPoliciesLink ? (
