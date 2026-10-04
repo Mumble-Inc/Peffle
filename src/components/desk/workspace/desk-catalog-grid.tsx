@@ -84,9 +84,9 @@ export function DeskCatalogGrid({
   }, [catalog, filter, query, sort, highlightedSku]);
 
   return (
-    <section id="catalog" className="mt-2">
+    <section id="catalog">
       <div className="rf-peffle-catalog-head">
-        <div>
+        <div className="rf-peffle-catalog-title">
           <h2>Catalog</h2>
           <p className="rf-peffle-catalog-count">{catalog.length} products</p>
         </div>
@@ -161,7 +161,13 @@ export function DeskCatalogGrid({
               data-primary={primary ? "true" : "false"}
             >
               <div className="rf-peffle-product-media">
-                <Image src={product.image} alt={product.imageAlt} width={480} height={420} />
+                <Image
+                  src={product.image}
+                  alt={product.imageAlt}
+                  width={480}
+                  height={420}
+                  sizes="(max-width: 760px) 45vw, 16vw"
+                />
                 <button
                   type="button"
                   className="rf-peffle-bookmark"

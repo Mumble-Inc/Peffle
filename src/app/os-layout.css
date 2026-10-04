@@ -1350,13 +1350,13 @@ body {
   color: var(--rf-muted);
 }
 
-.rf-peffle-hero {
+.rf-peffle-control .rf-peffle-hero {
   display: grid;
   gap: 0.85rem;
 }
 
 @media (min-width: 768px) {
-  .rf-peffle-hero {
+  .rf-peffle-control .rf-peffle-hero {
     grid-template-columns: 1.15fr 1fr;
   }
 }

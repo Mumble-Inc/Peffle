@@ -30,18 +30,61 @@ function initialsFromEmail(email: string | null) {
   return local.slice(0, 2).toUpperCase() || "NA";
 }
 
-export function DeskSidebar({
+export function DeskModeCard({
   merchantName,
   demoAvailable,
   demoOn,
   onDemoChange,
-  email,
-  capability,
 }: {
   merchantName: string;
   demoAvailable: boolean;
   demoOn: boolean;
   onDemoChange: (next: boolean) => void;
+}) {
+  if (demoAvailable) {
+    return (
+      <button
+        type="button"
+        role="switch"
+        aria-checked={demoOn}
+        aria-label={demoOn ? `Demo Mode, exploring as ${merchantName}` : `Live desk, ${merchantName}`}
+        data-testid="demo-mode-toggle"
+        className="rf-peffle-demo-card"
+        data-on={demoOn ? "true" : "false"}
+        onClick={() => {
+          const next = !demoOn;
+          try {
+            sessionStorage.setItem("razorflow-demo-mode", next ? "1" : "0");
+          } catch {
+            // session-only
+          }
+          onDemoChange(next);
+        }}
+      >
+        <span className="rf-peffle-demo-dot" aria-hidden />
+        <span className="rf-peffle-demo-label">{demoOn ? "Demo Mode" : "Live desk"}</span>
+      </button>
+    );
+  }
+
+  return (
+    <div
+      className="rf-peffle-demo-card"
+      data-on="false"
+      aria-label={`Live desk, ${merchantName}`}
+    >
+      <span className="rf-peffle-demo-dot" aria-hidden />
+      <span className="rf-peffle-demo-label">Live desk</span>
+    </div>
+  );
+}
+
+export function DeskSidebar({
+  merchantName,
+  email,
+  capability,
+}: {
+  merchantName: string;
   email: string | null;
   capability: BuyerCapability;
 }) {
@@ -77,42 +120,6 @@ export function DeskSidebar({
       </nav>
 
       <div className="rf-peffle-desk-sidebar-foot">
-        {demoAvailable ? (
-          <button
-            type="button"
-            role="switch"
-            aria-checked={demoOn}
-            data-testid="demo-mode-toggle"
-            className="rf-peffle-demo-card"
-            data-on={demoOn ? "true" : "false"}
-            onClick={() => {
-              const next = !demoOn;
-              try {
-                sessionStorage.setItem("razorflow-demo-mode", next ? "1" : "0");
-              } catch {
-                // session-only
-              }
-              onDemoChange(next);
-            }}
-          >
-            <span className="rf-peffle-demo-dot" aria-hidden />
-            <span>
-              <span className="block text-[0.8125rem] font-medium">Demo Mode</span>
-              <span className="mt-0.5 block text-[0.6875rem] text-muted">
-                Exploring as {merchantName}
-              </span>
-            </span>
-          </button>
-        ) : (
-          <div className="rf-peffle-demo-card" data-on="false">
-            <span className="rf-peffle-demo-dot" aria-hidden />
-            <span>
-              <span className="block text-[0.8125rem] font-medium">Live desk</span>
-              <span className="mt-0.5 block text-[0.6875rem] text-muted">{merchantName}</span>
-            </span>
-          </div>
-        )}
-
         <div className="rf-peffle-identity">
           <span className="rf-peffle-avatar" aria-hidden>
             {initialsFromEmail(email)}

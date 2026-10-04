@@ -20,7 +20,7 @@ import type { Phase } from "@/components/desk/desk-types";
 import { DeskCatalogGrid } from "@/components/desk/workspace/desk-catalog-grid";
 import { DeskContextRail, type DeskRailTab } from "@/components/desk/workspace/desk-context-rail";
 import { DeskHero, pickHeroProduct } from "@/components/desk/workspace/desk-hero";
-import { DeskSidebar } from "@/components/desk/workspace/desk-sidebar";
+import { DeskModeCard, DeskSidebar } from "@/components/desk/workspace/desk-sidebar";
 import { PeffleGuardMeter } from "@/components/desk/workspace/peffle-guard-meter";
 import { Money } from "@/components/money";
 import { Button } from "@/components/ui/design-system";
@@ -541,9 +541,6 @@ export function DeskApp() {
     <div className="rf-peffle-desk">
       <DeskSidebar
         merchantName={merchantName}
-        demoAvailable={demoModeAvailable}
-        demoOn={demoModeOn}
-        onDemoChange={setDemoModeOn}
         email={auth.email}
         capability={auth.capability}
       />
@@ -578,14 +575,20 @@ export function DeskApp() {
           </form>
           <div className="rf-peffle-top-actions">
             <button type="button" className="rf-peffle-merchant-chip" translate="no">
-              <Headphones className="size-4 text-muted" aria-hidden />
-              {merchantName}
-              <CaretDown className="size-3.5 text-muted" aria-hidden />
+              <Headphones className="size-4 shrink-0 text-muted" aria-hidden />
+              <span className="rf-peffle-merchant-name">{merchantName}</span>
+              <CaretDown className="size-3.5 shrink-0 text-muted" aria-hidden />
             </button>
             <Link href="/admin/policies" className="rf-peffle-icon-btn" aria-label="Settings">
               <GearSix className="size-4" />
             </Link>
             <AccountTopBarActions sessionId={sessionId} />
+            <DeskModeCard
+              merchantName={merchantName}
+              demoAvailable={demoModeAvailable}
+              demoOn={demoModeOn}
+              onDemoChange={setDemoModeOn}
+            />
           </div>
         </header>
 
@@ -604,7 +607,7 @@ export function DeskApp() {
             </div>
 
             {agentBusy ? (
-              <div className="mt-6 rounded-[12px] border border-line bg-surface p-4">
+              <div className="mt-4 rounded-[12px] border border-line bg-surface p-4">
                 <AgentProcessingView completedCount={agentProcessing.completedCount} />
               </div>
             ) : null}
@@ -616,7 +619,7 @@ export function DeskApp() {
             ) : null}
 
             {result && (result.status === "empty" || phase === "empty") ? (
-              <div className="rf-desk-empty-state mt-6" data-testid="discovery-empty">
+              <div className="rf-desk-empty-state mt-4" data-testid="discovery-empty">
                 <div className="rf-desk-empty-state-icon">
                   <Warning className="size-5" aria-hidden />
                 </div>
@@ -629,7 +632,7 @@ export function DeskApp() {
             ) : null}
 
             {result && sequential ? (
-              <div className="mt-6 rounded-[12px] border border-line bg-surface p-4">
+              <div className="mt-4 rounded-[12px] border border-line bg-surface p-4">
                 <ProductRecommendationBrowser
                   result={result}
                   sessionId={sessionId}
@@ -641,7 +644,7 @@ export function DeskApp() {
 
             {result?.attach && !sequential ? (
               <div
-                className="mt-6 flex flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:flex-row sm:items-center"
+                className="mt-4 flex flex-col gap-3 rounded-[12px] border border-line bg-surface p-4 sm:flex-row sm:items-center"
                 data-testid="suggested-accessory"
               >
                 <Image
@@ -678,7 +681,7 @@ export function DeskApp() {
             />
           </div>
 
-          <div className="flex min-h-0 flex-col">
+          <div className="rf-peffle-desk-context">
             <DeskContextRail
               tab={railTab}
               onTabChange={setRailTab}

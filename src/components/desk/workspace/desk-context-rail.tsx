@@ -28,7 +28,7 @@ function MiniRecs({ products }: { products: Product[] }) {
     <div className="rf-peffle-mini-recs">
       {products.slice(0, 3).map((product) => (
         <div key={product.sku} className="rf-peffle-mini-rec">
-          <Image src={product.image} alt={product.imageAlt} width={120} height={72} />
+          <Image src={product.image} alt={product.imageAlt} width={160} height={120} sizes="110px" />
           <p className="truncate text-[0.75rem] font-medium" translate="no">
             {shortName(product.name)}
           </p>
