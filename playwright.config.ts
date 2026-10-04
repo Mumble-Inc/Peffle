@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
+import fs from "fs";
+import os from "os";
 import path from "path";
 
 const root = process.cwd();
@@ -13,7 +15,17 @@ const webServerEnv = Object.fromEntries(
   Object.entries(process.env).filter((entry): entry is [string, string] => entry[1] !== undefined),
 );
 webServerEnv.RAZORFLOW_USE_DEV_EMAIL = "1";
-delete webServerEnv.GEMINI_API_KEY;
+webServerEnv.PEFFLE_STORAGE = path.join(os.tmpdir(), `razorflow-peffle-e2e-${e2ePort}.sqlite`);
+webServerEnv.GEMINI_API_KEY = "";
+webServerEnv.RAZORPAY_WEBHOOK_SECRET =
+  process.env.RAZORPAY_WEBHOOK_SECRET?.trim() || "razorflow-e2e-webhook-secret";
+webServerEnv.RAZORFLOW_STUB_RAZORPAY_REFUND = "1";
+process.env.RAZORPAY_WEBHOOK_SECRET = webServerEnv.RAZORPAY_WEBHOOK_SECRET;
+try {
+  fs.unlinkSync(webServerEnv.PEFFLE_STORAGE);
+} catch {
+  // first run
+}
 
 export default defineConfig({
   testDir: "./e2e",
