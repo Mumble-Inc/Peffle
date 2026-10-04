@@ -19,6 +19,7 @@
     "catalog:images": "tsx scripts/generate-northline-product-images.ts",
     "redteam": "NODE_ENV=test RAZORFLOW_REDTEAM=1 tsx scripts/redteam.ts",
     "demo:seed": "tsx scripts/demo-seed.ts",
+    "preflight": "tsx scripts/preflight.ts",
     "screenshots": "PLAYWRIGHT_HTML_OPEN=never playwright test e2e/peffle-screenshots.spec.ts --project=chromium"
   },
   "dependencies": {

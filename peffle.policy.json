@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "defaults": {
+    "onNoMatchingRule": "deny"
+  },
+  "budgets": [
+    {
+      "id": "checkout-daily-cap",
+      "scope": "global",
+      "window": "daily",
+      "limit": 1000000,
+      "match": {
+        "action": "checkout.create"
+      }
+    },
+    {
+      "id": "discount-daily-cap",
+      "scope": "global",
+      "window": "daily",
+      "limit": 50000,
+      "match": {
+        "action": "apply_discount"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "allow-checkout-create",
+      "match": {
+        "action": "checkout.create"
+      },
+      "effect": "allow"
+    },
+    {
+      "id": "allow-search-products",
+      "match": {
+        "action": "search_products"
+      },
+      "effect": "allow"
+    },
+    {
+      "id": "allow-apply-discount",
+      "match": {
+        "action": "apply_discount"
+      },
+      "effect": "allow"
+    },
+    {
+      "id": "approve-issue-refund",
+      "match": {
+        "action": "issue_refund"
+      },
+      "effect": "require_approval"
+    }
+  ]
+}

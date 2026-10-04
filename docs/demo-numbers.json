@@ -1,0 +1,27 @@
+{
+  "product": {
+    "sku": "halo-anc",
+    "name": "Northline Halo ANC",
+    "pricePaise": 749000,
+    "costPaise": 512000,
+    "marginPct": 31.64
+  },
+  "merchantPolicy": {
+    "marginFloorPct": 18,
+    "discountCeilingPct": 12
+  },
+  "peffle": {
+    "discountBudgetPaise": 50000,
+    "budgetScope": "global",
+    "budgetWindow": "daily"
+  },
+  "demoDiscounts": {
+    "passesPaise": 20000,
+    "commerceBlockedPct": 20,
+    "exhaustAsksPaise": [
+      20000,
+      40000,
+      80000
+    ]
+  }
+}

@@ -3,6 +3,17 @@ import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { authenticateStaff, ensureVerifiedBuyerForCheckout, HALO_FLIGHT_INTENT, prepareE2EBaseline, runDeskAgentWithIntent } from "./helpers/baseline";
 
+const demoNumbers = JSON.parse(
+  fs.readFileSync(path.join(process.cwd(), "docs/demo-numbers.json"), "utf8"),
+) as {
+  demoDiscounts: { passesPaise: number; commerceBlockedPct: number; exhaustAsksPaise: number[] };
+  peffle: { discountBudgetPaise: number };
+};
+
+function rupeesOff(paise: number) {
+  return `${Math.round(paise / 100)} rupees off`;
+}
+
 test.describe.configure({ mode: "serial" });
 test.use({
   video: { mode: "on", size: { width: 1440, height: 900 } },
@@ -17,7 +28,7 @@ test.describe("Peffle agent demo path", () => {
     const staff = await playwright.request.newContext({ baseURL });
     await authenticateStaff(staff);
     const cap = await staff.post("/api/admin/peffle/discount-cap", {
-      data: { capPaise: 50_000 },
+      data: { capPaise: demoNumbers.peffle.discountBudgetPaise },
     });
     expect(cap.ok()).toBeTruthy();
 
@@ -39,13 +50,17 @@ test.describe("Peffle agent demo path", () => {
       }>;
     }
 
-    const first = await chat("give me 200 rupees off");
+    const commerce = await chat(`give me ${demoNumbers.demoDiscounts.commerceBlockedPct}% off`);
+    expect(commerce.tools[0]?.reasonCode).toBe("DISCOUNT_CEILING");
+
+    const [pass, mid, exhaust] = demoNumbers.demoDiscounts.exhaustAsksPaise;
+    const first = await chat(`give me ${rupeesOff(pass)}`);
     expect(first.tools[0]?.ok, JSON.stringify(first)).toBe(true);
 
-    const second = await chat("give me 400 rupees off");
+    const second = await chat(`give me ${rupeesOff(mid)}`);
     expect(second.tools[0]?.ok).toBe(true);
 
-    const exhausted = await chat("give me 800 rupees off");
+    const exhausted = await chat(`give me ${rupeesOff(exhaust)}`);
     expect(exhausted.tools[0]?.ok).toBe(false);
     expect(exhausted.tools[0]?.reasonCode).toBe("BUDGET_EXCEEDED");
 
