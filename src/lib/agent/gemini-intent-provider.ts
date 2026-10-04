@@ -11,6 +11,7 @@ import {
   getGeminiApiKey,
   getGeminiModel,
 } from "@/lib/gemini/config";
+import { withGeminiRetry } from "@/lib/gemini/retry";
 
 const SYSTEM_INSTRUCTION = `You extract structured buyer intent from natural-language commerce requests.
 
@@ -58,38 +59,39 @@ export class GeminiIntentProvider implements IntentProvider {
       throw new StructuredIntentValidationError("Buyer request is empty");
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), GEMINI_REQUEST_TIMEOUT_MS);
-
-    try {
-      const response = await this.client.models.generateContent({
-        model: this.model,
-        contents: query,
-        config: {
-          abortSignal: controller.signal,
-          systemInstruction: SYSTEM_INSTRUCTION,
-          responseMimeType: "application/json",
-          responseJsonSchema: GEMINI_STRUCTURED_INTENT_JSON_SCHEMA,
-          temperature: 0.1,
-        },
-      });
-
-      const text = response.text?.trim();
-      if (!text) {
-        throw new StructuredIntentValidationError("Gemini returned an empty response");
-      }
-
-      let parsed: unknown;
+    const text = await withGeminiRetry(async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), GEMINI_REQUEST_TIMEOUT_MS);
       try {
-        parsed = JSON.parse(text);
-      } catch {
-        throw new StructuredIntentValidationError("Gemini response was not valid JSON");
+        const response = await this.client.models.generateContent({
+          model: this.model,
+          contents: query,
+          config: {
+            abortSignal: controller.signal,
+            systemInstruction: SYSTEM_INSTRUCTION,
+            responseMimeType: "application/json",
+            responseJsonSchema: GEMINI_STRUCTURED_INTENT_JSON_SCHEMA,
+            temperature: 0.1,
+          },
+        });
+        const body = response.text?.trim();
+        if (!body) {
+          throw new StructuredIntentValidationError("Gemini returned an empty response");
+        }
+        return body;
+      } finally {
+        clearTimeout(timeout);
       }
+    });
 
-      return validateStructuredIntent(parsed, query);
-    } finally {
-      clearTimeout(timeout);
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      throw new StructuredIntentValidationError("Gemini response was not valid JSON");
     }
+
+    return validateStructuredIntent(parsed, query);
   }
 }
 
