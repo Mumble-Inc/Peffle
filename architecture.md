@@ -23,6 +23,8 @@ Deterministic Policy Engine    (Decide / Govern)
       ↓
 Buyer Authorization
       ↓
+Peffle execution guard (`checkout.create`)
+      ↓
 Razorpay                       (Transact)
       ↓
 Verified Payment
@@ -32,7 +34,7 @@ Recovery (on failure)          (Recover)
 Audit + Admin metrics
 ```
 
-**AI interprets buyer intent; the database is the source of truth for what can be sold; the deterministic policy engine is the financial authority.**
+**AI interprets buyer intent; the database is the source of truth for what can be sold; the deterministic policy engine is the financial offer authority; Peffle is the final execution guard immediately before Razorpay order creation.**
 
 Phase 3B adds a server-side Gemini intent provider with deterministic fallback. Catalog retrieval, policy evaluation, checkout, and payment verification remain unchanged.
 
@@ -163,13 +165,13 @@ Desk flow:
 1. `POST /api/sessions` creates session + structured intent + audit events
 2. `POST /api/agent/run` loads catalog/policies, discovers/ranks products, evaluates policy, persists decision + audit events
 3. Buyer adds SKUs to cart via `POST /api/cart`
-4. `POST /api/checkout` (cart source) validates cart + policy, creates order line items, starts Razorpay
+4. `POST /api/checkout` (cart source) validates cart + merchant policy, Peffle-guards `checkout.create`, creates order line items, starts Razorpay
 
 ## Payments and recovery
 
 | Step | Endpoint / service | State |
 | --- | --- | --- |
-| Checkout start | `POST /api/checkout` → `createCheckoutFromCart` or `createCheckoutForSession` | Order `CREATED` + line items (cart), Payment `PENDING`, session `PAYMENT_PENDING` |
+| Checkout start | `POST /api/checkout` → merchant policy/cart validation → `peffle.guard(checkout.create)` → `createCheckoutFromCart` / `createCheckoutForSession` | Order `CREATED` + line items (cart), Payment `PENDING`, session `PAYMENT_PENDING` |
 | Abandon (modal dismiss) | `POST /api/payments/abandon` → `abandonCheckout` | Order/Payment `CANCELLED`, session restored to `DECISION_MADE`, audit `CHECKOUT_ABANDONED` |
 | Payment failure | `POST /api/payments/fail` or webhook | Order/Payment `FAILED`, session `PAYMENT_FAILED` |
 | Capture | `POST /api/payments/verify` or webhook | Order `PAID`, Payment `CAPTURED`, session `PAYMENT_CAPTURED` |
@@ -189,7 +191,11 @@ RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
 RAZORPAY_WEBHOOK_SECRET=
 NEXT_PUBLIC_RAZORPAY_KEY_ID=
+PEFFLE_STORAGE=.peffle/ledger.db
+PEFFLE_POLICY=peffle.policy.json
 ```
+
+Peffle (`peffle@0.1.7`) is a separate execution-control layer (`peffle.policy.json`). It does not replace Postgres `Policy` (margin, discount, order cap, budget fit). Side effects run inside `peffle.guard()`: `checkout.create`, `search_products`, `apply_discount`, `issue_refund`. Budgets are integer **paise**. `checkPolicy()` is advisory only. Enforcement is local SQLite / process-scoped.
 
 ## Data
 

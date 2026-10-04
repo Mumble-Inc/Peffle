@@ -16,6 +16,11 @@
 /playwright-report
 /blob-report
 /playwright/.cache
+/test-results/
+
+# local artifacts
+*.log
+.peffle/
 
 # next.js
 /.next/
@@ -40,6 +45,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# Peffle local SQLite ledger (execution guard)
+.peffle/
 
 # typescript
 *.tsbuildinfo

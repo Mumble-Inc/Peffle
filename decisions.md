@@ -19,3 +19,7 @@ Awesome Design is the full pattern library. Glass is reserved for agent, payment
 ## Playwright as a release gate
 
 A flow is not done when it renders. Core journeys live in `e2e/`.
+
+## Peffle as checkout execution guard
+
+RazorFlow merchant policy stays the offer authority. Peffle `guard()` wraps Razorpay order creation (`checkout.create`) so kill-switch, execution policy, and spend caps run before money-adjacent side effects. The two policy documents are not merged.

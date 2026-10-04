@@ -6,6 +6,14 @@ RazorFlow turns buyer intent into a **policy-governed, auditable sale** on Razor
 
 **Commerce pipeline:** Understand → Identify → Decide → Govern → Transact → Recover
 
+Peffle (`peffle@0.1.7`) sits on the live agent tool path and `checkout.create`. Merchant policy still owns price, margin, stock, and discount ceiling. Peffle owns whether the agent may execute, the global daily discount budget, refund approval, and the kill switch.
+
+| Layer | Enforces | Does not enforce |
+| --- | --- | --- |
+| **Commerce** (Postgres policy + catalog) | Margin floor, discount ceiling, stock, commercial validity | Spend caps, kill switch, one-time approvals |
+| **Peffle** (`guard()`) | Global daily budgets, `require_approval` refunds, agent kill | Catalog prices, Razorpay capture |
+| **Audit** | Record of allowed / blocked / approved / killed | Enforcement |
+
 ---
 
 ## What RazorFlow does today
@@ -21,7 +29,8 @@ RazorFlow turns buyer intent into a **policy-governed, auditable sale** on Razor
 | **Recovery** | Re-evaluate policy and catalog before retry after failure or abandoned checkout |
 | **Buyer accounts** | Register, email verification (SMTP or dev outbox), sign-in, password reset; verified buyers required for checkout |
 | **Merchant admin** | Overview, orders, payments, recovery queue, products, policies, activity audit, insights, staff management |
-| **Audit trail** | Append-only `AuditEvent` records for intent, policy, checkout, payment, recovery, and product changes |
+| **Peffle execution control** | `peffle@0.1.7` guards `checkout.create`, `search_products`, `apply_discount`, and `issue_refund` inside `guard()`. Kill switch, daily discount budget, refund approval. Local SQLite only |
+| **Agent chat tools** | `POST /api/agent/chat` — Gemini function calling when `GEMINI_API_KEY` is set; deterministic planner otherwise. Amounts recomputed server-side |
 | **Live metrics** | Landing page GMV and policy stats from captured payments only (no fabricated revenue) |
 
 ---
@@ -32,7 +41,8 @@ RazorFlow turns buyer intent into a **policy-governed, auditable sale** on Razor
 - **UI:** Tailwind CSS v4, Motion, Phosphor icons
 - **Data:** PostgreSQL, Prisma 6
 - **Payments:** Razorpay (server SDK + Checkout.js)
-- **AI (optional):** Google Gemini (`@google/genai`) for intent extraction only
+- **AI (optional):** Google Gemini (`@google/genai`) for intent extraction and agent tool choice
+- **Execution control:** `peffle@0.1.7` (local SQLite, process-scoped)
 - **Auth:** bcrypt passwords, signed session tokens, email verification (Nodemailer)
 - **Quality:** Vitest (integration), Playwright (E2E on port **3011**)
 
@@ -68,7 +78,7 @@ npm run catalog:images
 | `/verify-email` | Buyer | Email verification completion |
 | `/reset-password` | Buyer | Password reset |
 | `/policies` | Public URL | Redirects buyers to `/desk`; staff use `/admin/policies` |
-| `/admin` | Staff | Control plane home (overview) |
+| `/admin` | Staff | **Peffle control plane**: protection status, spend cap, kill switch, execution ledger; plus commerce GMV |
 | `/admin/orders` | Staff | Order list and detail |
 | `/admin/payments` | Staff | Payment list and detail |
 | `/admin/recovery` | Staff | Failed / abandoned checkout recovery queue |
@@ -103,7 +113,7 @@ Buyers see policy **outcomes** on the desk (allowed/blocked). They cannot read o
 3. **Agent run** — `POST /api/agent/run` loads catalog and policies from PostgreSQL, runs discovery + policy engine, persists `AgentDecision`.
 4. **Browse** — Multiple matches show **Option X of Y** with Previous/Next; single-intent prompts show one primary recommendation.
 5. **Cart** — **Add to cart** only; Transaction column is the cart source of truth (`POST/PATCH/DELETE /api/cart`).
-6. **Checkout** — `POST /api/checkout` with `{ sessionId, source: "cart" }` (or legacy `decisionId` path): server recomputes amount, re-validates policy, creates `Order` + `OrderLineItem` + `Payment`, creates Razorpay order.
+6. **Checkout** — `POST /api/checkout` with `{ sessionId, source: "cart" }` (or legacy `decisionId` path): server recomputes amount, re-validates merchant policy, Peffle-guards execution, creates `Order` + `OrderLineItem` + `Payment`, creates Razorpay order.
 7. **Pay** — Razorpay Checkout.js (public key + `order_id` only).
 8. **Verify** — `POST /api/payments/verify` validates signature server-side before UI shows success.
 9. **Complete** — Transaction shows captured summary; state survives reload until **Start new sale** (`POST /api/desk/reset`).
@@ -143,7 +153,7 @@ npm run smoke:gemini-intent
 
 | Step | API / service | Persistent state |
 | --- | --- | --- |
-| Start checkout | `POST /api/checkout` | Order `CREATED`, Payment `PENDING`, session `PAYMENT_PENDING` |
+| Start checkout | `POST /api/checkout` | Merchant policy, then Peffle `checkout.create` guard, then Order `CREATED`, Payment `PENDING`, session `PAYMENT_PENDING` |
 | Abandon modal | `POST /api/payments/abandon` | Order/Payment cancelled, session restored, `CHECKOUT_ABANDONED` |
 | Client success callback | `POST /api/payments/verify` | Signature check → `CAPTURED` / `PAID` or `PAYMENT_VERIFICATION_FAILED` |
 | Simulate decline (demo) | `POST /api/payments/fail` | `FAILED` without treating client callback as truth |
@@ -249,6 +259,9 @@ Copy `.env.example` to `.env.local` (and `.env` for Prisma CLI).
 | `SMTP_*`, `SMTP_FROM` | No | Real verification emails |
 | `INITIAL_ADMIN_EMAIL` | No | Bootstrap administrator after verification |
 | `RAZORFLOW_USE_DEV_EMAIL` | Test/E2E | Capture mail in dev outbox (`1`) |
+| `PEFFLE_STORAGE` | No | Local SQLite ledger path (default `.peffle/ledger.db`, server-only) |
+| `PEFFLE_POLICY` | No | Peffle execution policy JSON (default `peffle.policy.json`) |
+| `PEFFLE_CHECKOUT_CAP_PAISE` | No | Optional override of the `checkout.create` daily cap (integer paise). Policy default is `1000000` (₹10,000 / UTC day). |
 
 Without Razorpay keys, checkout returns a clear error; the UI does **not** fake payment success.
 
@@ -274,6 +287,8 @@ docker compose up -d
 cp .env.example .env.local
 cp .env.example .env
 ```
+
+Peffle uses local SQLite at `.peffle/ledger.db` (gitignored). The demo execution cap is ₹10,000 per UTC day (`1000000` paise in `peffle.policy.json`). Override with `PEFFLE_CHECKOUT_CAP_PAISE`. Merchant offer policy remains in Postgres.
 
 ### 4. Migrate and seed
 
@@ -310,7 +325,10 @@ For Gmail SMTP, use an [App Password](https://support.google.com/accounts/answer
 | `npm run db:studio` | Prisma Studio |
 | `npm run catalog:images` | Regenerate product SVG assets |
 | `npm run validate:gemini-discovery` | Live Gemini + DB discovery validation |
-| `npm run smoke:gemini-intent` | Gemini intent smoke test |
+| `npm run redteam` | Scripted guarded/unguarded benchmark → `docs/redteam-results.md` |
+| `npm run demo:seed` | Reset Peffle ledger, set 50000 paise discount cap, write `docs/demo-numbers.md` |
+| `npm run preflight` | PASS/FAIL env, DB, Gemini, Razorpay Test keys, ledger, single-node |
+| `npm run verify:clean` | Fresh clone → install → generate → test → build |
 
 ---
 
@@ -334,17 +352,28 @@ Payment E2E reaches the Razorpay Checkout boundary when Test Mode keys are prese
 
 | File | Contents |
 | --- | --- |
-| `architecture.md` | Pipeline, intent layers, cart, payments, recovery |
+| `architecture.md` | Pipeline, intent layers, cart, Peffle checkout guard, payments, recovery |
 | `DESIGN.md` | Visual identity and UI tokens |
 | `decisions.md` | Architectural decision notes |
-| `roadmap.md` | Scope and future work |
+| `DEMO.md` | 60-second Peffle demo |
+| `docs/redteam-results.md` | Scripted red-team counts (generated by `npm run redteam`) |
+
+---
+
+## Known limitations
+
+- **Peffle is local/process-scoped.** The ledger is SQLite on disk (or `:memory:` in tests). Approval tokens are process-local and do not survive restart. Run as a **single Node server**, not serverless / multi-instance. This repo does not implement hosted or multi-instance enforcement.
+- **Payments are Razorpay Test Mode.** Captures are real Test Mode API calls when keys are set; they are not production settlements. Refund HTTP is stubbed in E2E unless a real captured Razorpay payment id exists (`RAZORFLOW_STUB_RAZORPAY_REFUND=1`).
+- **`npm run redteam` is scripted** with a deterministic planner unless a live Gemini probe succeeds. Counts in `docs/redteam-results.json` are exact for that run, not organic traffic.
+- **Gemini status:** key and `gemini-3.6-flash` work; free-tier `generate_content` quota is 5 rpm and produces HTTP 429 (`RESOURCE_EXHAUSTED`). Chat retries with backoff then falls back. Do not claim Gemini planned a turn unless the row says `planner=gemini`.
+- **Injection resistance is structural**, not model-level: there is no set-price tool. Gemini can still choose `apply_discount`; commerce/Peffle still gate money.
 
 ---
 
 ## Design principles
 
 - **Original RazorFlow identity** — trust-first fintech UI; settlement teal accent; no generic AI-purple SaaS chrome
-- **Server authority** — catalog, policy, amounts, and capture state live in PostgreSQL
+- **Server authority** — catalog, merchant policy, amounts, and capture state live in PostgreSQL; Peffle authorizes checkout execution immediately before Razorpay order creation
 - **Auditable agent** — user-safe explanations only; no chain-of-thought in UI or audit payloads
 - **Honest metrics** — GMV from verified captures only
 
