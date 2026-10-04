@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { AuthError } from "@/lib/auth/errors";
 import { VerificationRequiredError } from "@/lib/auth/identity-errors";
-import { requireVerifiedBuyerSession } from "@/lib/auth/request";
+import { requireVerifiedBuyerSession, resolveAuthenticatedAccount } from "@/lib/auth/request";
 import {
   CheckoutError,
   createCheckoutForSession,
@@ -28,11 +28,17 @@ export async function POST(request: Request) {
     }
 
     await requireVerifiedBuyerSession(request, sessionId);
+    const account = await resolveAuthenticatedAccount(request);
+    if (!account) {
+      throw new VerificationRequiredError();
+    }
+
+    const execution = { principal: account.id };
 
     const checkout =
       source === "cart"
-        ? await createCheckoutFromCart(sessionId)
-        : await createCheckoutForSession(sessionId, decisionId!);
+        ? await createCheckoutFromCart(sessionId, execution)
+        : await createCheckoutForSession(sessionId, decisionId!, execution);
 
     return NextResponse.json(checkout);
   } catch (error) {
@@ -46,7 +52,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
     }
     if (error instanceof CheckoutError) {
-      return NextResponse.json({ error: error.message }, { status: error.status });
+      return NextResponse.json(
+        {
+          error: error.message,
+          ...(error.code ? { code: error.code } : {}),
+          ...(error.peffle ? { peffle: error.peffle } : {}),
+        },
+        { status: error.status },
+      );
     }
     console.error("POST /api/checkout failed:", error);
     return NextResponse.json({ error: "Checkout could not be started" }, { status: 500 });

@@ -1,7 +1,7 @@
 export const AGENT_PROCESSING_STEPS = [
   { id: "parse", num: "01", label: "Parsing buyer request" },
   { id: "catalog", num: "02", label: "Checking catalog" },
-  { id: "guardrails", num: "03", label: "Evaluating guardrails" },
+  { id: "guardrails", num: "03", label: "Evaluating merchant policy" },
   { id: "offer", num: "04", label: "Calculating best offer" },
   { id: "recommendation", num: "05", label: "Preparing recommendation" },
 ] as const;

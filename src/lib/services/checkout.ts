@@ -15,17 +15,25 @@ import { getAvailableCatalog } from "@/lib/services/catalog";
 import { getMerchantPoliciesForAgent } from "@/lib/services/policies";
 import { evaluateRecovery, isRecoveryContext, nextAttemptNumber } from "@/lib/services/recovery";
 import { loadStructuredIntentFromSession } from "@/lib/services/sessions";
+import { guardCheckoutCreate } from "@/lib/peffle/client";
+import { CheckoutError } from "@/lib/services/checkout-errors";
 
-export { CartError };
+export { CartError, CheckoutError };
 
-export class CheckoutError extends Error {
-  constructor(
-    message: string,
-    readonly status: number = 400,
-  ) {
-    super(message);
-    this.name = "CheckoutError";
-  }
+export type CheckoutExecutionContext = {
+  principal?: string;
+};
+
+async function resolveCheckoutPrincipal(sessionId: string, provided?: string): Promise<string> {
+  const trimmed = provided?.trim();
+  if (trimmed) return trimmed;
+
+  const identity = await db.buyerIdentity.findUnique({
+    where: { sessionId },
+    select: { accountId: true },
+  });
+  if (identity?.accountId) return identity.accountId;
+  return `session:${sessionId}`;
 }
 
 const STALE_DECISION_MESSAGE =
@@ -119,7 +127,11 @@ export async function assertNoDuplicateCheckout(
   }
 }
 
-export async function createCheckoutForSession(sessionId: string, decisionId: string) {
+export async function createCheckoutForSession(
+  sessionId: string,
+  decisionId: string,
+  context: CheckoutExecutionContext = {},
+) {
   if (!isRazorpayConfigured()) {
     throw new CheckoutError("Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.", 503);
   }
@@ -182,81 +194,97 @@ export async function createCheckoutForSession(sessionId: string, decisionId: st
     throw new CheckoutError("Order amount is invalid", 400);
   }
 
-  const order = await db.order.create({
-    data: {
+  const principal = await resolveCheckoutPrincipal(sessionId, context.principal);
+
+  return guardCheckoutCreate(
+    {
       sessionId,
-      decisionId,
+      merchantId: session.merchantId,
+      principal,
       amountPaise,
-      currency: "INR",
-      status: "CREATED",
-      attemptNumber,
+      source: "decision",
     },
-  });
+    async () => {
+      const order = await db.order.create({
+        data: {
+          sessionId,
+          decisionId,
+          amountPaise,
+          currency: "INR",
+          status: "CREATED",
+          attemptNumber,
+        },
+      });
 
-  const payment = await db.payment.create({
-    data: {
-      orderId: order.id,
-      status: "PENDING",
+      const payment = await db.payment.create({
+        data: {
+          orderId: order.id,
+          status: "PENDING",
+        },
+      });
+
+      await recordAuditEvent(sessionId, "ORDER_CREATED", "system", {
+        orderId: order.id,
+        decisionId,
+        amountPaise,
+      });
+
+      const client = getRazorpayClient();
+      const razorpayOrder = await client.orders.create({
+        amount: amountPaise,
+        currency: "INR",
+        receipt: `rf_${order.id}`,
+        notes: {
+          sessionId,
+          decisionId,
+          orderId: order.id,
+        },
+      });
+
+      await db.order.update({
+        where: { id: order.id },
+        data: { razorpayOrderId: razorpayOrder.id },
+      });
+
+      await db.buyerSession.update({
+        where: { id: sessionId },
+        data: { status: "PAYMENT_PENDING" },
+      });
+
+      await recordAuditEvent(sessionId, "CHECKOUT_STARTED", "system", {
+        orderId: order.id,
+        paymentId: payment.id,
+        razorpayOrderId: razorpayOrder.id,
+        amountPaise,
+        attemptNumber,
+        isRecovery: recovering,
+      });
+
+      if (recovering) {
+        await recordAuditEvent(sessionId, "RECOVERY_ATTEMPTED", "system", {
+          orderId: order.id,
+          paymentId: payment.id,
+          decisionId,
+          attemptNumber,
+        });
+      }
+
+      return {
+        keyId: getPublicRazorpayKeyId(),
+        orderId: order.id,
+        paymentId: payment.id,
+        razorpayOrderId: razorpayOrder.id,
+        amountPaise,
+        currency: "INR" as const,
+      };
     },
-  });
-
-  await recordAuditEvent(sessionId, "ORDER_CREATED", "system", {
-    orderId: order.id,
-    decisionId,
-    amountPaise,
-  });
-
-  const client = getRazorpayClient();
-  const razorpayOrder = await client.orders.create({
-    amount: amountPaise,
-    currency: "INR",
-    receipt: `rf_${order.id}`,
-    notes: {
-      sessionId,
-      decisionId,
-      orderId: order.id,
-    },
-  });
-
-  await db.order.update({
-    where: { id: order.id },
-    data: { razorpayOrderId: razorpayOrder.id },
-  });
-
-  await db.buyerSession.update({
-    where: { id: sessionId },
-    data: { status: "PAYMENT_PENDING" },
-  });
-
-  await recordAuditEvent(sessionId, "CHECKOUT_STARTED", "system", {
-    orderId: order.id,
-    paymentId: payment.id,
-    razorpayOrderId: razorpayOrder.id,
-    amountPaise,
-    attemptNumber,
-    isRecovery: recovering,
-  });
-
-  if (recovering) {
-    await recordAuditEvent(sessionId, "RECOVERY_ATTEMPTED", "system", {
-      orderId: order.id,
-      paymentId: payment.id,
-      decisionId,
-      attemptNumber,
-    });
-  }
-
-  return {
-    keyId: getPublicRazorpayKeyId(),
-    orderId: order.id,
-    paymentId: payment.id,
-    razorpayOrderId: razorpayOrder.id,
-    amountPaise,
-    currency: "INR" as const,
-  };
+  );
 }
 
-export async function createCheckoutFromCart(sessionId: string) {
+export async function createCheckoutFromCart(
+  sessionId: string,
+  context: CheckoutExecutionContext = {},
+) {
   if (!isRazorpayConfigured()) {
     throw new CheckoutError("Razorpay is not configured. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.", 503);
   }
@@ -306,109 +334,122 @@ export async function createCheckoutFromCart(sessionId: string) {
     throw new CheckoutError("An active or completed order already exists for this session.", 409);
   }
 
-  await db.agentDecision.updateMany({
-    where: { sessionId, supersededAt: null },
-    data: { supersededAt: new Date() },
-  });
-
-  const catalog = await getAvailableCatalog(session.merchantId);
-  const primaryLine = cart.lines[0]!;
-  const primaryProduct = catalog.find((item) => item.sku === primaryLine.sku);
-
-  const decision = await db.agentDecision.create({
-    data: {
-      sessionId,
-      primaryProductId: primaryProduct?.id ?? null,
-      attachProductId: null,
-      subtotalPaise: cart.subtotalPaise,
-      marginPct: validation.marginPct,
-      attachRevenuePaise: 0,
-      recommendationReason: "Checkout from user cart",
-      policyAllowed: true,
-      policyReason: null,
-      discountPct: 0,
-      quantity: 1,
-      status: "READY",
-    },
-  });
-
-  const attemptNumber = await nextAttemptNumber(sessionId, decision.id);
   const amountPaise = cart.subtotalPaise;
+  const principal = await resolveCheckoutPrincipal(sessionId, context.principal);
 
-  const order = await db.order.create({
-    data: {
+  return guardCheckoutCreate(
+    {
       sessionId,
-      decisionId: decision.id,
+      merchantId: session.merchantId,
+      principal,
       amountPaise,
-      currency: "INR",
-      status: "CREATED",
-      attemptNumber,
-      lineItems: {
-        create: cart.lines.map((line) => ({
-          productId: line.productId,
-          sku: line.sku,
-          quantity: line.quantity,
-          unitPricePaise: line.unitPricePaise,
-          lineTotalPaise: line.lineTotalPaise,
-        })),
-      },
-    },
-  });
-
-  const payment = await db.payment.create({
-    data: {
-      orderId: order.id,
-      status: "PENDING",
-    },
-  });
-
-  await recordAuditEvent(sessionId, "ORDER_CREATED", "system", {
-    orderId: order.id,
-    decisionId: decision.id,
-    amountPaise,
-    source: "cart",
-    lineCount: cart.lines.length,
-  });
-
-  const client = getRazorpayClient();
-  const razorpayOrder = await client.orders.create({
-    amount: amountPaise,
-    currency: "INR",
-    receipt: `rf_${order.id}`,
-    notes: {
-      sessionId,
-      decisionId: decision.id,
-      orderId: order.id,
       source: "cart",
     },
-  });
+    async () => {
+      await db.agentDecision.updateMany({
+        where: { sessionId, supersededAt: null },
+        data: { supersededAt: new Date() },
+      });
 
-  await db.order.update({
-    where: { id: order.id },
-    data: { razorpayOrderId: razorpayOrder.id },
-  });
+      const catalog = await getAvailableCatalog(session.merchantId);
+      const primaryLine = cart.lines[0]!;
+      const primaryProduct = catalog.find((item) => item.sku === primaryLine.sku);
 
-  await db.buyerSession.update({
-    where: { id: sessionId },
-    data: { status: "PAYMENT_PENDING" },
-  });
+      const decision = await db.agentDecision.create({
+        data: {
+          sessionId,
+          primaryProductId: primaryProduct?.id ?? null,
+          attachProductId: null,
+          subtotalPaise: cart.subtotalPaise,
+          marginPct: validation.marginPct,
+          attachRevenuePaise: 0,
+          recommendationReason: "Checkout from user cart",
+          policyAllowed: true,
+          policyReason: null,
+          discountPct: 0,
+          quantity: 1,
+          status: "READY",
+        },
+      });
 
-  await recordAuditEvent(sessionId, "CHECKOUT_STARTED", "system", {
-    orderId: order.id,
-    paymentId: payment.id,
-    razorpayOrderId: razorpayOrder.id,
-    amountPaise,
-    attemptNumber,
-    source: "cart",
-  });
+      const attemptNumber = await nextAttemptNumber(sessionId, decision.id);
 
-  return {
-    keyId: getPublicRazorpayKeyId(),
-    orderId: order.id,
-    paymentId: payment.id,
-    decisionId: decision.id,
-    razorpayOrderId: razorpayOrder.id,
-    amountPaise,
-    currency: "INR" as const,
-  };
+      const order = await db.order.create({
+        data: {
+          sessionId,
+          decisionId: decision.id,
+          amountPaise,
+          currency: "INR",
+          status: "CREATED",
+          attemptNumber,
+          lineItems: {
+            create: cart.lines.map((line) => ({
+              productId: line.productId,
+              sku: line.sku,
+              quantity: line.quantity,
+              unitPricePaise: line.unitPricePaise,
+              lineTotalPaise: line.lineTotalPaise,
+            })),
+          },
+        },
+      });
+
+      const payment = await db.payment.create({
+        data: {
+          orderId: order.id,
+          status: "PENDING",
+        },
+      });
+
+      await recordAuditEvent(sessionId, "ORDER_CREATED", "system", {
+        orderId: order.id,
+        decisionId: decision.id,
+        amountPaise,
+        source: "cart",
+        lineCount: cart.lines.length,
+      });
+
+      const client = getRazorpayClient();
+      const razorpayOrder = await client.orders.create({
+        amount: amountPaise,
+        currency: "INR",
+        receipt: `rf_${order.id}`,
+        notes: {
+          sessionId,
+          decisionId: decision.id,
+          orderId: order.id,
+          source: "cart",
+        },
+      });
+
+      await db.order.update({
+        where: { id: order.id },
+        data: { razorpayOrderId: razorpayOrder.id },
+      });
+
+      await db.buyerSession.update({
+        where: { id: sessionId },
+        data: { status: "PAYMENT_PENDING" },
+      });
+
+      await recordAuditEvent(sessionId, "CHECKOUT_STARTED", "system", {
+        orderId: order.id,
+        paymentId: payment.id,
+        razorpayOrderId: razorpayOrder.id,
+        amountPaise,
+        attemptNumber,
+        source: "cart",
+      });
+
+      return {
+        keyId: getPublicRazorpayKeyId(),
+        orderId: order.id,
+        paymentId: payment.id,
+        decisionId: decision.id,
+        razorpayOrderId: razorpayOrder.id,
+        amountPaise,
+        currency: "INR" as const,
+      };
+    },
+  );
 }

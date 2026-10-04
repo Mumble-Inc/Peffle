@@ -19,11 +19,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "RazorFlow",
-    template: "%s · RazorFlow",
+    default: "Peffle",
+    template: "%s · Peffle",
   },
   description:
-    "RazorFlow is a merchant commerce agent that turns buyer intent into policy-governed Razorpay transactions.",
+    "AI commerce without giving AI a blank cheque. Peffle guards agent checkout before Razorpay; RazorFlow runs catalog, policy, and capture.",
 };
 
 export default function RootLayout({

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { PoliciesFormValues } from "@/lib/policy/map";
 import { buildPolicyCopy } from "@/lib/policy/copy";
 import { formatInr } from "@/lib/format";
+import type { PeffleControlState } from "@/lib/peffle/types";
 import {
   AdminFeedback,
   Input,
@@ -20,14 +21,21 @@ export function AdminPoliciesDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [peffle, setPeffle] = useState<PeffleControlState | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
-        const response = await fetch("/api/admin/policies", { credentials: "include" });
-        if (!response.ok) throw new Error("Could not load policies.");
-        const payload = (await response.json()) as { policies: PoliciesFormValues };
+        const [policyRes, peffleRes] = await Promise.all([
+          fetch("/api/admin/policies", { credentials: "include" }),
+          fetch("/api/admin/peffle", { credentials: "include" }),
+        ]);
+        if (!policyRes.ok) throw new Error("Could not load policies.");
+        const payload = (await policyRes.json()) as { policies: PoliciesFormValues };
         setPolicies(payload.policies);
+        if (peffleRes.ok) {
+          setPeffle((await peffleRes.json()) as PeffleControlState);
+        }
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Could not load policies.");
       } finally {
@@ -81,8 +89,8 @@ export function AdminPoliciesDashboard() {
   return (
     <div className="rf-admin-page">
       <PageHeader
-        title="Policies"
-        description={`Guardrails for ${policies.merchant}'s autonomous commerce agent. Financial authority stays on the server.`}
+        title="Merchant policies"
+        description={`RazorFlow commercial guardrails for ${policies.merchant}. Peffle execution limits live on Control — they are a separate policy layer.`}
       />
 
       {saved ? (
@@ -105,6 +113,17 @@ export function AdminPoliciesDashboard() {
           <StatCell label="Budget fit" value={policies.requireBudgetFit ? "Required" : "Optional"} />
         </StatStrip>
       </section>
+
+      {peffle?.discountSpend ? (
+        <section className="rf-admin-section" data-testid="peffle-discount-budget">
+          <SectionHeading title="Peffle daily discount budget" description="From the local execution ledger. Separate from merchant discount ceiling." />
+          <StatStrip>
+            <StatCell label="Limit" value={formatInr(peffle.discountSpend.limitPaise / 100)} />
+            <StatCell label="Spent" value={formatInr(peffle.discountSpend.spentPaise / 100)} />
+            <StatCell label="Remaining" value={formatInr(peffle.discountSpend.remainingPaise / 100)} />
+          </StatStrip>
+        </section>
+      ) : null}
 
       <section className="rf-admin-section" aria-labelledby="policy-config">
         <SectionHeading

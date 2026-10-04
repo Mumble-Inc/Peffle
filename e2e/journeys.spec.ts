@@ -16,7 +16,7 @@ test.describe("RazorFlow journeys", () => {
   test("landing tells the governed sale story", async ({ page }) => {
     const isMobile = test.info().project.use.isMobile;
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /Turn buyer intent into a governed sale/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /AI commerce without giving AI a blank cheque/i })).toBeVisible();
     await expect(page.getByRole("link", { name: "Open the desk" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Agent decision" })).toBeVisible();
     await expect(page.getByText("Recommended")).toBeVisible();
@@ -90,7 +90,7 @@ test.describe("RazorFlow journeys", () => {
 
   test("admin portal loads overview for the merchant", async ({ page }) => {
     await page.goto("/admin");
-    await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Control", exact: true })).toBeVisible({
       timeout: 15_000,
     });
     const sidebarNav = page.getByRole("navigation", { name: "Admin" });

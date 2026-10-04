@@ -54,9 +54,9 @@ export function AdminAppShell({ merchantName, children }: AdminAppShellProps) {
             <div className="rf-sidebar-brand flex min-w-0 flex-1 items-center gap-3 px-4">
               <Mark className="rf-sidebar-mark size-5 shrink-0 text-accent" />
               <div className="rf-sidebar-brand-text min-w-0">
-                <p className="truncate text-sm font-semibold tracking-tight">RazorFlow</p>
+                <p className="truncate text-sm font-semibold tracking-tight">Peffle</p>
                 <p className="truncate text-[11px] text-muted" translate="no">
-                  Merchant OS
+                  Execution control
                 </p>
               </div>
             </div>
@@ -162,7 +162,7 @@ export function AdminAppShell({ merchantName, children }: AdminAppShellProps) {
               >
                 <div className="rf-admin-nav-drawer-header">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold tracking-tight">RazorFlow Admin</p>
+                    <p className="text-sm font-semibold tracking-tight">Peffle Control</p>
                     <p className="truncate text-xs text-muted" translate="no">
                       {merchantName}
                     </p>

@@ -21,6 +21,8 @@ import {
 } from "@/components/desk/product-recommendation-browser";
 import { AgentProcessingView } from "@/components/desk/agent-processing-view";
 import { CompletedTransaction, PaymentNotCompleted } from "@/components/desk/completed-transaction";
+import { PeffleBlockedPanel } from "@/components/desk/peffle-blocked";
+import { AgentChatPanel } from "@/components/desk/agent-chat-panel";
 import { DeskStageRail } from "@/components/desk/desk-stage-rail";
 import { useAgentProcessingPresentation } from "@/components/desk/use-agent-processing";
 import type { Phase } from "@/components/desk/desk-types";
@@ -34,6 +36,7 @@ import { TransactionCart } from "@/components/desk/transaction-cart";
 import { useCart } from "@/hooks/use-cart";
 import { openRazorpayCheckout } from "@/lib/razorpay/checkout";
 import type { CapturedPaymentView } from "@/lib/desk/payment-display";
+import type { PeffleCheckoutBlock } from "@/lib/peffle/types";
 
 type AgentApiResponse = {
   sessionId: string;
@@ -70,7 +73,7 @@ const phaseCopy: Record<Phase, string> = {
   empty: "No catalog match",
   processing: "Collecting payment…",
   captured: "Payment captured",
-  failed: "Payment failed",
+  failed: "Blocked",
 };
 
 export function DeskApp() {
@@ -93,6 +96,7 @@ export function DeskApp() {
   const [pendingForceFail, setPendingForceFail] = useState(false);
   const [capturedPayment, setCapturedPayment] = useState<CapturedPaymentView | null>(null);
   const [failureOverlayOpen, setFailureOverlayOpen] = useState(false);
+  const [peffleBlock, setPeffleBlock] = useState<PeffleCheckoutBlock | null>(null);
 
   const { cart, loading: cartLoading, refresh: refreshCart, updateQuantity, removeLine } = useCart(sessionId);
 
@@ -224,6 +228,7 @@ export function DeskApp() {
     const payload = (await response.json()) as {
       error?: string;
       code?: string;
+      peffle?: PeffleCheckoutBlock;
       keyId?: string;
       orderId?: string;
       decisionId?: string;
@@ -238,7 +243,13 @@ export function DeskApp() {
         (err as Error & { code?: string }).code = "VERIFICATION_REQUIRED";
         throw err;
       }
-      throw new Error(payload.error ?? "Checkout could not start.");
+      const err = new Error(payload.error ?? "Checkout could not start.") as Error & {
+        code?: string;
+        peffle?: PeffleCheckoutBlock;
+      };
+      err.code = payload.code;
+      err.peffle = payload.peffle;
+      throw err;
     }
 
     if (!payload.keyId || !payload.orderId || !payload.razorpayOrderId || !payload.amountPaise) {
@@ -312,6 +323,7 @@ export function DeskApp() {
     if (!result || result.status !== "ready" || cart.itemCount === 0 || phase === "captured") return;
     setPhase("processing");
     setError(null);
+    setPeffleBlock(null);
 
     try {
       const checkout = await startCheckout();
@@ -343,7 +355,7 @@ export function DeskApp() {
         amount: checkout.amountPaise,
         currency: checkout.currency,
         name: merchantName,
-        description: cart.lines.map((line) => line.name).join(", ") || "RazorFlow purchase",
+        description: cart.lines.map((line) => line.name).join(", ") || "Peffle checkout",
         order_id: checkout.razorpayOrderId,
         theme: { color: "#0f766e" },
         handler: async (paymentResponse) => {
@@ -431,6 +443,15 @@ export function DeskApp() {
         (cause as Error & { code?: string }).code === "VERIFICATION_REQUIRED"
       ) {
         await promptForCheckoutAuth(forceFail);
+        return;
+      }
+      const peffle = (cause as Error & { peffle?: PeffleCheckoutBlock }).peffle;
+      if (peffle?.blocked) {
+        setPeffleBlock(peffle);
+        setPhase("failed");
+        setFailureOverlayOpen(true);
+        setError(cause instanceof Error ? cause.message : "Checkout blocked.");
+        setRecovery(null);
         return;
       }
       setPhase("failed");
@@ -709,7 +730,7 @@ export function DeskApp() {
                         : result?.status === "empty"
                           ? (result.explanations[0]?.reason ?? "No matching products in catalog.")
                           : result?.status === "ready"
-                            ? "Allowed. All guardrails satisfied."
+                            ? "Allowed. Merchant policy satisfied. Protected by Peffle at checkout."
                             : "Policy has not run yet."}
                     </span>
                   </p>
@@ -741,10 +762,21 @@ export function DeskApp() {
                 ) : null}
 
                 <div className="rf-desk-transact-actions mt-auto pt-4">
+                  <AgentChatPanel sessionId={sessionId} />
                   {phase === "captured" && capturedPayment ? (
                     <CompletedTransaction
                       payment={capturedPayment}
                       onStartNewSale={() => void startNewSale()}
+                    />
+                  ) : phase === "failed" && peffleBlock ? (
+                    <PeffleBlockedPanel
+                      block={peffleBlock}
+                      onDismiss={() => {
+                        setFailureOverlayOpen(false);
+                        setPhase("ready");
+                        setPeffleBlock(null);
+                        setError(null);
+                      }}
                     />
                   ) : phase === "failed" ? (
                     <PaymentNotCompleted
@@ -761,7 +793,7 @@ export function DeskApp() {
                     className="rf-btn rf-motion-colors flex min-h-11 w-full items-center justify-center rounded-[8px] bg-accent text-sm font-medium text-white hover:bg-accent-hover enabled:active:scale-[0.98] disabled:opacity-50"
                   >
                     {phase === "processing" ? (
-                      "Collecting payment…"
+                      "Guarding with Peffle…"
                     ) : result?.status === "ready" && cart.itemCount > 0 ? (
                       <>
                         Authorize <Money value={cart.subtotal} />
@@ -781,7 +813,8 @@ export function DeskApp() {
                   </button>
                   <p className="mt-3 flex items-center gap-2 text-xs text-muted">
                     <Lock className="size-3.5 shrink-0" aria-hidden="true" />
-                    Razorpay Test Mode checkout. Capture is confirmed only after server verification.
+                    Peffle authorizes checkout before Razorpay. Capture is confirmed only after server
+                    verification.
                   </p>
                     </>
                   )}
@@ -797,6 +830,7 @@ export function DeskApp() {
               checkoutTotal={cart.subtotal}
               result={result}
               error={error}
+              peffleBlock={peffleBlock}
               recovery={recovery}
               onRetry={() => authorize(false)}
               onReviewBasket={() => {
@@ -967,6 +1001,7 @@ function DecisionBody({
 function PaymentOverlay({
   checkoutTotal,
   error,
+  peffleBlock,
   recovery,
   onRetry,
   onReviewBasket,
@@ -976,11 +1011,57 @@ function PaymentOverlay({
   checkoutTotal: number;
   result: AgentResult;
   error: string | null;
+  peffleBlock: PeffleCheckoutBlock | null;
   recovery: RecoveryEvaluation | null;
   onRetry: () => void;
   onReviewBasket: () => void;
   onClose: () => void;
 }) {
+  if (peffleBlock) {
+    return (
+      <motion.div
+        className="rf-overlay"
+        role="presentation"
+        initial={false}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      >
+        <div className="rf-overlay-backdrop" aria-hidden />
+        <section
+          role="dialog"
+          aria-modal="true"
+          className="rf-dialog"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <h2 className="text-lg font-semibold tracking-tight" data-testid="peffle-blocked-dialog">
+            {peffleBlock.code === "PEFFLE_AGENT_KILLED" ? "Agent disabled" : "Peffle blocked this action"}
+          </h2>
+          <p className="mt-3 text-3xl font-semibold tracking-tight tabular">
+            <Money value={peffleBlock.amountPaise / 100} />
+          </p>
+          <p className="mt-3 text-sm text-ink-soft" role="status">
+            {peffleBlock.code === "PEFFLE_BUDGET_EXCEEDED" && peffleBlock.limitPaise != null ? (
+              <>
+                Execution stopped at the spend cap of <Money value={peffleBlock.limitPaise / 100} />.
+                Razorpay order was not created.
+              </>
+            ) : peffleBlock.code === "PEFFLE_AGENT_KILLED" ? (
+              <>Kill switch is on. Razorpay order was not created.</>
+            ) : (
+              <>Execution policy stopped this checkout. Razorpay order was not created.</>
+            )}
+          </p>
+          <div className="mt-5">
+            <Button type="button" variant="secondary" className="w-full" onClick={onClose}>
+              Close
+            </Button>
+          </div>
+        </section>
+      </motion.div>
+    );
+  }
+
   const failureMessage =
     error ?? "Razorpay declined the payment. Your basket is unchanged.";
 

@@ -39,6 +39,7 @@ export function parseActivityFilter(value: string | null): AdminActivityFilter {
     "payments",
     "agent",
     "system",
+    "peffle",
   ];
   if (value && allowed.includes(value as AdminActivityFilter)) {
     return value as AdminActivityFilter;

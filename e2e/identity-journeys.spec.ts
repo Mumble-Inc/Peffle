@@ -77,7 +77,7 @@ test.describe("Phase 11 account journeys", () => {
     });
     await page.getByRole("banner").getByRole("link", { name: "Admin" }).click();
     await page.waitForURL(/\/admin/, { timeout: 10_000 });
-    await expect(page.getByRole("heading", { name: "Overview", exact: true })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Control", exact: true })).toBeVisible({
       timeout: 15_000,
     });
   });

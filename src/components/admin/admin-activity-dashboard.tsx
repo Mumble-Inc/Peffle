@@ -21,6 +21,9 @@ const PAGE_SIZE = 50;
 
 function activityTone(type: string): "neutral" | "success" | "warning" | "danger" | "accent" {
   if (type.startsWith("PAYMENT_CAPTURED") || type === "POLICY_ALLOWED" || type === "RECOVERY_SUCCEEDED") return "success";
+  if (type.startsWith("AGENT_TOOL_ALLOWED") || type === "AGENT_TOOL_APPROVED") return "success";
+  if (type === "AGENT_TOOL_BLOCKED" || type === "AGENT_TOOL_DENIED") return "warning";
+  if (type === "AGENT_TOOL_APPROVAL_REQUIRED") return "accent";
   if (type.startsWith("PAYMENT_FAILED") || type === "POLICY_BLOCKED" || type === "RECOVERY_BLOCKED" || type === "RECOVERY_FAILED") return "danger";
   if (type.startsWith("RECOVERY_")) return "warning";
   if (type.startsWith("PRODUCT_") || type === "POLICY_UPDATED") return "accent";
@@ -69,7 +72,7 @@ export function AdminActivityDashboard() {
     <div className="rf-admin-page">
       <PageHeader
         title="Activity"
-        description="Merchant-scoped audit trail from buyer sessions and admin mutations. Secrets are never shown."
+        description="Commerce audit plus Peffle ledger outcomes. Approval tokens are never shown."
       />
 
       {error ? <AdminFeedback message={error} variant="error" /> : null}
@@ -86,6 +89,7 @@ export function AdminActivityDashboard() {
             { value: "orders", label: "Orders" },
             { value: "payments", label: "Payments" },
             { value: "agent", label: "Agent activity" },
+            { value: "peffle", label: "Peffle ledger" },
             { value: "system", label: "System activity" },
           ]}
         />
@@ -102,7 +106,7 @@ export function AdminActivityDashboard() {
         <>
           <EventStream>
             {page.items.map((item) => (
-              <EventRow
+        <EventRow
                 key={item.id}
                 time={formatTimeShort(item.when)}
                 title={item.label}

@@ -34,6 +34,11 @@ export const ACTIVITY_LABELS: Partial<Record<AuditEventType, string>> = {
   PRODUCT_INVENTORY_CHANGED: "Inventory updated",
   PRODUCT_PRICE_CHANGED: "Price updated",
   POLICY_UPDATED: "Policy updated",
+  AGENT_TOOL_ALLOWED: "Peffle allowed",
+  AGENT_TOOL_BLOCKED: "Peffle blocked",
+  AGENT_TOOL_APPROVAL_REQUIRED: "Peffle approval required",
+  AGENT_TOOL_APPROVED: "Peffle approved",
+  AGENT_TOOL_DENIED: "Peffle denied",
 };
 
 export type AdminActivityItem = {
@@ -54,7 +59,8 @@ export type AdminActivityFilter =
   | "orders"
   | "payments"
   | "agent"
-  | "system";
+  | "system"
+  | "peffle";
 
 const PRODUCT_TYPES: AuditEventType[] = [
   "PRODUCT_CREATED",
@@ -95,6 +101,11 @@ const AGENT_TYPES: AuditEventType[] = [
   "POLICY_EVALUATED",
   "POLICY_ALLOWED",
   "POLICY_BLOCKED",
+  "AGENT_TOOL_ALLOWED",
+  "AGENT_TOOL_BLOCKED",
+  "AGENT_TOOL_APPROVAL_REQUIRED",
+  "AGENT_TOOL_APPROVED",
+  "AGENT_TOOL_DENIED",
 ];
 
 const SYSTEM_TYPES: AuditEventType[] = ["SESSION_CREATED", "WEBHOOK_RECEIVED"];
@@ -117,6 +128,14 @@ export function activityFilterTypes(filter: AdminActivityFilter): AuditEventType
       return PAYMENT_TYPES;
     case "agent":
       return AGENT_TYPES;
+    case "peffle":
+      return [
+        "AGENT_TOOL_ALLOWED",
+        "AGENT_TOOL_BLOCKED",
+        "AGENT_TOOL_APPROVAL_REQUIRED",
+        "AGENT_TOOL_APPROVED",
+        "AGENT_TOOL_DENIED",
+      ];
     case "system":
       return SYSTEM_TYPES;
     default:

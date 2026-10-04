@@ -23,6 +23,7 @@ export function CompletedTransaction({ payment, onStartNewSale }: CompletedTrans
             <p className="text-sm font-medium text-accent" data-testid="payment-success">
               Payment captured
             </p>
+            <p className="mt-1 text-xs text-muted">Protected by Peffle</p>
             <p className="mt-2 text-base font-semibold text-ink" translate="no">
               {payment.productName}
             </p>

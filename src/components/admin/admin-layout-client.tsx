@@ -52,7 +52,7 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
   if (!ready) {
     return (
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4">
-        <p className="text-sm text-muted">Loading merchant control plane…</p>
+        <p className="text-sm text-muted">Loading Peffle control plane…</p>
       </div>
     );
   }

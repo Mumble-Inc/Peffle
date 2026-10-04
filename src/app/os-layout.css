@@ -1333,3 +1333,256 @@ body {
     animation: none !important;
   }
 }
+
+/* ——— Peffle control plane ——— */
+.rf-peffle-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 2.5rem;
+}
+
+.rf-peffle-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rf-muted);
+}
+
+.rf-peffle-hero {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .rf-peffle-hero {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+
+.rf-peffle-card {
+  border: 1px solid var(--rf-line);
+  border-radius: 12px;
+  background: var(--rf-surface);
+  padding: 1.1rem 1.25rem;
+}
+
+.rf-peffle-card-status[data-state="protected"] {
+  box-shadow: inset 3px 0 0 var(--rf-success);
+}
+
+.rf-peffle-card-status[data-state="disabled"] {
+  box-shadow: inset 3px 0 0 var(--rf-warning);
+}
+
+.rf-peffle-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--rf-warning);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--rf-warning) 18%, transparent);
+}
+
+.rf-peffle-dot[data-on="true"] {
+  background: var(--rf-success);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--rf-success) 18%, transparent);
+}
+
+.rf-peffle-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+@media (min-width: 520px) {
+  .rf-peffle-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rf-peffle-meta dt {
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rf-muted);
+}
+
+.rf-peffle-meta dd {
+  margin-top: 0.2rem;
+  font-size: 0.8125rem;
+  color: var(--rf-ink);
+}
+
+.rf-peffle-meter {
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--rf-line) 70%, transparent);
+}
+
+.rf-peffle-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--rf-accent);
+}
+
+.rf-peffle-cap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid color-mix(in oklab, var(--rf-line) 80%, transparent);
+}
+
+.rf-peffle-kill {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem 1.25rem;
+}
+
+.rf-peffle-kill[data-state="armed"] {
+  box-shadow: inset 3px 0 0 color-mix(in oklab, var(--rf-danger) 55%, var(--rf-line));
+}
+
+.rf-peffle-kill[data-state="tripped"] {
+  box-shadow: inset 3px 0 0 var(--rf-warning);
+  background: color-mix(in oklab, var(--rf-warning) 6%, var(--rf-surface));
+}
+
+.rf-peffle-activity {
+  border: 1px solid var(--rf-line);
+  border-radius: 12px;
+  background: var(--rf-canvas-2);
+  padding: 1.1rem 1.25rem 0.35rem;
+}
+
+.rf-peffle-activity-head {
+  margin-bottom: 0.65rem;
+}
+
+.rf-peffle-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.rf-peffle-table th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--rf-muted);
+  padding: 0.55rem 0.75rem 0.55rem 0;
+  border-bottom: 1px solid var(--rf-line);
+}
+
+.rf-peffle-table tbody tr[data-result="ALLOWED"] td:first-child {
+  box-shadow: inset 3px 0 0 var(--rf-success);
+}
+
+.rf-peffle-table tbody tr[data-result="BLOCKED"] {
+  background: color-mix(in oklab, var(--rf-warning) 7%, transparent);
+}
+
+.rf-peffle-table tbody tr[data-result="BLOCKED"] td:first-child {
+  box-shadow: inset 3px 0 0 var(--rf-warning);
+}
+
+.rf-peffle-table tbody tr[data-result="FAILED"] td:first-child {
+  box-shadow: inset 3px 0 0 var(--rf-danger);
+}
+
+.rf-peffle-table td {
+  padding: 0.72rem 0.75rem 0.72rem 0.65rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--rf-line) 70%, transparent);
+  vertical-align: middle;
+}
+
+.rf-peffle-result {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.4rem;
+  padding: 0 0.45rem;
+  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.rf-peffle-result[data-result="ALLOWED"] {
+  color: var(--rf-success);
+  background: color-mix(in oklab, var(--rf-success) 12%, transparent);
+}
+
+.rf-peffle-result[data-result="BLOCKED"] {
+  color: var(--rf-warning);
+  background: color-mix(in oklab, var(--rf-warning) 14%, transparent);
+}
+
+.rf-peffle-result[data-result="FAILED"] {
+  color: var(--rf-danger);
+  background: color-mix(in oklab, var(--rf-danger) 12%, transparent);
+}
+
+.rf-peffle-result[data-result="PENDING"],
+.rf-peffle-result[data-result="IN_PROGRESS"] {
+  color: var(--rf-ink-soft);
+  background: color-mix(in oklab, var(--rf-ink) 8%, transparent);
+}
+
+.rf-peffle-layers {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .rf-peffle-layers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.rf-peffle-layer {
+  border: 1px solid var(--rf-line);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  background: var(--rf-surface);
+}
+
+.rf-peffle-layer[data-layer="merchant"] {
+  border-left: 3px solid color-mix(in oklab, var(--rf-ink) 22%, var(--rf-line));
+}
+
+.rf-peffle-layer[data-layer="peffle"] {
+  border-left: 3px solid var(--rf-accent);
+}
+
+.rf-peffle-layer-status {
+  margin-top: 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.rf-peffle-layer p:last-child {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--rf-muted);
+}
+
+.rf-peffle-commerce {
+  margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rf-line);
+  opacity: 0.92;
+}
+
+.rf-desk-peffle-stop {
+  border-color: color-mix(in oklab, var(--rf-warning) 35%, var(--rf-line)) !important;
+  background: color-mix(in oklab, var(--rf-warning) 8%, var(--rf-surface)) !important;
+}
+
+.rf-desk-peffle-stop-title {
+  color: var(--rf-warning);
+}

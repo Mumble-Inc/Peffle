@@ -28,16 +28,17 @@ export function LandingPageContent({
       <section className="rf-vp-hero" aria-labelledby="hero-heading">
         <div className="rf-vp-hero-inner">
           <div className="rf-vp-hero-copy">
-            <p className="rf-vp-kicker">Merchant operating system</p>
+            <p className="rf-vp-kicker">Execution control for AI commerce</p>
             <p className="rf-vp-eyebrow" translate="no">
               {showcase.merchant.name}
             </p>
             <h1 id="hero-heading" className="rf-vp-headline">
-              Turn buyer intent into a governed sale.
+              AI commerce without giving AI a blank cheque.
             </h1>
             <p className="rf-vp-lede">
-              RazorFlow recommends from your catalog, enforces policy, collects on Razorpay, and
-              recovers failed payments without breaking the basket.
+              Peffle is the last gate before money moves. RazorFlow recommends from your catalog and
+              enforces merchant policy. Peffle then authorizes execution — spend caps, kill switch, and
+              an audit ledger — before Razorpay ever sees an order.
             </p>
             <div className="rf-vp-actions">
               <Link href="/desk" className="rf-btn rf-btn-primary rf-motion-colors inline-flex min-h-11 items-center rounded-[8px] px-5 text-sm font-medium text-white">
@@ -57,11 +58,11 @@ export function LandingPageContent({
       <section className="rf-land-section" aria-labelledby="workflow-heading">
         <div className="rf-land-section-inner">
           <h2 id="workflow-heading" className="rf-land-section-title">
-            The governed commerce lifecycle
+            Commerce, then execution control
           </h2>
           <p className="rf-land-section-lede">
-            Every sale moves through the same operational stages. Each transition is audited and
-            visible in the merchant control plane.
+            RazorFlow runs discovery and merchant policy. Peffle decides whether the agent may execute.
+            Razorpay only receives an order after both layers pass.
           </p>
           <LandingWorkflowRail />
         </div>
@@ -70,7 +71,7 @@ export function LandingPageContent({
       <section className="rf-land-section bg-canvas-2/40" aria-labelledby="guardrails-heading">
         <div className="rf-land-section-inner">
           <h2 id="guardrails-heading" className="rf-land-section-title">
-            Guardrails sit in front of payment
+            Two policy layers. One payment rail.
           </h2>
           <p className="rf-land-section-lede">{showcase.guardrailSummary}</p>
           <LandingGovernanceList items={showcase.policyCopy} />
@@ -115,10 +116,10 @@ export function LandingPageContent({
       <section className="rf-land-cta">
         <div className="rf-land-cta-inner">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">Run a governed sale on the desk</h2>
+            <h2 className="text-lg font-semibold tracking-tight">See Peffle stop a blank cheque</h2>
             <p className="mt-1.5 max-w-[42ch] text-sm text-muted">
-              Start with buyer intent. The agent handles recommendation, policy, Razorpay checkout,
-              and recovery.
+              Run the desk. Merchant policy still prices the offer. Peffle decides whether checkout
+              may execute before Razorpay.
             </p>
           </div>
           <Link href="/desk" className="rf-btn rf-btn-primary inline-flex min-h-11 shrink-0 items-center rounded-[8px] px-5 text-sm font-medium text-white">

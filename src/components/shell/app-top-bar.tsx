@@ -48,7 +48,7 @@ export function AppTopBar({
               <Link href="/" className="flex shrink-0 items-center gap-2 text-ink">
                 <Mark className="size-5 text-accent" />
                 <span className="text-sm font-semibold tracking-tight" translate="no">
-                  RazorFlow
+                  Peffle
                 </span>
               </Link>
 
@@ -59,7 +59,7 @@ export function AppTopBar({
                   </span>
                   <div className="min-w-0 rf-topbar-context">
                     <p className="truncate text-sm font-medium tracking-tight">
-                      {variant === "desk" ? "Commerce desk" : (pageTitle ?? "Admin")}
+                      {variant === "desk" ? "Commerce desk" : (pageTitle ?? "Control")}
                     </p>
                     {merchantName ? (
                       <p className="truncate text-xs text-muted" translate="no">

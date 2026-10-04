@@ -7,6 +7,7 @@ import {
   ListBullets,
   Package,
   ShieldCheck,
+  ShieldWarning,
   Stack,
   Storefront,
   ArrowsClockwise,
@@ -36,9 +37,12 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [{ href: "/desk", label: "Desk", icon: Storefront, exact: true }],
   },
   {
+    label: "Peffle",
+    items: [{ href: "/admin", label: "Control", icon: ShieldWarning, exact: true }],
+  },
+  {
     label: "Commerce",
     items: [
-      { href: "/admin", label: "Overview", icon: Gauge, exact: true },
       { href: "/admin/orders", label: "Orders", icon: ClipboardText },
       { href: "/admin/payments", label: "Payments", icon: CreditCard },
       { href: "/admin/recovery", label: "Recovery", icon: ArrowsClockwise },
@@ -61,7 +65,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
 ];
 
 export const MOBILE_NAV: NavItem[] = [
-  { href: "/admin", label: "Overview", icon: Gauge, exact: true },
+  { href: "/admin", label: "Control", icon: ShieldWarning, exact: true },
   { href: "/admin/orders", label: "Orders", icon: ClipboardText },
   { href: "/desk", label: "Desk", icon: Storefront, exact: true },
   { href: "/admin/products", label: "Products", icon: Package },
@@ -69,7 +73,7 @@ export const MOBILE_NAV: NavItem[] = [
 ];
 
 export function titleForPath(pathname: string): string {
-  if (pathname === "/admin") return "Overview";
+  if (pathname === "/admin") return "Control";
   if (pathname.startsWith("/admin/orders")) return "Orders";
   if (pathname.startsWith("/admin/payments")) return "Payments";
   if (pathname.startsWith("/admin/recovery")) return "Recovery";

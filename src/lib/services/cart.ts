@@ -52,13 +52,29 @@ function mapLine(line: CartLine & { product: DbProduct }): CartLineView {
 }
 
 export async function getCartForSession(sessionId: string): Promise<CartView> {
-  const lines = await db.cartLine.findMany({
-    where: { sessionId },
-    include: { product: true },
-    orderBy: { createdAt: "asc" },
-  });
+  const [lines, discounts] = await Promise.all([
+    db.cartLine.findMany({
+      where: { sessionId },
+      include: { product: true },
+      orderBy: { createdAt: "asc" },
+    }),
+    db.sessionDiscount.findMany({ where: { sessionId } }),
+  ]);
+  const discountByProduct = new Map(discounts.map((row) => [row.productId, row.amountPaise]));
 
-  const mapped = lines.map(mapLine);
+  const mapped = lines.map((line) => {
+    const view = mapLine(line);
+    const discountPaise = discountByProduct.get(line.productId) ?? 0;
+    const unitPricePaise = Math.max(0, view.unitPricePaise - discountPaise);
+    const lineTotalPaise = unitPricePaise * view.quantity;
+    return {
+      ...view,
+      unitPricePaise,
+      unitPrice: unitPricePaise / 100,
+      lineTotalPaise,
+      lineTotal: lineTotalPaise / 100,
+    };
+  });
   const subtotalPaise = mapped.reduce((sum, line) => sum + line.lineTotalPaise, 0);
 
   return {
@@ -242,7 +258,7 @@ export function validateCartAgainstPolicies(
         detail: `${line.name} has ${product.inventory} in stock, ${line.quantity} requested`,
       });
     }
-    subtotal += product.price * line.quantity;
+    subtotal += line.unitPrice * line.quantity;
     cost += product.cost * line.quantity;
   }
 
