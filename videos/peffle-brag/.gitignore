@@ -7,6 +7,10 @@
 renders/*_20*.mp4
 renders/*_20*.meta.json
 
+# Duplicate plates already stored in assets/
+capture/assets/
+capture/screenshots/
+
 # Local secrets if anyone drops a key here
 .env
 .env.local
