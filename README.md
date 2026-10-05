@@ -147,6 +147,32 @@ A shorter copy of this script lives in [`DEMO.md`](./DEMO.md).
 
 ---
 
+## Product film
+
+42-second brag film for judges: Peffle as the **execution-control layer** between an AI agent and tools with side effects. It is not a payment-gateway, fraud, or SOC story.
+
+| Beat | What it shows |
+| --- | --- |
+| 0–5s | Agents can call real tools. Peffle decides what they may execute. |
+| 5–12s | Buyer intent under ₹7,500 → Halo ANC in policy → cart |
+| 12–20s | 20% discount request → authority / budget exceeded → **BLOCKED** |
+| 20–28s | Spend limit, approval, kill switch, audit. Red-team demo: 50 executed / 150 blocked |
+| 28–36s | Kill switch. Agent killed. Audit trail of blocked calls |
+| 36–42s | The agent makes the decision. Peffle controls the execution. |
+
+Rendered MP4: [`videos/peffle-brag/renders/peffle-brag.mp4`](./videos/peffle-brag/renders/peffle-brag.mp4)
+
+Source is a HyperFrames project (Outfit + IBM Plex Mono, captured `/desk`, ElevenLabs VO + SFX):
+
+```bash
+cd videos/peffle-brag
+npm run dev      # Studio preview
+npm run check    # lint + runtime + layout + contrast
+npm run render   # encode MP4
+```
+
+---
+
 ## Stack
 
 - **Framework:** Next.js 16 (App Router), React 19, TypeScript
@@ -497,6 +523,7 @@ Payment E2E reaches the Razorpay Checkout boundary when Test Mode keys are prese
 | File | Contents |
 | --- | --- |
 | `DEMO.md` | Short 60-second Peffle demo |
+| `videos/peffle-brag/renders/peffle-brag.mp4` | 42s execution-control product film |
 | `architecture.md` | Pipeline, intent layers, cart, Peffle checkout guard, payments, recovery |
 | `DESIGN.md` | Visual identity and UI tokens |
 | `decisions.md` | Architectural decision notes |

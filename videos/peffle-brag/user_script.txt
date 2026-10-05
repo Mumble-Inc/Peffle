@@ -1,0 +1,35 @@
+AI agents can act.
+But who controls what they’re allowed to do?
+
+Find me the best headphones under ₹7,500.
+INTENT → DISCOVERY → ACTION
+
+Apply 20% discount.
+PEFFLE GUARD
+DISCOUNT REQUEST
+AUTHORITY: EXCEEDED
+BUDGET: EXCEEDED
+BLOCKED
+AGENT REQUEST → PEFFLE → BLOCK
+
+SPEND LIMIT
+APPROVAL
+KILL SWITCH
+AUDIT TRAIL
+17 → 48 → 103 → 200
+50 EXECUTED
+150 BLOCKED
+Controlled red-team demonstration.
+
+PEFFLE GUARD
+AGENT STATUS
+KILLED
+BLOCKED
+BLOCKED
+BLOCKED
+
+The agent makes the decision.
+Peffle controls the execution.
+PEFFLE
+Execution control for AI agents.
+AI can act. Authority should be enforced.

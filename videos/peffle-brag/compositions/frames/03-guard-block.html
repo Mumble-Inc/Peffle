@@ -1,0 +1,368 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Outfit";
+      src: url("assets/fonts/Outfit-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      src: url("assets/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      src: url("assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #eceae4;
+    }
+
+    [id="f03-guard-block-bg"] {
+      position: absolute;
+      inset: 0;
+    }
+
+    [id="f03-guard-block-bg"] img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 0;
+    }
+
+    [id="f03-guard-block-dim"] {
+      position: absolute;
+      inset: 0;
+      background: #0c1116;
+      opacity: 0.32;
+    }
+
+    [id="f03-guard-block-composer"] {
+      position: absolute;
+      left: 1548px;
+      top: 512px;
+      width: 348px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      background: #10161c;
+      border: 1px solid rgba(236, 234, 228, 0.16);
+      border-radius: 8px;
+    }
+
+    [id="f03-guard-block-type"] {
+      margin: 0;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 400;
+      font-size: 13px;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
+      color: #eceae4;
+      white-space: nowrap;
+    }
+
+    [id="f03-guard-block-type"] [data-ch] {
+      display: inline;
+    }
+
+    [id="f03-guard-block-caret"] {
+      display: inline-block;
+      width: 2px;
+      height: 1.7cqw;
+      margin-left: 0.2cqw;
+      background: #2a9d96;
+      vertical-align: -0.18em;
+    }
+
+    [id="f03-guard-block-card"] {
+      position: absolute;
+      left: 30cqw;
+      top: 12cqh;
+      width: 40cqw;
+      padding: 2.4cqw 2.6cqw 2.2cqw;
+      background: #0c1116;
+      border: 1px solid #2a9d96;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(236, 234, 228, 0.08), 0 4px 16px rgba(236, 234, 228, 0.04);
+    }
+
+    [id="f03-guard-block-kicker"] {
+      margin: 0 0 1.2cqw;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 500;
+      font-size: 1.46cqw;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #eceae4;
+    }
+
+    [id="f03-guard-block-spike"] {
+      color: #2a9d96;
+      margin-right: 0.55cqw;
+    }
+
+    [id="f03-guard-block-request"] {
+      margin: 0 0 1.5cqw;
+      font-family: "Outfit", sans-serif;
+      font-weight: 400;
+      font-size: 2.3cqw;
+      line-height: 1.25;
+      letter-spacing: -0.005em;
+      color: #eceae4;
+    }
+
+    [id="f03-guard-block-rule"] {
+      height: 1px;
+      margin: 0 0 1.6cqw;
+      background: rgba(236, 234, 228, 0.12);
+    }
+
+    [id="f03-guard-block-rows"] {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85cqw;
+    }
+
+    [id="f03-guard-block-authority"],
+    [id="f03-guard-block-budget"] {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 500;
+      font-size: 1.35cqw;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    [id="f03-guard-block-authority"] span:first-child,
+    [id="f03-guard-block-budget"] span:first-child {
+      color: rgba(236, 234, 228, 0.62);
+    }
+
+    [id="f03-guard-block-authority"] span:last-child,
+    [id="f03-guard-block-budget"] span:last-child {
+      color: #e0564f;
+    }
+
+    [id="f03-guard-block-stamp"] {
+      margin: 2cqw 0 0;
+      font-family: "Outfit", sans-serif;
+      font-weight: 400;
+      font-size: 7.3cqw;
+      line-height: 0.95;
+      letter-spacing: -0.022em;
+      color: #e0564f;
+    }
+
+    [id="f03-guard-block-pipe"] {
+      position: absolute;
+      left: 420px;
+      top: 820px;
+      width: 1080px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8cqw;
+      padding: 14px 22px;
+      background: #10161c;
+      border: 1px solid rgba(236, 234, 228, 0.14);
+      border-radius: 8px;
+    }
+
+    [id="f03-guard-block-pipe"] [data-node] {
+      flex: 1;
+      text-align: center;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 500;
+      font-size: 1.35cqw;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #eceae4;
+    }
+
+    [id="f03-guard-block-pipe"] [data-node="block"] {
+      color: #e0564f;
+    }
+
+    [id="f03-guard-block-pipe"] [data-arrow] {
+      flex: 0 0 auto;
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 400;
+      font-size: 1.46cqw;
+      color: #2a9d96;
+    }
+  </style>
+
+  <div data-hf-id="hf-q2h6" id="root" data-composition-id="03-guard-block" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-dbwn" class="clip" id="f03-guard-block-bg" data-start="0" data-duration="8" data-track-index="0">
+      <img data-hf-id="hf-4cb6" src="assets/full-page.png" alt="">
+    </div>
+
+    <div data-hf-id="hf-ait7" class="clip" id="f03-guard-block-dim" data-start="0" data-duration="8" data-track-index="1"></div>
+
+    <div data-hf-id="hf-7ghm" class="clip" id="f03-guard-block-composer" data-start="0" data-duration="8" data-track-index="2">
+      <p data-hf-id="hf-yvry" id="f03-guard-block-type">
+        <span data-hf-id="hf-1gew" data-ch="">A</span><span data-hf-id="hf-hzej" data-ch="">p</span><span data-hf-id="hf-f8e3" data-ch="">p</span><span data-hf-id="hf-pxj3" data-ch="">l</span><span data-hf-id="hf-lk5s" data-ch="">y</span><span data-hf-id="hf-17gp" data-ch=""> </span><span data-hf-id="hf-6me9" data-ch="">2</span><span data-hf-id="hf-7f0b" data-ch="">0</span><span data-hf-id="hf-gmys" data-ch="">%</span><span data-hf-id="hf-8u7x" data-ch=""> </span><span data-hf-id="hf-mr2v" data-ch="">d</span><span data-hf-id="hf-rx28" data-ch="">i</span><span data-hf-id="hf-hl3i" data-ch="">s</span><span data-hf-id="hf-nxzy" data-ch="">c</span><span data-hf-id="hf-pj82" data-ch="">o</span><span data-hf-id="hf-gshg" data-ch="">u</span><span data-hf-id="hf-p4x1" data-ch="">n</span><span data-hf-id="hf-ge6f" data-ch="">t</span><span data-hf-id="hf-isn5" id="f03-guard-block-caret"></span>
+      </p>
+    </div>
+
+    <div data-hf-id="hf-bm9u" class="clip" id="f03-guard-block-card" data-start="2.2" data-duration="5.8" data-track-index="3">
+      <p data-hf-id="hf-2wig" id="f03-guard-block-kicker">
+        <span data-hf-id="hf-gf51" id="f03-guard-block-spike">✱</span>PEFFLE GUARD
+      </p>
+      <p data-hf-id="hf-b7on" id="f03-guard-block-request">DISCOUNT REQUEST</p>
+      <div data-hf-id="hf-agex" id="f03-guard-block-rule"></div>
+      <div data-hf-id="hf-z0b4" id="f03-guard-block-rows">
+        <div data-hf-id="hf-cl6i" id="f03-guard-block-authority">
+          <span data-hf-id="hf-em8q">AUTHORITY</span>
+          <span data-hf-id="hf-q71s">EXCEEDED</span>
+        </div>
+        <div data-hf-id="hf-rk9k" id="f03-guard-block-budget">
+          <span data-hf-id="hf-7il8">BUDGET</span>
+          <span data-hf-id="hf-y8so">EXCEEDED</span>
+        </div>
+      </div>
+      <p data-hf-id="hf-pq1x" id="f03-guard-block-stamp">BLOCKED</p>
+    </div>
+
+    <div data-hf-id="hf-13a5" class="clip" id="f03-guard-block-pipe" data-start="5.4" data-duration="2.6" data-track-index="4">
+      <span data-hf-id="hf-iuyn" data-node="request">AGENT REQUEST</span>
+      <span data-hf-id="hf-exkv" data-arrow="">→</span>
+      <span data-hf-id="hf-q3bi" data-node="peffle">PEFFLE</span>
+      <span data-hf-id="hf-lym7" data-arrow="">→</span>
+      <span data-hf-id="hf-q6pm" data-node="block">BLOCK</span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      var el = function (id) {
+        return document.getElementById(id);
+      };
+      var chars = el("f03-guard-block-type").querySelectorAll("[data-ch]");
+      var pipe = el("f03-guard-block-pipe");
+      var pipeNodes = pipe.querySelectorAll("[data-node]");
+      var pipeArrows = pipe.querySelectorAll("[data-arrow]");
+
+      tl.fromTo(
+        el("f03-guard-block-composer"),
+        { opacity: 0 },
+        { opacity: 1, duration: 0.28, ease: "power2.out" },
+        0
+      );
+
+      tl.fromTo(
+        chars,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.05, stagger: 0.072, ease: "none" },
+        0.12
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-caret"),
+        { opacity: 0 },
+        { opacity: 1, duration: 0.12, ease: "none" },
+        0.12
+      );
+
+      tl.to(el("f03-guard-block-composer"), { autoAlpha: 0, duration: 0.2, ease: "power2.out" }, 2.05);
+      tl.fromTo(
+        el("f03-guard-block-dim"),
+        { opacity: 0.32 },
+        { opacity: 0.55, duration: 0.35, ease: "power2.out" },
+        2.2
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-card"),
+        { opacity: 0, x: 140, scale: 0.94 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.52, ease: "power3.out" },
+        2.2
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-kicker"),
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" },
+        2.48
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-request"),
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" },
+        2.72
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-rule"),
+        { opacity: 0 },
+        { opacity: 1, duration: 0.2, ease: "none" },
+        2.96
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-authority"),
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        3.18
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-budget"),
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        3.52
+      );
+
+      tl.fromTo(
+        el("f03-guard-block-stamp"),
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.42, ease: "power2.out" },
+        4.12
+      );
+
+      tl.fromTo(
+        pipe,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+        5.4
+      );
+
+      tl.fromTo(
+        pipeNodes,
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.28, stagger: 0.16, ease: "power2.out" },
+        5.52
+      );
+
+      tl.fromTo(
+        pipeArrows,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.2, stagger: 0.16, ease: "none" },
+        5.64
+      );
+
+      window.__timelines["03-guard-block"] = tl;
+    })();
+  </script>
+</template>

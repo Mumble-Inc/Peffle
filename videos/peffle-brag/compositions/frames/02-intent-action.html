@@ -1,0 +1,375 @@
+<template>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: "Outfit";
+      src: url("assets/fonts/Outfit-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      src: url("assets/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      src: url("assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #eceae4;
+      background: #0c1116;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    #f02-desk {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 0;
+    }
+
+    #f02-dim {
+      position: absolute;
+      inset: 0;
+      background: #0c1116;
+      opacity: 0.55;
+    }
+
+    #f02-highlight {
+      position: absolute;
+      left: 204px;
+      top: 274px;
+      width: 324px;
+      height: 378px;
+      border: 1px solid #2a9d96;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    #f02-prompt {
+      position: absolute;
+      left: 204px;
+      top: 72px;
+      width: 1180px;
+      padding: 22px 28px 24px;
+      border-radius: 12px;
+      background: #10161c;
+      border: 1px solid rgba(236, 234, 228, 0.16);
+    }
+
+    #f02-prompt-k {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #2a9d96;
+    }
+
+    #f02-typed-row {
+      display: flex;
+      align-items: flex-start;
+      margin-top: 12px;
+      min-height: 44px;
+    }
+
+    #f02-typed {
+      font-family: Outfit, sans-serif;
+      font-size: 32px;
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.018em;
+      color: #eceae4;
+      white-space: pre-wrap;
+    }
+
+    #f02-caret {
+      display: inline-block;
+      width: 2px;
+      height: 30px;
+      margin: 6px 0 0 4px;
+      background: #2a9d96;
+      flex: 0 0 auto;
+    }
+
+    #f02-evidence {
+      position: absolute;
+      left: 232px;
+      top: 236px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: #10161c;
+      border: 1px solid rgba(61, 186, 120, 0.45);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #3dba78;
+    }
+
+    #f02-find {
+      position: absolute;
+      left: 204px;
+      top: 72px;
+      width: 720px;
+      padding: 22px 28px 24px;
+      border-radius: 12px;
+      background: #10161c;
+      border: 1px solid rgba(236, 234, 228, 0.16);
+    }
+
+    #f02-find-k {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #2a9d96;
+    }
+
+    #f02-find-name {
+      margin-top: 10px;
+      font-family: Outfit, sans-serif;
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: -0.018em;
+      line-height: 1.15;
+    }
+
+    #f02-find-price {
+      margin-top: 8px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 22px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      color: #eceae4;
+    }
+
+    #f02-find-why {
+      margin-top: 10px;
+      font-family: Outfit, sans-serif;
+      font-size: 16px;
+      line-height: 1.35;
+      color: rgba(236, 234, 228, 0.72);
+    }
+
+    #f02-cart {
+      position: absolute;
+      left: 1548px;
+      top: 668px;
+      width: 348px;
+      padding: 14px 16px 16px;
+      border-radius: 12px;
+      background: #10161c;
+      border: 1px solid rgba(42, 157, 150, 0.45);
+    }
+
+    #f02-cart-k {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #2a9d96;
+    }
+
+    #f02-cart-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    #f02-cart-name {
+      font-family: Outfit, sans-serif;
+      font-size: 16px;
+    }
+
+    #f02-cart-amt {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 16px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #f02-pipe {
+      position: absolute;
+      left: 64px;
+      bottom: 36px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      background: #10161c;
+      border: 1px solid rgba(236, 234, 228, 0.16);
+    }
+
+    .f02-step {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #c8c6c0;
+    }
+
+    .f02-step.is-on {
+      color: #7ad4ce;
+    }
+
+    .f02-dash {
+      width: 28px;
+      height: 1px;
+      background: rgba(236, 234, 228, 0.22);
+    }
+  </style>
+
+  <div id="root" data-composition-id="02-intent-action" data-width="1920" data-height="1080">
+    <div id="f02-world" class="clip" data-start="0" data-duration="7" data-track-index="0">
+      <img id="f02-desk" src="assets/scroll-000.png" alt="" />
+      <div id="f02-dim"></div>
+      <div id="f02-highlight"></div>
+    </div>
+    <div id="f02-editorial" class="clip" data-start="0" data-duration="7" data-track-index="1">
+      <div id="f02-prompt">
+        <div id="f02-prompt-k">Buyer intent</div>
+        <div id="f02-typed-row">
+          <span id="f02-typed"></span><span id="f02-caret"></span>
+        </div>
+      </div>
+      <div id="f02-evidence">search_products  allowed</div>
+      <div id="f02-find">
+        <div id="f02-find-k">Discovery</div>
+        <div id="f02-find-name">Northline Halo ANC</div>
+        <div id="f02-find-price">₹7,490</div>
+        <div id="f02-find-why">Best match under the ₹7,500 ceiling. In policy.</div>
+      </div>
+      <div id="f02-cart">
+        <div id="f02-cart-k">Cart</div>
+        <div id="f02-cart-row">
+          <span id="f02-cart-name">Northline Halo ANC</span>
+          <span id="f02-cart-amt">₹7,490</span>
+        </div>
+      </div>
+      <div id="f02-pipe">
+        <div class="f02-step" id="f02-intent">Intent</div>
+        <div class="f02-dash"></div>
+        <div class="f02-step" id="f02-discovery">Discovery</div>
+        <div class="f02-dash"></div>
+        <div class="f02-step" id="f02-action">Action</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var QUERY = "Find me the best headphones under ₹7,500.";
+      var typedEl = document.getElementById("f02-typed");
+      var caretEl = document.getElementById("f02-caret");
+      var dim = document.getElementById("f02-dim");
+      var highlight = document.getElementById("f02-highlight");
+      var prompt = document.getElementById("f02-prompt");
+      var evidence = document.getElementById("f02-evidence");
+      var find = document.getElementById("f02-find");
+      var cart = document.getElementById("f02-cart");
+      var intentEl = document.getElementById("f02-intent");
+      var discoveryEl = document.getElementById("f02-discovery");
+      var actionEl = document.getElementById("f02-action");
+
+      gsap.set([highlight, evidence, find, cart], { opacity: 0 });
+      gsap.set([discoveryEl, actionEl], { color: "#C8C6C0", opacity: 1 });
+      gsap.set(intentEl, { color: "#7AD4CE", opacity: 1 });
+      gsap.set(dim, { opacity: 0.55 });
+      gsap.set(prompt, { opacity: 1, y: 0 });
+
+      var tl = gsap.timeline({ paused: true });
+
+      var typeState = { n: 0 };
+      tl.fromTo(
+        typeState,
+        { n: 0 },
+        {
+          n: QUERY.length,
+          duration: 2.05,
+          ease: "none",
+          onUpdate: function () {
+            typedEl.textContent = QUERY.slice(0, Math.floor(typeState.n));
+          },
+        },
+        0.12
+      );
+
+      var blink = { p: 0 };
+      tl.fromTo(
+        blink,
+        { p: 0 },
+        {
+          p: Math.PI * 2 * 10,
+          duration: 7,
+          ease: "none",
+          onUpdate: function () {
+            var typing = typeState.n < QUERY.length;
+            caretEl.style.opacity = typing ? "1" : Math.sin(blink.p) > 0 ? "1" : "0";
+          },
+        },
+        0
+      );
+
+      tl.to(dim, { opacity: 0.22, duration: 0.4, ease: "power3.out" }, 2.12);
+      tl.to(prompt, { opacity: 0, y: -10, duration: 0.22, ease: "power3.in" }, 2.12);
+      tl.fromTo(
+        find,
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        2.28
+      );
+      tl.fromTo(
+        evidence,
+        { opacity: 0, y: 6 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" },
+        2.34
+      );
+      tl.fromTo(
+        highlight,
+        { opacity: 0, scale: 0.985 },
+        { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" },
+        2.3
+      );
+      tl.to(intentEl, { color: "#C8C6C0", duration: 0.2, ease: "none" }, 2.32);
+      tl.to(discoveryEl, { color: "#7AD4CE", duration: 0.2, ease: "none" }, 2.32);
+
+      tl.fromTo(
+        cart,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+        4.55
+      );
+      tl.to(discoveryEl, { color: "#C8C6C0", duration: 0.2, ease: "none" }, 4.58);
+      tl.to(actionEl, { color: "#7AD4CE", duration: 0.2, ease: "none" }, 4.58);
+
+      window.__timelines["02-intent-action"] = tl;
+    })();
+  </script>
+</template>

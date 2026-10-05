@@ -1,6 +1,6 @@
 # 60-second Peffle demo
 
-Traffic below is a live local path. Enforcement is process-scoped SQLite, not a hosted control plane. Full setup, env vars, and talking points: [README.md](./README.md#demo).
+Traffic below is a live local path. Enforcement is process-scoped SQLite, not a hosted control plane. Full setup, env vars, and talking points: [README.md](./README.md#demo). The 42s execution-control film is [`videos/peffle-brag/renders/peffle-brag.mp4`](./videos/peffle-brag/renders/peffle-brag.mp4).
 
 ## Prepare
 

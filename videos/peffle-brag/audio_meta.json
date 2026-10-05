@@ -1,0 +1,35 @@
+{
+  "tts_provider": "macos-reed",
+  "voice_id": "Reed (English (UK))",
+  "bgm": null,
+  "bgm_pending": false,
+  "voices": [
+    { "frame": 1, "id": "01", "path": "assets/voice/01.wav", "duration_s": 5 },
+    { "frame": 2, "id": "02", "path": "assets/voice/02.wav", "duration_s": 7 },
+    { "frame": 3, "id": "03", "path": "assets/voice/03.wav", "duration_s": 8 },
+    { "frame": 4, "id": "04", "path": "assets/voice/04.wav", "duration_s": 8 },
+    { "frame": 5, "id": "05", "path": "assets/voice/05.wav", "duration_s": 8 },
+    { "frame": 6, "id": "06", "path": "assets/voice/06.wav", "duration_s": 6 }
+  ],
+  "sfx": [
+    { "frame": 1, "file": "assets/sfx/whoosh-short.mp3", "offset_s": 4.4, "duration_s": 0.57, "volume": 0.34 },
+    { "frame": 2, "file": "assets/sfx/typing.mp3", "offset_s": 0.12, "duration_s": 1.5, "volume": 0.24 },
+    { "frame": 2, "file": "assets/sfx/pop.mp3", "offset_s": 2.28, "duration_s": 0.72, "volume": 0.3 },
+    { "frame": 2, "file": "assets/sfx/click.mp3", "offset_s": 4.55, "duration_s": 0.37, "volume": 0.32 },
+    { "frame": 3, "file": "assets/sfx/typing.mp3", "offset_s": 0.08, "duration_s": 1.5, "volume": 0.22 },
+    { "frame": 3, "file": "assets/sfx/error.mp3", "offset_s": 2.15, "duration_s": 0.7, "volume": 0.36 },
+    { "frame": 3, "file": "assets/sfx/impact-bass-1.mp3", "offset_s": 2.18, "duration_s": 0.9, "volume": 0.3 },
+    { "frame": 4, "file": "assets/sfx/click.mp3", "offset_s": 0.15, "duration_s": 0.37, "volume": 0.3 },
+    { "frame": 4, "file": "assets/sfx/click.mp3", "offset_s": 0.55, "duration_s": 0.37, "volume": 0.3 },
+    { "frame": 4, "file": "assets/sfx/click.mp3", "offset_s": 0.95, "duration_s": 0.37, "volume": 0.3 },
+    { "frame": 4, "file": "assets/sfx/click.mp3", "offset_s": 1.35, "duration_s": 0.37, "volume": 0.3 },
+    { "frame": 4, "file": "assets/sfx/impact-bass-1.mp3", "offset_s": 5.4, "duration_s": 0.9, "volume": 0.32 },
+    { "frame": 5, "file": "assets/sfx/impact-bass-2.mp3", "offset_s": 0.06, "duration_s": 1.1, "volume": 0.34 },
+    { "frame": 5, "file": "assets/sfx/click.mp3", "offset_s": 2.45, "duration_s": 0.37, "volume": 0.3 },
+    { "frame": 5, "file": "assets/sfx/click.mp3", "offset_s": 3.15, "duration_s": 0.37, "volume": 0.3 },
+    { "frame": 5, "file": "assets/sfx/error.mp3", "offset_s": 3.85, "duration_s": 0.55, "volume": 0.28 },
+    { "frame": 6, "file": "assets/sfx/whoosh-short.mp3", "offset_s": 0.05, "duration_s": 0.57, "volume": 0.28 },
+    { "frame": 6, "file": "assets/sfx/impact-bass-1.mp3", "offset_s": 3.8, "duration_s": 0.9, "volume": 0.32 }
+  ],
+  "total_duration_s": 42
+}

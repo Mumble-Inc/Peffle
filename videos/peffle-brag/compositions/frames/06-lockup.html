@@ -1,0 +1,324 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Outfit";
+      src: url("assets/fonts/Outfit-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      src: url("assets/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "IBM Plex Mono";
+      src: url("assets/fonts/IBMPlexMono-Medium.ttf") format("truetype");
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      font-family: Outfit, sans-serif;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    [data-lockup-bg] {
+      background: #0c1116;
+    }
+
+    [data-lockup-desk] {
+      inset: 0;
+    }
+
+    [data-lockup-desk] img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 18%;
+      transform-origin: 50% 50%;
+    }
+
+    [data-lockup-stage] {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 83%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4.2cqw;
+      box-sizing: border-box;
+    }
+
+    [data-lockup-cluster] {
+      position: absolute;
+      left: 4.2cqw;
+      right: 4.2cqw;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: 50% 50%;
+    }
+
+    #f06-lockup-thesis-b,
+    #f06-lockup-hold {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    [data-lockup-line] {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: baseline;
+      gap: 0.22em 0.38em;
+      max-width: 72cqw;
+      margin: 0;
+      color: #eceae4;
+      font-family: Outfit, sans-serif;
+      font-size: 4.6cqw;
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.12;
+      letter-spacing: -0.018em;
+      text-align: center;
+      transform-origin: 50% 50%;
+    }
+
+    [data-lockup-line] span {
+      display: inline-block;
+    }
+
+    [data-lockup-volt] {
+      color: #2a9d96;
+      font-style: italic;
+    }
+
+    [data-lockup-mark] {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4cqw;
+      transform-origin: 50% 50%;
+    }
+
+    [data-lockup-word] {
+      display: flex;
+      justify-content: center;
+      gap: 0.02em;
+      color: #eceae4;
+      font-family: Outfit, sans-serif;
+      font-size: 8.6cqw;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 0.98;
+      letter-spacing: 0.16em;
+      transform-origin: 50% 50%;
+    }
+
+    [data-lockup-word] span {
+      display: inline-block;
+      transform-origin: 50% 50%;
+    }
+
+    [data-lockup-rule] {
+      width: 18cqw;
+      height: 1px;
+      background: rgba(236, 234, 228, 0.12);
+      transform-origin: 50% 50%;
+    }
+
+    [data-lockup-sub] {
+      color: #eceae4;
+      margin: 0;
+      color: #eceae4;
+      font-family: Outfit, sans-serif;
+      font-size: 2.08cqw;
+      font-weight: 400;
+      font-style: normal;
+      line-height: 1.5;
+      letter-spacing: -0.005em;
+      text-align: center;
+    }
+
+    [data-lockup-foot] {
+      margin: 0.4cqw 0 0;
+      color: #eceae4;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 1.46cqw;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+  </style>
+
+  <div data-hf-id="hf-wede" id="root" data-composition-id="06-lockup" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-09jo" class="clip" data-lockup-bg="" data-start="0" data-duration="6" data-track-index="0"></div>
+
+    <div data-hf-id="hf-vc0n" class="clip" data-lockup-desk="" data-start="0" data-duration="6" data-track-index="1">
+      <img data-hf-id="hf-8cw8" id="f06-lockup-desk" src="assets/scroll-000.png" alt="">
+    </div>
+
+    <div data-hf-id="hf-z8l1" class="clip" data-lockup-stage="" data-start="0" data-duration="6" data-track-index="2">
+      <div data-hf-id="hf-k7h4" data-lockup-cluster="" id="f06-lockup-thesis">
+        <p data-hf-id="hf-hxxe" data-lockup-line="" id="f06-lockup-line1">
+          <span data-hf-id="hf-sxk0">The</span>
+          <span data-hf-id="hf-lxfe">agent</span>
+          <span data-hf-id="hf-rdi0">makes</span>
+          <span data-hf-id="hf-3tds">the</span>
+          <span data-hf-id="hf-cvlv">decision.</span>
+        </p>
+      </div>
+
+      <div data-hf-id="hf-swcl" data-lockup-cluster="" id="f06-lockup-thesis-b">
+        <p data-hf-id="hf-9xu9" data-lockup-line="" id="f06-lockup-line2">
+          <span data-hf-id="hf-hqds" data-lockup-volt="">Peffle</span>
+          <span data-hf-id="hf-9a0r">controls</span>
+          <span data-hf-id="hf-5u2g">the</span>
+          <span data-hf-id="hf-vh9h">execution.</span>
+        </p>
+      </div>
+
+      <div data-hf-id="hf-48gf" data-lockup-cluster="" id="f06-lockup-hold">
+        <div data-hf-id="hf-oejy" data-lockup-mark="" id="f06-lockup-mark">
+          <div data-hf-id="hf-foed" data-lockup-word="" id="f06-lockup-word" aria-label="PEFFLE">
+            <span data-hf-id="hf-g0yr">P</span><span data-hf-id="hf-l6y4">E</span><span data-hf-id="hf-k011">F</span><span data-hf-id="hf-adfd">F</span><span data-hf-id="hf-hm6v">L</span><span data-hf-id="hf-16v8">E</span>
+          </div>
+          <div data-hf-id="hf-hf9i" data-lockup-rule="" id="f06-lockup-rule"></div>
+          <p data-hf-id="hf-nicr" data-lockup-sub="" id="f06-lockup-sub">Execution control for AI agents.</p>
+          <p data-hf-id="hf-29ro" data-lockup-foot="" id="f06-lockup-foot">AI can act. Authority should be enforced.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    window.__timelines = window.__timelines || {};
+    var tl = gsap.timeline({ paused: true });
+    var desk = document.getElementById("f06-lockup-desk");
+    var thesisA = document.getElementById("f06-lockup-thesis");
+    var thesisB = document.getElementById("f06-lockup-thesis-b");
+    var hold = document.getElementById("f06-lockup-hold");
+    var line1Words = gsap.utils.toArray(
+      document.getElementById("f06-lockup-line1").querySelectorAll("span")
+    );
+    var line2Words = gsap.utils.toArray(
+      document.getElementById("f06-lockup-line2").querySelectorAll("span")
+    );
+    var letters = gsap.utils.toArray(
+      document.getElementById("f06-lockup-word").querySelectorAll("span")
+    );
+    var rule = document.getElementById("f06-lockup-rule");
+    var sub = document.getElementById("f06-lockup-sub");
+    var foot = document.getElementById("f06-lockup-foot");
+
+    gsap.set(thesisB, { autoAlpha: 0, scale: 0.72 });
+    gsap.set(hold, { autoAlpha: 0 });
+    gsap.set(letters, { opacity: 0, scale: 0 });
+    gsap.set([rule, sub, foot], { opacity: 0 });
+    gsap.set(line2Words, { opacity: 0 });
+
+    tl.fromTo(
+      desk,
+      { scale: 1.06, opacity: 0.46 },
+      { scale: 1.12, opacity: 0, duration: 1.6, ease: "power2.inOut" },
+      0
+    );
+
+    line1Words.forEach(function (word, i) {
+      tl.fromTo(
+        word,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.42, ease: "power2.out" },
+        0.1 + i * 0.09
+      );
+    });
+
+    line1Words.forEach(function (word, i) {
+      tl.to(
+        word,
+        { opacity: 0, duration: 0.28, ease: "power2.in" },
+        2.12 + i * 0.05
+      );
+    });
+
+    tl.set(thesisA, { autoAlpha: 0 }, 2.18);
+    tl.fromTo(
+      thesisB,
+      { autoAlpha: 0, scale: 0.72 },
+      { autoAlpha: 1, scale: 1, duration: 0.48, ease: "power3.out" },
+      2.2
+    );
+
+    line2Words.forEach(function (word, i) {
+      tl.fromTo(
+        word,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: "power2.out" },
+        2.22 + i * 0.08
+      );
+    });
+
+    tl.to(
+      thesisB,
+      { scale: 0.68, autoAlpha: 0, duration: 0.38, ease: "power2.in" },
+      3.42
+    );
+
+    tl.set(hold, { autoAlpha: 1 }, 3.68);
+
+    letters.forEach(function (letter, i) {
+      tl.fromTo(
+        letter,
+        { scale: 0, opacity: 0, y: 10 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.52, ease: "power3.out" },
+        3.72 + i * 0.055
+      );
+    });
+
+    tl.fromTo(
+      rule,
+      { opacity: 0, scaleX: 0 },
+      { opacity: 1, scaleX: 1, duration: 0.4, ease: "power2.out" },
+      4.22
+    );
+
+    tl.fromTo(
+      sub,
+      { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" },
+      4.38
+    );
+
+    tl.fromTo(
+      foot,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" },
+      4.78
+    );
+
+    tl.to(hold, { scale: 1.02, duration: 1.2, ease: "none" }, 4.8);
+
+    window.__timelines["06-lockup"] = tl;
+  </script>
+</template>

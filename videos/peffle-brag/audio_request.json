@@ -1,0 +1,24 @@
+{
+  "provider": "gemini",
+  "voice": "Fenrir",
+  "tts_model": "gemini-3.8-flash-tts",
+  "lang": "en",
+  "style": "Documentary technical narrator. Tight pacing. Dry. No hype. Speak only the script.",
+  "lines": [
+    {
+      "id": "01",
+      "text": "AI agents can call real tools. Peffle decides what they may execute."
+    },
+    {
+      "id": "02",
+      "text": "A buyer wants headphones under 7,500 rupees. Peffle finds Halo ANC in policy and writes the cart."
+    },
+    {
+      "id": "03",
+      "text": "The agent tries a 20 percent discount. Authority and budget exceeded. Peffle blocks it. Nothing executes."
+    }
+  ],
+  "bgm": {
+    "mode": "none"
+  }
+}
