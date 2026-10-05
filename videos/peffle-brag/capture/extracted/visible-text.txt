@@ -1,0 +1,210 @@
+[a] Skip to content
+[p] Peffle
+[p] AI Commerce. Controlled.
+[a] Policies
+[a] Analytics
+[span] Guest
+[span] Guest
+[span] Northline Audio
+[label] Search products, compare, or ask Peffle
+[kbd] ⌘ K
+[button] Run agent
+[span] Northline Audio
+[span] Live desk
+[p] Northline Audio
+[h1] Find the right audio.
+[span] Within your policy.
+[p] Search the catalog, compare options, and check policy before checkout.
+[button] Recommend under ₹15,000
+[button] Compare Halo vs Transit
+[button] Show bestsellers
+[button] Shop headphones
+[button] Browse soundbar
+[button] 25% off Halo
+[div] Waiting for intent
+[h2] Catalog
+[p] products
+[button] All
+[button] Headphones
+[button] Earbuds
+[button] Speakers
+[button] Accessories
+[label] Sort
+[option] Featured
+[option] Price: low
+[option] Price: high
+[h3] Northline Halo ANC
+[p] Over-ear headphones
+[span] ₹7,490
+[button] Add
+[h3] Northline Transit Max ANC
+[p] Over-ear headphones
+[span] ₹18,990
+[button] Add
+[h3] Northline Cabin Comfort ANC
+[p] Over-ear headphones
+[span] ₹16,990
+[button] Add
+[h3] Northline QuietCore Fold
+[p] Over-ear headphones
+[span] ₹16,490
+[button] Add
+[h3] Northline Room Fill
+[p] Speaker
+[span] ₹14,990
+[button] Add
+[h3] Northline Arc Soundbar
+[p] Soundbar
+[span] ₹11,990
+[button] Add
+[h3] Northline Shelf One
+[p] Speaker
+[span] ₹8,990
+[button] Add
+[h3] Northline Field Party
+[p] Speaker
+[span] ₹7,990
+[button] Add
+[h3] Northline Arc Slim
+[p] Soundbar
+[span] ₹6,990
+[button] Add
+[h3] Northline Desk Wave
+[p] Speaker
+[span] ₹5,990
+[button] Add
+[h3] Northline Drift Pro
+[p] Wireless earbuds
+[span] ₹5,990
+[button] Add
+[h3] Northline Field Rugged
+[p] Speaker
+[span] ₹5,490
+[button] Add
+[h3] Northline Studio Open
+[p] Over-ear headphones
+[span] ₹5,490
+[button] Add
+[h3] Northline Tide Speaker
+[p] Speaker
+[span] ₹4,590
+[button] Add
+[h3] Northline Canal Pro IEM
+[p] Wireless earbuds
+[span] ₹4,490
+[button] Add
+[h3] Northline Bassline Over
+[p] Over-ear headphones
+[span] ₹4,290
+[button] Add
+[h3] Northline Field speaker
+[p] Speaker
+[span] ₹3,990
+[button] Add
+[h3] Northline Drift Sport
+[p] Wireless earbuds
+[span] ₹3,490
+[button] Add
+[h3] Northline Stage Monitor
+[p] Wireless earbuds
+[span] ₹3,290
+[button] Add
+[h3] Northline Drift buds
+[p] Wireless earbuds
+[span] ₹2,990
+[button] Add
+[h3] Northline Drift Open
+[p] Wireless earbuds
+[span] ₹2,790
+[button] Add
+[h3] Northline Commute Lite
+[p] Over-ear headphones
+[span] ₹2,490
+[button] Add
+[h3] Northline Dual Dock
+[p] charger
+[span] ₹2,490
+[button] Add
+[h3] Northline Pulse Buds
+[p] Wireless earbuds
+[span] ₹2,490
+[button] Add
+[h3] Northline leather carry sleeve
+[p] Accessory
+[span] ₹2,190
+[button] Add
+[h3] Northline Drift Mini
+[p] Wireless earbuds
+[span] ₹1,990
+[button] Add
+[h3] Northline USB-C DAC Lite
+[p] adapter
+[span] ₹1,990
+[button] Add
+[h3] Northline dual headphone stand
+[p] Accessory
+[span] ₹1,790
+[button] Add
+[h3] Northline Field Mini
+[p] Speaker
+[span] ₹1,490
+[button] Add
+[h3] Northline BT Aux adapter
+[p] adapter
+[span] ₹1,290
+[button] Add
+[h3] Northline Travel Charge 20W
+[p] charger
+[span] ₹990
+[button] Add
+[h3] Northline Daily Wired
+[p] Wireless earbuds
+[span] ₹890
+[button] Add
+[h3] Northline USB-C audio cable 1.2m
+[p] cable
+[span] ₹790
+[button] Add
+[h3] Northline braided USB-C 2m
+[p] cable
+[span] ₹590
+[button] Add
+[h3] Northline Transit Shell
+[p] Accessory
+[span] ₹1,290
+[button] Add
+[h3] Northline Drift hard case
+[p] Accessory
+[span] ₹790
+[button] Add
+[h3] Halo hard case
+[p] Accessory
+[span] ₹790
+[button] Add
+[h3] Northline Studio Pouch
+[p] Accessory
+[span] ₹690
+[button] Add
+[h3] Northline memory foam tips 3-pack
+[p] Accessory
+[span] ₹590
+[button] Add
+[h3] Northline Drift silicone case
+[p] Accessory
+[span] ₹490
+[button] Add
+[button] Chat
+[button] Cart
+[button] Policy
+[button] Trace
+[p] Ask Peffle to search the catalog, compare options, or check an offer against merchant policy.
+[h3] Cart
+[p] No items added yet.
+[button] Authorize
+[button] Simulate decline
+[p] Within policy
+[a] View policy →
+[span] ₹50,000
+[dt] Discount limit
+[dt] Margin floor
+[dt] Order value

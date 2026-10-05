@@ -1,0 +1,265 @@
+{
+  "typography": [
+    {
+      "role": "display",
+      "fontFamily": "Outfit",
+      "fontSize": "29.6px",
+      "fontWeight": "500",
+      "lineHeight": "33.152px",
+      "letterSpacing": "-1.184px",
+      "color": "#ECEAE4",
+      "sampleText": "Find the right audio.Within your policy."
+    },
+    {
+      "role": "heading",
+      "fontFamily": "Outfit",
+      "fontSize": "18px",
+      "fontWeight": "550",
+      "lineHeight": "20.7px",
+      "letterSpacing": "-0.36px",
+      "color": "#ECEAE4",
+      "sampleText": "Catalog"
+    },
+    {
+      "role": "label",
+      "fontFamily": "Outfit",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "lineHeight": "24px",
+      "letterSpacing": "normal",
+      "color": "#ECEAE4",
+      "sampleText": "Search products, compare, or ask Peffle"
+    },
+    {
+      "role": "body",
+      "fontFamily": "Outfit",
+      "fontSize": "15px",
+      "fontWeight": "600",
+      "lineHeight": "16.5px",
+      "letterSpacing": "-0.3px",
+      "color": "#ECEAE4",
+      "sampleText": "Peffle"
+    },
+    {
+      "role": "heading-3",
+      "fontFamily": "Outfit",
+      "fontSize": "14px",
+      "fontWeight": "550",
+      "lineHeight": "21px",
+      "letterSpacing": "-0.21px",
+      "color": "#ECEAE4",
+      "sampleText": "Northline Halo ANC"
+    },
+    {
+      "role": "code",
+      "fontFamily": "IBM Plex Mono",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "lineHeight": "21px",
+      "letterSpacing": "normal",
+      "color": "#ECEAE4",
+      "sampleText": "₹7,490"
+    }
+  ],
+  "spacing": {
+    "observed": [
+      2,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      14,
+      16,
+      18
+    ],
+    "baseUnit": 8
+  },
+  "radius": [
+    "7px",
+    "8px",
+    "10px",
+    "999px"
+  ],
+  "shadows": [],
+  "buttons": [
+    {
+      "label": "Run agent",
+      "background": "transparent",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#ECEAE4",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "border": "0px solid rgb(236, 234, 228)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "1px"
+    },
+    {
+      "label": "Northline Audio",
+      "background": "#10161C",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#ECEAE4",
+      "padding": "0px 10.4px",
+      "borderRadius": "8px",
+      "border": "1px solid rgb(36, 44, 53)",
+      "boxShadow": "none",
+      "fontSize": "13px",
+      "fontWeight": "500",
+      "height": "34.3906px"
+    },
+    {
+      "label": "Recommend under ₹15,000",
+      "background": "#0C1015",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#D7DDE3",
+      "padding": "0px 11.2px",
+      "borderRadius": "999px",
+      "border": "1px solid rgb(42, 51, 60)",
+      "boxShadow": "none",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "height": "29.5938px"
+    },
+    {
+      "label": "button",
+      "background": "transparent",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#8B959F",
+      "padding": "0px 10.4px",
+      "borderRadius": "999px",
+      "border": "1px solid rgb(42, 51, 60)",
+      "boxShadow": "none",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "height": "29.5938px"
+    },
+    {
+      "label": "All",
+      "background": "#12181F",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#ECEAE4",
+      "padding": "0px 10.4px",
+      "borderRadius": "999px",
+      "border": "1px solid rgb(42, 51, 60)",
+      "boxShadow": "none",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "height": "29.5938px"
+    },
+    {
+      "label": "Headphones",
+      "background": "transparent",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#8B959F",
+      "padding": "0px 10.4px",
+      "borderRadius": "999px",
+      "border": "1px solid rgba(0, 0, 0, 0)",
+      "boxShadow": "none",
+      "fontSize": "12px",
+      "fontWeight": "400",
+      "height": "29.5938px"
+    }
+  ],
+  "cards": [
+    {
+      "label": "card",
+      "background": "#10161C",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#ECEAE4",
+      "padding": "0px",
+      "borderRadius": "10px",
+      "border": "1px solid oklab(0.361948 -0.0320573 -0.018328)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "406.969px"
+    },
+    {
+      "label": "card",
+      "background": "#10161C",
+      "backgroundImage": "",
+      "backdropFilter": "",
+      "color": "#ECEAE4",
+      "padding": "0px",
+      "borderRadius": "10px",
+      "border": "1px solid rgb(28, 36, 45)",
+      "boxShadow": "none",
+      "fontSize": "16px",
+      "fontWeight": "400",
+      "height": "406.969px"
+    }
+  ],
+  "nav": {
+    "label": "navigation",
+    "background": "transparent",
+    "backgroundImage": "",
+    "backdropFilter": "",
+    "color": "#ECEAE4",
+    "padding": "0px",
+    "borderRadius": "0px",
+    "border": "0px solid rgb(236, 234, 228)",
+    "boxShadow": "none",
+    "fontSize": "16px",
+    "fontWeight": "400",
+    "height": "218.297px"
+  },
+  "chips": [
+    {
+      "label": "Northline Audio",
+      "background": "#10161C",
+      "color": "#ECEAE4",
+      "padding": "0px 10.4px",
+      "borderRadius": "8px",
+      "border": "1px solid rgb(36, 44, 53)",
+      "boxShadow": "none",
+      "fontSize": "13px",
+      "fontWeight": "500",
+      "height": "34.3906px"
+    },
+    {
+      "label": "NA",
+      "background": "#1A222B",
+      "color": "#ECEAE4",
+      "padding": "0px",
+      "borderRadius": "999px",
+      "border": "0px solid rgb(236, 234, 228)",
+      "boxShadow": "none",
+      "fontSize": "11px",
+      "fontWeight": "600",
+      "height": "29.5938px"
+    }
+  ],
+  "statCells": [],
+  "tabs": [
+    {
+      "label": "₹7,490",
+      "background": "transparent",
+      "color": "#ECEAE4",
+      "padding": "0px",
+      "borderRadius": "0px",
+      "border": "0px solid rgb(236, 234, 228)",
+      "boxShadow": "none",
+      "fontSize": "14px",
+      "fontWeight": "600",
+      "height": "auto"
+    }
+  ],
+  "backgrounds": [
+    {
+      "value": "linear-gradient(90deg, rgba(7, 9, 12, 0.9) 0%, rgba(7, 9, 12, 0.58) 46%, rgba(7, 9, 12, 0.18) 100%), linear-gradient(rgba(7, 9, 12, 0.08), rgba(7, 9, 12, 0.42))",
+      "area": 260771
+    }
+  ],
+  "glass": []
+}
