@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { isStaffOrAdmin } from "@/lib/auth/capability";
 import type { BuyerCapability } from "@/lib/auth/capability";
@@ -10,44 +11,37 @@ type AdminLayoutClientProps = {
 };
 
 export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
+  const router = useRouter();
   const [merchantName, setMerchantName] = useState("Merchant");
   const [ready, setReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function bootstrap() {
       try {
         const authRes = await fetch("/api/auth/session", { credentials: "include" });
         if (!authRes.ok) {
-          throw new Error("Could not load session.");
+          router.replace("/desk");
+          return;
         }
         const authPayload = (await authRes.json()) as {
           merchantName?: string;
           capability?: BuyerCapability;
         };
         if (!authPayload.capability || !isStaffOrAdmin(authPayload.capability)) {
-          throw new Error("Staff access required. Verify an authorized staff email on the desk first.");
+          router.replace("/desk");
+          return;
         }
         if (authPayload.merchantName) {
           setMerchantName(authPayload.merchantName);
         }
         setReady(true);
-      } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Admin portal unavailable.");
+      } catch {
+        router.replace("/desk");
       }
     }
 
     void bootstrap();
-  }, []);
-
-  if (error) {
-    return (
-      <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Admin unavailable</h1>
-        <p className="mt-2 text-sm text-muted">{error}</p>
-      </div>
-    );
-  }
+  }, [router]);
 
   if (!ready) {
     return (

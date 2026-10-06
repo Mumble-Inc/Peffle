@@ -13,6 +13,7 @@ export function PeffleGuardMeter({
   trace,
   blocked,
   blockedReason,
+  showStaffPolicyLink = false,
 }: {
   policies: MerchantPolicies | null;
   result: AgentResult | null;
@@ -20,6 +21,7 @@ export function PeffleGuardMeter({
   trace: DemoTracePayload | null;
   blocked: boolean;
   blockedReason: string | null;
+  showStaffPolicyLink?: boolean;
 }) {
   const maxOrder = policies?.maxOrderInr ?? 0;
   const orderValue = cart.itemCount > 0 ? cart.subtotal : (result?.subtotal ?? 0);
@@ -54,9 +56,11 @@ export function PeffleGuardMeter({
           )}
           {killActive ? "Kill switch on" : withinPolicy ? "Within policy" : "Outside policy"}
         </p>
-        <a href="/admin/policies" className="text-[0.75rem] text-muted hover:text-ink">
-          View policy →
-        </a>
+        {showStaffPolicyLink ? (
+          <a href="/admin/policies" className="text-[0.75rem] text-muted hover:text-ink">
+            View policy
+          </a>
+        ) : null}
       </div>
 
       <div className="rf-peffle-guard-meter-row">

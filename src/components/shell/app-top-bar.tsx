@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { Gauge, ShieldCheck, Storefront } from "@phosphor-icons/react";
+import { ShieldCheck, Storefront } from "@phosphor-icons/react";
 import { AccountTopBarActions } from "@/components/auth/account-top-bar-actions";
 import { useAuthSession } from "@/components/auth/use-auth-session";
 import { Mark } from "@/components/mark";
@@ -76,7 +76,7 @@ export function AppTopBar({
             {variant === "public" ? (
               <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
                 <nav aria-label="Primary" className="hidden min-w-0 items-center gap-0.5 sm:flex sm:gap-1">
-                  {PUBLIC_NAV.filter((link) => link.href !== "/admin").map((link) => {
+                  {PUBLIC_NAV.map((link) => {
                     const active = isPublicNavActive(pathname, link.href, link.exact);
                     return (
                       <Link

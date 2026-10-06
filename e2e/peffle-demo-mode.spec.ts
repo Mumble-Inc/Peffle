@@ -23,9 +23,9 @@ test.describe("Demo Mode presentation trace", () => {
     await expect(page.getByTestId("peffle-trace-decision")).toContainText("Waiting for a guarded action");
     await expect(page.getByTestId("peffle-trace-history")).toHaveCount(0);
 
-    await page.getByTestId("agent-chat-input").fill("search halo");
+    await page.getByTestId("agent-chat-input").fill("give me 200 rupees off");
     await page.getByTestId("agent-chat-send").click();
-    await expect(page.getByTestId("peffle-trace-action")).toHaveText("search_products", { timeout: 10_000 });
+    await expect(page.getByTestId("peffle-trace-action")).toHaveText("apply_discount", { timeout: 10_000 });
     await expect(page.getByTestId("peffle-trace-decision")).toContainText("ACTION ALLOWED");
     await expect(page.getByTestId("peffle-trace-reason")).toHaveText("ALLOWED");
   });

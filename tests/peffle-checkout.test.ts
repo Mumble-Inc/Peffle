@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { ApprovalRequiredError, type PolicyConfig } from "peffle";
+import { ApprovalRequiredError, StorageError, type PolicyConfig } from "peffle";
 import { db } from "@/lib/db";
 import {
   getPeffle,
@@ -236,6 +236,17 @@ describe("Peffle checkout execution guard", () => {
     expect(queryPeffleCheckoutEvents(sessionId)).toHaveLength(0);
 
     await updatePersistedPolicies(defaultMerchantPolicy);
+  });
+
+  it("maps storage errors without re-opening the ledger for cap metadata", () => {
+    const mapped = mapPeffleCheckoutError(new StorageError("Failed to open storage"));
+    expect(mapped).toMatchObject({
+      name: "CheckoutError",
+      status: 503,
+      code: "PEFFLE_UNAVAILABLE",
+    });
+    expect(mapped.message).toMatch(/Node 22/);
+    expect(mapped.peffle?.limitPaise).toBe(1_000_000);
   });
 
   it("maps unexpected approval-required errors without exposing a redemption token", () => {

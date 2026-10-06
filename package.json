@@ -2,10 +2,14 @@
   "name": "razorflow",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22 <26"
+  },
   "scripts": {
-    "dev": "next dev --port 3010",
-    "build": "prisma generate && next build",
-    "start": "next start --port 3010",
+    "postinstall": "node scripts/rebuild-native-deps.mjs",
+    "dev": "bash scripts/with-supported-node.sh next dev --port 3010",
+    "build": "bash scripts/with-supported-node.sh sh -c 'prisma generate && next build'",
+    "start": "bash scripts/with-supported-node.sh next start --port 3010",
     "lint": "eslint",
     "test": "vitest run",
     "test:e2e": "PLAYWRIGHT_HTML_OPEN=never playwright test",
@@ -19,6 +23,7 @@
     "catalog:images": "tsx scripts/generate-northline-product-images.ts",
     "redteam": "NODE_ENV=test RAZORFLOW_REDTEAM=1 tsx scripts/redteam.ts",
     "demo:seed": "tsx scripts/demo-seed.ts",
+    "sync:ai-env": "node scripts/sync-ai-env-from-blueprint.mjs",
     "verify:clean": "bash scripts/verify-clean.sh",
     "screenshots": "PLAYWRIGHT_HTML_OPEN=never playwright test e2e/peffle-screenshots.spec.ts --project=chromium"
   },

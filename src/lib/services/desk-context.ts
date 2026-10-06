@@ -6,7 +6,12 @@ import { buildPolicyCopy, type PolicyCopyItem } from "@/lib/policy/copy";
 import type { MerchantPolicies, PublicProduct } from "@/lib/agent/types";
 import { getActiveCatalog } from "@/lib/services/catalog";
 import { toPublicProduct } from "@/lib/services/catalog-map";
-import { getDeskActiveSessionState, type DeskActiveSessionState } from "@/lib/services/desk-session-state";
+import {
+  getDeskActiveSessionState,
+  getDeskResumeSessionState,
+  type DeskActiveSessionState,
+  type DeskResumeSessionState,
+} from "@/lib/services/desk-session-state";
 import { getMerchantPoliciesForAgent } from "@/lib/services/policies";
 import { resolveDemoMerchant } from "@/lib/services/merchant";
 
@@ -27,6 +32,7 @@ export type DeskContext = {
   };
   demoModeAvailable: boolean;
   activeSession: DeskActiveSessionState | null;
+  resumeSession: DeskResumeSessionState | null;
 };
 
 export async function getDeskContext(options?: {
@@ -46,6 +52,10 @@ export async function getDeskContext(options?: {
   const categoryHint = primary?.category ?? "products";
   const activeSession =
     options?.sessionId != null ? await getDeskActiveSessionState(options.sessionId) : null;
+  const resumeSession =
+    activeSession == null && options?.sessionId != null
+      ? await getDeskResumeSessionState(options.sessionId)
+      : null;
 
   return {
     merchant: {
@@ -53,7 +63,7 @@ export async function getDeskContext(options?: {
       name: merchant.name,
     },
     demoPrompts: buildDemoPrompts(catalog, { maxDiscountPct: agentPolicies.maxDiscountPct }),
-    intentPlaceholder: `Describe what you need, your budget, and any discount request. Example: ${categoryHint} under ₹${sampleBudget.toLocaleString("en-IN")}…`,
+    intentPlaceholder: `Search catalog — ${categoryHint}, budget, or use case. Example: ${categoryHint} under ₹${sampleBudget.toLocaleString("en-IN")}`,
     catalog: catalog.map(toPublicProduct),
     policies: agentPolicies,
     auth: {
@@ -64,6 +74,7 @@ export async function getDeskContext(options?: {
     },
     demoModeAvailable: isDemoModeEnabled() && isStaffOrAdmin(options?.capability ?? "anonymous"),
     activeSession,
+    resumeSession,
   };
 }
 

@@ -8,6 +8,7 @@ import {
   loadPolicyFromJson,
   PeffleError,
   PolicyDeniedError,
+  StorageError,
   type ActionEvent,
   type ActionRequest,
   type GuardOptions,
@@ -28,6 +29,26 @@ export const DISCOUNT_CAP_BUDGET_ID = "discount-daily-cap";
 export const PEFFLE_SEARCH_ACTION = "search_products";
 export const PEFFLE_DISCOUNT_ACTION = "apply_discount";
 export const PEFFLE_REFUND_ACTION = "issue_refund";
+
+/** Policy default when the ledger cannot be read (avoid re-opening storage on error paths). */
+const FALLBACK_CHECKOUT_CAP_PAISE = 1_000_000;
+
+function isNativeModuleLoadError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const cause = (error as { cause?: unknown }).cause;
+  if (cause && typeof cause === "object" && (cause as { code?: string }).code === "ERR_DLOPEN_FAILED") {
+    return true;
+  }
+  return (error as { code?: string }).code === "ERR_DLOPEN_FAILED";
+}
+
+function safeCheckoutCapPaise(): number {
+  try {
+    return getCheckoutCapPaise();
+  } catch {
+    return FALLBACK_CHECKOUT_CAP_PAISE;
+  }
+}
 
 const DEFAULT_STORAGE = ".peffle/ledger.db";
 const DEFAULT_POLICY = "peffle.policy.json";
@@ -250,7 +271,7 @@ function peffleBlock(
     agentId: PEFFLE_CHECKOUT_AGENT_ID,
     action: PEFFLE_CHECKOUT_ACTION,
     amountPaise: input?.amountPaise ?? 0,
-    limitPaise: extras?.limitPaise ?? getCheckoutCapPaise(),
+    limitPaise: extras?.limitPaise ?? safeCheckoutCapPaise(),
     spentPaise: extras?.spentPaise ?? null,
   };
 }
@@ -293,12 +314,20 @@ export function mapPeffleCheckoutError(error: unknown, input?: CheckoutGuardInpu
       peffleBlock("PEFFLE_APPROVAL_REQUIRED", input),
     );
   }
+  if (error instanceof StorageError || isNativeModuleLoadError(error)) {
+    return new CheckoutError(
+      "Peffle execution ledger could not be opened. Use Node 22 LTS (see .nvmrc), then run npm install.",
+      503,
+      "PEFFLE_UNAVAILABLE",
+      peffleBlock("PEFFLE_UNAVAILABLE", input, { limitPaise: FALLBACK_CHECKOUT_CAP_PAISE }),
+    );
+  }
 
   return new CheckoutError(
     "Checkout could not be authorized",
     503,
     "PEFFLE_UNAVAILABLE",
-    peffleBlock("PEFFLE_UNAVAILABLE", input),
+    peffleBlock("PEFFLE_UNAVAILABLE", input, { limitPaise: FALLBACK_CHECKOUT_CAP_PAISE }),
   );
 }
 
@@ -330,6 +359,12 @@ export async function guardCheckoutCreate<T>(
   } catch (error) {
     if (error instanceof CheckoutError) throw error;
     if (error instanceof PeffleError) throw mapPeffleCheckoutError(error, input);
+    if (isNativeModuleLoadError(error)) {
+      throw mapPeffleCheckoutError(
+        new StorageError("Failed to open storage", error instanceof Error ? error : undefined),
+        input,
+      );
+    }
     throw error;
   }
 }

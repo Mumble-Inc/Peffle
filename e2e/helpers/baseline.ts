@@ -170,6 +170,10 @@ export async function prepareE2EBaseline(page: Page) {
   await page.emulateMedia({ reducedMotion: "reduce" });
 }
 
+export async function openDeskCartTab(page: Page) {
+  await page.getByRole("tab", { name: /^Cart/ }).click();
+}
+
 /** Fill intent, run agent, and add primary recommendation to cart for checkout. */
 export async function runDeskAgentWithIntent(
   page: Page,
@@ -185,6 +189,7 @@ export async function runDeskAgentWithIntent(
   await expect(page.getByTestId("product-name")).toBeVisible({ timeout: 15_000 });
   await page.getByTestId("add-to-cart-halo-anc").click();
   await expect(page.getByTestId("cart-summary")).toBeVisible({ timeout: 10_000 });
+  await openDeskCartTab(page);
   await expect(page.getByTestId("authorize")).toBeEnabled({ timeout: 10_000 });
 }
 

@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
 import { AuthError } from "@/lib/auth/errors";
 import { requireBuyerSession } from "@/lib/auth/request";
+import { normalizeChatHistory } from "@/lib/agent/chat-history";
 import { runAgentChat } from "@/lib/agent/agent-chat";
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { sessionId?: string; message?: string };
+    const body = (await request.json()) as {
+      sessionId?: string;
+      message?: string;
+      history?: unknown;
+    };
     const sessionId = body.sessionId?.trim();
     const message = body.message?.trim() ?? "";
     if (!sessionId) {
@@ -16,7 +21,8 @@ export async function POST(request: Request) {
     }
 
     await requireBuyerSession(request, sessionId);
-    const result = await runAgentChat(sessionId, message);
+    const history = normalizeChatHistory(body.history);
+    const result = await runAgentChat(sessionId, message, history);
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof AuthError) {

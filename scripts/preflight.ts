@@ -41,6 +41,25 @@ function ledgerWritable(): Check {
   }
 }
 
+async function peffleStorageReady(): Promise<Check> {
+  const major = Number(process.versions.node.split(".")[0]);
+  if (major >= 26) {
+    return {
+      name: "peffle-storage",
+      ok: false,
+      detail: `Node ${process.versions.node} unsupported for better-sqlite3; use Node 22 (.nvmrc)`,
+    };
+  }
+  try {
+    const { getPeffle } = await import("../src/lib/peffle/client");
+    getPeffle().query({ limit: 1 });
+    return { name: "peffle-storage", ok: true, detail: "ledger opens" };
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "ledger open failed";
+    return { name: "peffle-storage", ok: false, detail };
+  }
+}
+
 async function singleNode(): Promise<Check> {
   if (process.env.VERCEL) {
     return { name: "single-node", ok: false, detail: "VERCEL is set; Peffle ledger is process-local, not serverless-safe" };
@@ -75,6 +94,7 @@ async function main() {
       detail: keyId.startsWith("rzp_test_") ? "rzp_test key id present" : "missing or not Test Mode",
     },
     ledgerWritable(),
+    await peffleStorageReady(),
     await singleNode(),
     { name: "PEFFLE_POLICY", ok: fs.existsSync(process.env.PEFFLE_POLICY?.trim() || "peffle.policy.json"), detail: "peffle.policy.json" },
   ];

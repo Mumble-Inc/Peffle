@@ -1,8 +1,8 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import Image from "next/image";
-import { CaretRight, ShieldCheck } from "@phosphor-icons/react";
+import { CaretRight } from "@phosphor-icons/react";
 import { AgentChatPanel } from "@/components/desk/agent-chat-panel";
 import { CompletedTransaction, PaymentNotCompleted } from "@/components/desk/completed-transaction";
 import { PeffleBlockedPanel } from "@/components/desk/peffle-blocked";
@@ -68,6 +68,7 @@ export function DeskContextRail({
   onTryAgain,
   onDismissBlock,
   onChatTurn,
+  onEnsureDeskSession,
   children,
 }: {
   tab: DeskRailTab;
@@ -82,7 +83,7 @@ export function DeskContextRail({
   demoModeAvailable: boolean;
   demoModeOn: boolean;
   demoRefreshNonce: number;
-  lastPlanner: "gemini" | "deterministic" | null;
+  lastPlanner: "gemini" | "groq" | "deterministic" | null;
   capturedPayment: CapturedPaymentView | null;
   peffleBlock: PeffleCheckoutBlock | null;
   error: string | null;
@@ -95,7 +96,8 @@ export function DeskContextRail({
   onStartNewSale: () => void;
   onTryAgain: () => void;
   onDismissBlock: () => void;
-  onChatTurn: (turn: { planner: "gemini" | "deterministic" }) => void;
+  onChatTurn: (turn: { planner: "gemini" | "groq" | "deterministic" }) => void;
+  onEnsureDeskSession: (seed?: string) => Promise<string | null>;
   children?: ReactNode;
 }) {
   const recs = result?.results?.length
@@ -104,18 +106,23 @@ export function DeskContextRail({
       ? [result.primary, result.attach].filter((item): item is Product => item != null)
       : [];
   const policyCopy = policies ? buildPolicyCopy(policies) : [];
+  const tabs: Array<[DeskRailTab, string]> = [
+    ["chat", "Chat"],
+    ["cart", `Cart${cart.itemCount ? ` (${cart.itemCount})` : ""}`],
+    ["policy", "Policy"],
+    ...(demoModeAvailable ? [["trace", "Trace"] as [DeskRailTab, string]] : []),
+  ];
+
+  useEffect(() => {
+    if (tab === "trace" && !demoModeAvailable) {
+      onTabChange("chat");
+    }
+  }, [demoModeAvailable, onTabChange, tab]);
 
   return (
     <aside className="rf-peffle-desk-rail" data-testid="transaction-rail">
       <div className="rf-peffle-rail-tabs" role="tablist" aria-label="Context">
-        {(
-          [
-            ["chat", "Chat"],
-            ["cart", `Cart${cart.itemCount ? ` (${cart.itemCount})` : ""}`],
-            ["policy", "Policy"],
-            ["trace", "Trace"],
-          ] as const
-        ).map(([id, label]) => (
+        {tabs.map(([id, label]) => (
           <button
             key={id}
             type="button"
@@ -130,86 +137,39 @@ export function DeskContextRail({
       </div>
 
       <div className="rf-peffle-rail-body">
-        {tab === "chat" ? (
-          <div className="rf-peffle-chat-thread" data-testid="recommendation">
-            {result ? (
-              <>
-                <div className="rf-peffle-bubble" data-from="user">
-                  {intent}
-                </div>
-                <div className="rf-peffle-bubble" data-from="agent">
-                  <div className="rf-peffle-agent-head">
-                    <ShieldCheck className="size-3.5 text-success" aria-hidden />
-                    <span className="font-medium text-ink">Peffle</span>
-                  </div>
-                  <p>
-                    {result.explanations[0]?.reason ??
-                      (result.status === "empty"
-                        ? "No catalog match for that request."
-                        : "Here are the best options from the live catalog, checked against merchant policy.")}
-                  </p>
-                  <MiniRecs products={recs} />
-                </div>
-                <details className="rf-peffle-disclosure">
-                  <summary>
-                    Why these?
-                    <CaretRight className="size-3.5" />
-                  </summary>
-                  <p className="pb-3 text-[0.8125rem] text-ink-soft">
-                    {result.explanations.map((item) => item.reason).join(" ")}
-                  </p>
-                </details>
-                <details className="rf-peffle-disclosure">
-                  <summary>
-                    Compare key differences
-                    <CaretRight className="size-3.5" />
-                  </summary>
-                  <ul className="space-y-1 pb-3 text-[0.8125rem] text-ink-soft">
-                    {recs.map((product) => (
-                      <li key={product.sku}>
-                        {shortName(product.name)} · <Money value={product.price} /> · {product.blurb}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-                <details className="rf-peffle-disclosure">
-                  <summary>
-                    Check availability
-                    <CaretRight className="size-3.5" />
-                  </summary>
-                  <ul className="space-y-1 pb-3 text-[0.8125rem] text-ink-soft">
-                    {recs.map((product) => (
-                      <li key={product.sku}>
-                        {shortName(product.name)} · {product.inventory} in stock
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-                <details className="rf-peffle-disclosure">
-                  <summary>
-                    View policy impact
-                    <CaretRight className="size-3.5" />
-                  </summary>
-                  <ul className="space-y-1 pb-3 text-[0.8125rem] text-ink-soft">
-                    {(result.policies.length ? result.policies : []).map((item) => (
-                      <li key={item.id}>
-                        {item.label}: {item.result === "blocked" ? "Blocked" : item.detail}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              </>
-            ) : (
-              <p className="text-[0.8125rem] leading-relaxed text-muted">
-                Ask Peffle to search the catalog, compare options, or check an offer against merchant
-                policy.
-              </p>
-            )}
-            <AgentChatPanel sessionId={sessionId} onTurn={onChatTurn} />
-          </div>
-        ) : null}
+        <div
+          className="rf-peffle-rail-panel rf-peffle-rail-panel-chat"
+          hidden={tab !== "chat"}
+          data-testid="recommendation"
+        >
+          {result ? (
+            <details className="rf-peffle-search-recap">
+              <summary>
+                Latest catalog search
+                <CaretRight className="size-3.5" aria-hidden />
+              </summary>
+              <div className="rf-peffle-search-recap-body">
+                <p className="text-[0.75rem] text-muted">You searched</p>
+                <p className="mt-1 text-[0.8125rem] text-ink-soft">{intent}</p>
+                <p className="mt-2 text-[0.8125rem] leading-relaxed text-ink-soft">
+                  {result.explanations[0]?.reason ??
+                    (result.status === "empty"
+                      ? "No catalog match for that request."
+                      : "Recommendation from live catalog and merchant policy.")}
+                </p>
+                <MiniRecs products={recs} />
+              </div>
+            </details>
+          ) : null}
+          <AgentChatPanel
+            sessionId={sessionId}
+            onTurn={onChatTurn}
+            onEnsureSession={onEnsureDeskSession}
+            chatLocked={busy && phase !== "captured"}
+          />
+        </div>
 
-        <div className={tab === "cart" ? "flex flex-1 flex-col" : undefined} hidden={tab === "policy" || tab === "trace"}>
+        <div className="rf-peffle-rail-panel" hidden={tab !== "cart"}>
           <TransactionCart
             cart={cart}
             loading={cartLoading}
@@ -230,7 +190,7 @@ export function DeskContextRail({
           ) : null}
         </div>
 
-        {tab === "policy" ? (
+        <div className="rf-peffle-rail-panel" hidden={tab !== "policy"}>
           <ul className="space-y-3 text-sm">
             {policyCopy.map((item) => (
               <li key={item.id} className="border-b border-line/40 pb-3 last:border-0">
@@ -248,25 +208,25 @@ export function DeskContextRail({
               </li>
             ))}
           </ul>
-        ) : null}
+        </div>
 
-        {tab === "trace" && !(demoModeAvailable && demoModeOn) ? (
-            <p className="text-[0.8125rem] text-muted">
-              Trace is available in Demo Mode for staff. It reads live Peffle Guard events for this
-              session.
-            </p>
-        ) : null}
-
-        {demoModeAvailable && demoModeOn ? (
+        <div className="rf-peffle-rail-panel" hidden={tab !== "trace"}>
+          {demoModeAvailable && demoModeOn ? (
             <PeffleGuardTrace
               sessionId={sessionId}
               on={demoModeOn}
               refreshNonce={demoRefreshNonce}
               planner={lastPlanner}
             />
-        ) : null}
+          ) : (
+            <p className="text-[0.8125rem] text-muted">
+              Trace is available in Demo Mode for staff. It reads live Peffle Guard events for this
+              session.
+            </p>
+          )}
+        </div>
 
-        <div className="rf-desk-transact-actions mt-auto pt-4">
+        <div className="rf-desk-transact-actions" hidden={tab !== "cart"}>
           {phase === "captured" && capturedPayment ? (
             <CompletedTransaction payment={capturedPayment} onStartNewSale={onStartNewSale} />
           ) : phase === "failed" && peffleBlock ? (

@@ -25,7 +25,7 @@ export function TransactionCart({
     <section
       id="desk-transaction-cart"
       tabIndex={-1}
-      className="mt-4 flex flex-1 flex-col outline-none"
+      className="flex flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-accent"
       data-testid="transaction-cart"
       aria-labelledby="transaction-cart-heading"
     >

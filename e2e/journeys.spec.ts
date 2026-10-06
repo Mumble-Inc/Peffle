@@ -5,6 +5,7 @@ import {
   ensureVerifiedBuyerForCheckout,
   expectAdminNavLinkVisible,
   prepareE2EBaseline,
+  openDeskCartTab,
   runDeskAgentWithIntent,
 } from "./helpers/baseline";
 
@@ -66,6 +67,7 @@ test.describe("Peffle journeys", () => {
     await expect(page.getByTestId("policy-result")).toContainText(/above the \d+% ceiling/i, {
       timeout: 15_000,
     });
+    await openDeskCartTab(page);
     await expect(page.getByTestId("authorize")).toBeDisabled();
   });
 

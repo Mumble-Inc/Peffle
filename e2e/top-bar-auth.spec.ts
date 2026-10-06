@@ -13,6 +13,11 @@ test.describe("Top bar auth", () => {
     await expect(banner.getByRole("button", { name: "Create account" })).toHaveCount(0);
     await expect(banner.getByText(/Session/i)).toHaveCount(0);
     await expect(banner.getByRole("link", { name: "Admin" })).toHaveCount(0);
+    const deskNav = page.getByRole("navigation", { name: "Desk" });
+    await expect(deskNav.getByRole("link", { name: "Control" })).toHaveCount(0);
+    await expect(deskNav.getByRole("link", { name: "Orders" })).toHaveCount(0);
+    await expect(deskNav.getByRole("link", { name: "Analytics" })).toHaveCount(0);
+    await expect(deskNav.getByRole("link", { name: "Policies" })).toHaveCount(0);
   });
 
   test("login modal contains create account action", async ({ page }) => {
