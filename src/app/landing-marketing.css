@@ -27,6 +27,7 @@
   --radius-pill: 9999px;
   --color-primary-cta: #0c4186;
   --color-primary-on: #ffffff;
+  --header-height: 80px;
 }
 
 .m-landing-shell {
@@ -37,6 +38,16 @@
 .m-landing-shell > :not(.rf-ambient) {
   position: relative;
   z-index: 1;
+}
+
+.m-landing-shell > .m-header {
+  z-index: 40;
+}
+
+.m-landing-shell .m-header__fade {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .rf-ambient {
@@ -232,10 +243,79 @@
 
 .m-landing-shell .m-hero {
   position: relative;
+  isolation: isolate;
+  overflow: visible;
   text-align: center;
   padding-block: clamp(32px, 6vw, 64px) clamp(48px, 10vw, 96px);
   background: transparent;
   border: none;
+}
+
+.m-landing-shell .m-hero__sky {
+  position: absolute;
+  top: calc(var(--header-height) * -2);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(180deg, #3876ba 0%, #8cbfe8 100%);
+}
+
+.m-landing-shell .m-hero__sky > * {
+  height: 100%;
+  min-height: 100%;
+}
+
+.m-landing-shell .m-hero__sky::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  height: 62%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 16%,
+    rgba(255, 255, 255, 0.18) 34%,
+    rgba(255, 255, 255, 0.42) 52%,
+    rgba(255, 255, 255, 0.7) 70%,
+    rgba(255, 255, 255, 0.9) 86%,
+    #ffffff 100%
+  );
+}
+
+.m-landing-shell .m-hero + .rf-land-section {
+  border-top: none;
+}
+
+.m-landing-shell .rf-land-section,
+.m-landing-shell .rf-land-cta {
+  padding-inline: clamp(1.5rem, 8vw, 7.5rem);
+}
+
+.m-landing-shell .rf-land-section-inner,
+.m-landing-shell .rf-land-cta-inner {
+  width: min(100%, 64rem);
+  margin-inline: auto;
+}
+
+.m-landing-shell .rf-section-label,
+.m-landing-shell .rf-land-section-title,
+.m-landing-shell .rf-land-section-lede,
+.m-landing-shell .rf-land-cta-title,
+.m-landing-shell .rf-land-cta-inner > div > p {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.m-landing-shell .m-hero > .m-container {
+  position: relative;
+  z-index: 1;
 }
 
 .m-landing-shell .m-hero__chip {
@@ -243,9 +323,11 @@
   margin-bottom: var(--space-7);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   font-size: var(--text-chip);
   font-weight: 500;
-  color: var(--color-muted);
+  color: rgba(247, 248, 250, 0.92);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -258,7 +340,8 @@
   font-weight: 600;
   letter-spacing: var(--tracking-display);
   line-height: var(--leading-display);
-  color: var(--color-ink);
+  color: #f7f8fa;
+  text-shadow: 0 1px 18px rgba(12, 40, 80, 0.35);
   text-wrap: balance;
 }
 
@@ -268,7 +351,8 @@
   font-family: var(--font-outfit), var(--font-sans);
   font-size: var(--text-body-lead);
   line-height: var(--leading-lead);
-  color: var(--color-muted);
+  color: rgba(247, 248, 250, 0.88);
+  text-shadow: 0 1px 12px rgba(12, 40, 80, 0.28);
 }
 
 .m-landing-shell .m-hero__actions {

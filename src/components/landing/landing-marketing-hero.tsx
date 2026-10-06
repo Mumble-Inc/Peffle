@@ -4,6 +4,7 @@ import { Container } from "@/components/marketing/Container";
 import { GlassButton } from "@/components/marketing/GlassButton";
 import { PrimaryButton } from "@/components/marketing/PrimaryButton";
 import { LandingTrace } from "@/components/landing/landing-trace";
+import { CloudShader } from "@/components/ui/cloud-shader";
 import type { LandingShowcase } from "@/lib/services/desk-context";
 
 type Props = {
@@ -13,6 +14,9 @@ type Props = {
 export function LandingMarketingHero({ showcase }: Props) {
   return (
     <section className="m-hero rf-env-atmosphere" id="top" data-testid="glass-env-wash">
+      <div className="m-hero__sky" data-testid="hero-cloud-shader" aria-hidden>
+        <CloudShader className="h-full min-h-0 w-full" />
+      </div>
       <Container>
         <p className="m-hero__chip">{showcase.merchant.name}</p>
         <h1 id="hero-heading" className="m-hero__title">
