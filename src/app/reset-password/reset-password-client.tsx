@@ -1,14 +1,13 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { Button } from "@/components/ui/design-system";
+import { Button, ButtonLink } from "@/components/ui/design-system";
 import { PasswordInput } from "@/components/auth/password-input";
 
-export default function ResetPasswordClient() {
+export default function ResetPasswordClient({ merchantName }: { merchantName: string }) {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
@@ -44,19 +43,16 @@ export default function ResetPasswordClient() {
     <>
       <SiteHeader />
       <main id="content" className="mx-auto flex min-h-[60dvh] max-w-lg flex-col justify-center px-4 py-12">
-        <div className="rf-glass rounded-[16px] border border-line/70 p-6">
+        <div className="rf-glass-l2 p-6" data-rf-glass-level="2" data-rf-glass-purpose="reset-password">
           <h1 className="text-2xl font-semibold tracking-tight">Reset password</h1>
           {!token ? (
             <p className="mt-3 text-sm text-danger">Reset link is invalid.</p>
           ) : message ? (
             <>
               <p className="mt-3 text-sm text-success">{message}</p>
-              <Link
-                href="/desk"
-                className="rf-btn rf-btn-primary rf-motion-colors mt-6 inline-flex min-h-11 items-center rounded-[8px] px-5 text-sm font-medium text-white"
-              >
+              <ButtonLink href="/desk" className="mt-6">
                 Sign in at the desk
-              </Link>
+              </ButtonLink>
             </>
           ) : (
             <form className="mt-4 space-y-3" onSubmit={onSubmit}>
@@ -90,7 +86,7 @@ export default function ResetPasswordClient() {
           )}
         </div>
       </main>
-      <SiteFooter merchantName="Northline Audio" />
+      <SiteFooter merchantName={merchantName} />
     </>
   );
 }

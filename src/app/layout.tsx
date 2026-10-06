@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Outfit } from "next/font/google";
+import "./peffle-tokens.css";
 import "./globals.css";
 import "./os-layout.css";
 import "./mobile-layout.css";
 import "./desk-workspace.css";
+import "./marketing-chrome.css";
+import "./landing-marketing.css";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -36,7 +39,7 @@ export default function RootLayout({
     <html
       lang="en-IN"
       className={`${outfit.variable} ${ibmPlexMono.variable} h-full antialiased`}
-      data-theme="dark"
+      data-theme="light"
     >
       <body className="min-h-full bg-canvas text-ink">
         <a

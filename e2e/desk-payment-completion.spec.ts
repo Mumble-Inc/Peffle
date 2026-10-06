@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { prepareE2EBaseline, runDeskAgentWithIntent, ensureVerifiedBuyerForCheckout } from "./helpers/baseline";
+import { armSimulateDecline, prepareE2EBaseline, runDeskAgentWithIntent, ensureVerifiedBuyerForCheckout } from "./helpers/baseline";
 import { isRazorpayConfigured } from "./helpers/env";
 import {
   captureCurrentDeskSaleViaApi,
@@ -55,6 +55,7 @@ test.describe("Desk post-payment UX", () => {
   test("failed payment is not marked captured", async ({ page }) => {
     test.skip(!isRazorpayConfigured(), "Requires Razorpay test keys");
 
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await ensureVerifiedBuyerForCheckout(page);
     await page.getByTestId("simulate-decline").click();

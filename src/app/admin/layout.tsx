@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { headers } from "next/headers";
+import { AdminLayoutClient } from "@/components/admin/admin-layout-client";
 import { AuthError } from "@/lib/auth/errors";
 import { requireStaffSession } from "@/lib/auth/request";
 
@@ -33,5 +34,5 @@ export default async function AdminRouteLayout({ children }: { children: ReactNo
     throw error;
   }
 
-  return children;
+  return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }

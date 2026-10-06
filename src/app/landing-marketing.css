@@ -1,0 +1,329 @@
+/* Swify-style centered landing hero + glass tabs (Peffle content only) */
+
+.m-landing-shell {
+  --color-page: #ffffff;
+  --color-ink: #1f1f1f;
+  --color-muted: #5f6368;
+  --glass-floating-fill: rgba(255, 255, 255, 0.42);
+  --glass-floating-border: rgba(60, 64, 67, 0.08);
+  --blur-glass-floating: 28px;
+  --saturate-glass-floating: 1.55;
+  --shadow-glass-floating:
+    rgba(255, 255, 255, 0.82) 0 1px 0 inset,
+    rgba(60, 64, 67, 0.06) 0 10px 28px -10px,
+    rgba(60, 64, 67, 0.04) 0 2px 6px -2px;
+  --blur-glass-icon: 16px;
+  --saturate-glass-icon: 1.5;
+  --space-4: 16px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --text-display-min: 2.75rem;
+  --text-display-max: 4.75rem;
+  --text-chip: 0.8125rem;
+  --tracking-display: -0.035em;
+  --leading-display: 1.02;
+  --content-max-lead: 42rem;
+  --size-control-hero: 44px;
+  --radius-pill: 9999px;
+  --color-primary-cta: #0c4186;
+  --color-primary-on: #ffffff;
+}
+
+.m-landing-shell {
+  position: relative;
+  background: #ffffff;
+}
+
+.m-landing-shell > :not(.rf-ambient) {
+  position: relative;
+  z-index: 1;
+}
+
+.rf-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.rf-ambient__mesh {
+  position: absolute;
+  inset: -8%;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 38%,
+    rgba(0, 0, 0, 0.45) 68%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 38%,
+    rgba(0, 0, 0, 0.45) 68%,
+    transparent 100%
+  );
+}
+
+.rf-ambient__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+.rf-landing-page .rf-landing,
+.rf-landing-page .m-hero.rf-env-atmosphere,
+.rf-landing-page .rf-land-cta.rf-env-atmosphere {
+  background: transparent;
+  background-image: none;
+}
+
+@media (max-width: 768px) {
+  .rf-ambient__mesh {
+    opacity: 0.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-ambient__mesh {
+    animation: none;
+  }
+}
+
+.m-landing-shell .m-main {
+  padding-top: 0;
+}
+
+.m-landing-shell .m-header__bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.m-landing-shell .m-header__start {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  min-width: 0;
+}
+
+.m-landing-shell .m-header__center {
+  justify-self: stretch;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.m-landing-shell .m-header__center::-webkit-scrollbar {
+  display: none;
+}
+
+.m-landing-shell .m-header__actions {
+  justify-self: end;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  min-width: max-content;
+}
+
+.m-landing-shell .m-header .m-header__download.btn-primary {
+  display: inline-flex;
+}
+
+.m-landing-shell .m-header__center-tabs {
+  display: block;
+}
+
+.m-landing-shell .m-header .btn-primary,
+.m-landing-shell .m-hero .btn-primary,
+.m-landing-shell .m-footer .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--size-control-header);
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-cta);
+  color: var(--color-primary-on);
+  box-shadow: var(--shadow-primary);
+  font-family: var(--font-outfit), var(--font-sans);
+  font-size: var(--text-control);
+  font-weight: 500;
+  line-height: 1.25;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.m-landing-shell .btn-primary:hover {
+  opacity: 0.92;
+}
+
+.m-landing-shell .m-header__login .rf-topbar-login {
+  min-height: var(--size-control-header);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: var(--text-control);
+}
+
+.m-landing-shell .glass-floating {
+  background: var(--glass-floating-fill);
+  border: var(--border-width-hairline) solid var(--glass-floating-border);
+  box-shadow: var(--shadow-glass-floating);
+  backdrop-filter: blur(var(--blur-glass-floating)) saturate(var(--saturate-glass-floating));
+  -webkit-backdrop-filter: blur(var(--blur-glass-floating)) saturate(var(--saturate-glass-floating));
+}
+
+.m-landing-shell .glass-tabs {
+  display: inline-flex;
+  position: relative;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  gap: 2px;
+}
+
+.m-landing-shell .glass-tabs.glass-floating {
+  padding: 5px;
+}
+
+.m-landing-shell .glass-tabs__tab {
+  position: relative;
+  z-index: 1;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: var(--font-outfit), var(--font-sans);
+  font-size: var(--text-control);
+  font-weight: 500;
+  color: var(--color-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--duration-ui);
+}
+
+.m-landing-shell .glass-tabs__tab[aria-selected="true"] {
+  color: var(--color-ink);
+}
+
+.m-landing-shell .glass-tabs__indicator {
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  border-radius: var(--radius-pill);
+  background: var(--glass-active-fill);
+  border: var(--border-width-hairline) solid var(--glass-floating-border);
+  box-shadow: var(--shadow-glass-icon);
+  backdrop-filter: blur(var(--blur-glass-icon)) saturate(var(--saturate-glass-icon));
+  -webkit-backdrop-filter: blur(var(--blur-glass-icon)) saturate(var(--saturate-glass-icon));
+}
+
+.m-landing-shell .m-hero {
+  position: relative;
+  text-align: center;
+  padding-block: clamp(32px, 6vw, 64px) clamp(48px, 10vw, 96px);
+  background: transparent;
+  border: none;
+}
+
+.m-landing-shell .m-hero__chip {
+  display: inline-flex;
+  margin-bottom: var(--space-7);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-chip);
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.m-landing-shell .m-hero__title {
+  margin: 0 auto var(--space-4);
+  max-width: 16ch;
+  font-family: var(--font-outfit), var(--font-sans);
+  font-size: clamp(var(--text-display-min), 5.5vw + 1rem, var(--text-display-max));
+  font-weight: 600;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  color: var(--color-ink);
+  text-wrap: balance;
+}
+
+.m-landing-shell .m-hero__lead {
+  margin: 0 auto var(--space-8);
+  max-width: var(--content-max-lead);
+  font-family: var(--font-outfit), var(--font-sans);
+  font-size: var(--text-body-lead);
+  line-height: var(--leading-lead);
+  color: var(--color-muted);
+}
+
+.m-landing-shell .m-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: clamp(2rem, 5vw, 3rem);
+}
+
+.m-landing-shell .m-hero__actions .btn-primary {
+  height: var(--size-control-hero);
+  padding-inline: 20px;
+  border-radius: 9999px;
+}
+
+.m-landing-shell .m-hero__actions .btn-glass {
+  min-height: var(--size-control-hero);
+  padding-inline: 20px;
+}
+
+.m-landing-shell .m-hero__stage {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+  text-align: left;
+}
+
+.m-landing-shell #how-it-works,
+.m-landing-shell #live-trace,
+.m-landing-shell #the-gate,
+.m-landing-shell #ledger,
+.m-landing-shell #top {
+  scroll-margin-top: calc(var(--header-height) + 12px);
+}
+
+.m-landing-shell .m-logo-chip__mark {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .m-landing-shell .m-header__actions .m-header__login {
+    order: 10;
+  }
+
+  .m-landing-shell .glass-tabs__tab {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .m-landing-shell .glass-floating,
+  .m-landing-shell .glass-tabs__indicator {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--color-surface);
+  }
+}

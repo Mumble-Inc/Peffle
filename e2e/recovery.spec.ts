@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { isRazorpayConfigured } from "./helpers/env";
-import { ensureVerifiedBuyerForCheckout, prepareE2EBaseline, authenticateStaff, expectAdminNavLinkVisible, runDeskAgentWithIntent } from "./helpers/baseline";
+import { armSimulateDecline, ensureVerifiedBuyerForCheckout, prepareE2EBaseline, authenticateStaff, expectAdminNavLinkVisible, runDeskAgentWithIntent } from "./helpers/baseline";
 
 test.describe("Revenue recovery E2E", () => {
   test.beforeEach(async ({ page }) => {
@@ -10,6 +10,7 @@ test.describe("Revenue recovery E2E", () => {
   test("desk failed payment can recover with successful retry", async ({ page }) => {
     test.skip(!isRazorpayConfigured(), "Requires Razorpay test keys for checkout order creation");
 
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("authorize")).toBeEnabled({ timeout: 15_000 });
     await ensureVerifiedBuyerForCheckout(page);
@@ -42,6 +43,7 @@ test.describe("Revenue recovery E2E", () => {
       });
     });
 
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("authorize")).toBeEnabled({ timeout: 15_000 });
     await ensureVerifiedBuyerForCheckout(page);

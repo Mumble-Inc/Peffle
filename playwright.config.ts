@@ -41,7 +41,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: `npx next dev --port ${e2ePort}`,
+    command: `node --require ./scripts/readlink-shim.cjs ./node_modules/next/dist/bin/next dev --webpack --port ${e2ePort}`,
     url: e2eBaseUrl,
     reuseExistingServer: false,
     timeout: 120_000,

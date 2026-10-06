@@ -11,7 +11,7 @@ Reading: trust-first fintech product for merchants and judges. Quiet premium-neu
 
 Landing dials: variance 6, motion 5, density 4. Desk dials: variance 4, motion 4, density 6.
 
-Tokens live in `src/app/globals.css`. Accent is settlement teal only. Fonts: Outfit + IBM Plex Mono. No Inter. No Fraunces. No Instrument Serif. No AI purple. No em dashes in UI copy. No crypto terminal.
+Tokens live in `src/app/peffle-tokens.css` (Google Remix light + Remix dark). Primary actions use `--primary` / `#0C4186` via `--rf-accent`; CSS `--accent` stays transparent per Remix. Fonts: Outfit + IBM Plex Mono. No Inter. No Fraunces. No Instrument Serif. No AI purple. No em dashes in UI copy. No crypto terminal. No legacy settlement teal.
 
 Radius: controls 8px, panels 12px, glass overlays 16px. Phosphor icons only, one family, weight regular.
 

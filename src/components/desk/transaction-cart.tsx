@@ -7,6 +7,7 @@ import type { CartState } from "@/hooks/use-cart";
 type TransactionCartProps = {
   cart: CartState;
   loading: boolean;
+  error?: string | null;
   readOnly?: boolean;
   onUpdateQuantity: (lineId: string, quantity: number) => void | Promise<boolean>;
   onRemoveLine: (lineId: string) => void | Promise<boolean>;
@@ -15,6 +16,7 @@ type TransactionCartProps = {
 export function TransactionCart({
   cart,
   loading,
+  error = null,
   readOnly = false,
   onUpdateQuantity,
   onRemoveLine,
@@ -32,6 +34,12 @@ export function TransactionCart({
       <h3 id="transaction-cart-heading" className="text-xs font-medium uppercase tracking-wide text-muted">
         Cart
       </h3>
+
+      {error ? (
+        <p className="mt-2 text-sm text-danger" role="alert">
+          {error}
+        </p>
+      ) : null}
 
       {loading && isEmpty ? (
         <p className="mt-2 text-sm text-muted">Loading cart…</p>

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { isRazorpayConfigured } from "./helpers/env";
 import {
+  armSimulateDecline,
   authenticateMerchant,
   ensureVerifiedBuyerForCheckout,
   prepareE2EBaseline,
@@ -87,6 +88,7 @@ test.describe("Phase 7 journey regression", () => {
       });
     });
 
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("authorize")).toBeEnabled({ timeout: 15_000 });
     await ensureVerifiedBuyerForCheckout(page);

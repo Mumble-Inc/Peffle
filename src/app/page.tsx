@@ -1,3 +1,4 @@
+import { AmbientBackground } from "@/components/landing/ambient-background";
 import { LandingPageContent } from "@/components/landing/landing-page-content";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -16,7 +17,8 @@ export default async function HomePage() {
         : "0";
 
   return (
-    <>
+    <div className="rf-landing-page m-landing-shell">
+      <AmbientBackground />
       <SiteHeader />
       <LandingPageContent
         showcase={showcase}
@@ -24,6 +26,6 @@ export default async function HomePage() {
         policyBlockLabel={policyBlockLabel}
       />
       <SiteFooter merchantName={showcase.merchant.name} />
-    </>
+    </div>
   );
 }

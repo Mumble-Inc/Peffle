@@ -38,10 +38,12 @@ export function useCart(sessionId: string | null) {
   const [cart, setCart] = useState<CartState>(EMPTY_CART);
   const [loading, setLoading] = useState(false);
   const [addedSku, setAddedSku] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     if (!sessionId) {
       setCart(EMPTY_CART);
+      setError(null);
       return;
     }
     setLoading(true);
@@ -49,9 +51,15 @@ export function useCart(sessionId: string | null) {
       const response = await fetch(`/api/cart?sessionId=${encodeURIComponent(sessionId)}`, {
         credentials: "include",
       });
-      if (!response.ok) return;
+      if (!response.ok) {
+        setError("Could not refresh the cart.");
+        return;
+      }
       const payload = (await response.json()) as { cart: CartState };
       setCart(payload.cart);
+      setError(null);
+    } catch {
+      setError("Could not refresh the cart.");
     } finally {
       setLoading(false);
     }
@@ -75,9 +83,13 @@ export function useCart(sessionId: string | null) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId, sku, quantity }),
     });
-    if (!response.ok) return false;
+    if (!response.ok) {
+      setError("Could not add that item to the cart.");
+      return false;
+    }
     const payload = (await response.json()) as { cart: CartState };
     setCart(payload.cart);
+    setError(null);
     setAddedSku(sku);
     dispatchCartUpdated();
     window.setTimeout(() => setAddedSku(null), 2000);
@@ -92,9 +104,13 @@ export function useCart(sessionId: string | null) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId, lineId, quantity }),
     });
-    if (!response.ok) return false;
+    if (!response.ok) {
+      setError("Could not update the cart.");
+      return false;
+    }
     const payload = (await response.json()) as { cart: CartState };
     setCart(payload.cart);
+    setError(null);
     dispatchCartUpdated();
     return true;
   }
@@ -107,12 +123,16 @@ export function useCart(sessionId: string | null) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId, lineId }),
     });
-    if (!response.ok) return false;
+    if (!response.ok) {
+      setError("Could not update the cart.");
+      return false;
+    }
     const payload = (await response.json()) as { cart: CartState };
     setCart(payload.cart);
+    setError(null);
     dispatchCartUpdated();
     return true;
   }
 
-  return { cart, loading, addedSku, refresh, addSku, updateQuantity, removeLine };
+  return { cart, loading, error, addedSku, refresh, addSku, updateQuantity, removeLine };
 }

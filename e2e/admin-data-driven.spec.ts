@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { isRazorpayConfigured } from "./helpers/env";
-import { authenticateMerchant, ensureVerifiedBuyerForCheckout, prepareE2EBaseline, runDeskAgentWithIntent } from "./helpers/baseline";
+import { armSimulateDecline, authenticateMerchant, ensureVerifiedBuyerForCheckout, prepareE2EBaseline, runDeskAgentWithIntent } from "./helpers/baseline";
 
 async function fetchOverviewJson(page: import("@playwright/test").Page) {
   await authenticateMerchant(page.request);
@@ -30,6 +30,7 @@ test.describe("Admin data-driven E2E", () => {
   test("desk commerce flow updates admin metrics and activity", async ({ page }) => {
     const baseline = await fetchOverviewJson(page);
 
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("product-name")).toHaveText("Northline Halo ANC", {
       timeout: 15_000,

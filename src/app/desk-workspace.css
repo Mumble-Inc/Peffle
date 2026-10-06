@@ -3,24 +3,24 @@
 .rf-peffle-desk {
   --desk-sidebar: 14.5rem;
   --desk-rail: 23.5rem;
-  --desk-topbar: 3rem;
-  --desk-control: 2.15rem;
+  --desk-topbar: 4.25rem;
+  --desk-control: 2.75rem;
   --desk-radius: 8px;
-  --desk-hero-emphasis: #b7c4ea;
+  --desk-hero-emphasis: var(--rf-accent);
   display: grid;
   grid-template-columns: var(--desk-sidebar) minmax(0, 1fr);
   height: 100dvh;
   min-height: 100dvh;
   overflow: hidden;
-  background: #07090c;
+  background: var(--rf-canvas);
   color: var(--rf-ink);
 }
 
 .rf-peffle-desk-sidebar {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #1a2028;
-  background: #080b0f;
+  border-right: 1px solid var(--rf-line);
+  background: var(--rf-canvas);
   padding: 0.85rem 0.7rem 0.75rem;
   min-height: 0;
   height: 100%;
@@ -63,14 +63,14 @@
   min-height: 2.15rem;
   padding: 0 0.6rem;
   border-radius: 8px;
-  color: #9aa3ad;
+  color: var(--rf-muted);
   font-size: 0.8125rem;
   text-decoration: none;
 }
 
 .rf-peffle-desk-nav a[data-active="true"] {
-  background: #171e27;
-  color: var(--rf-ink);
+  background: var(--rf-accent-soft);
+  color: var(--rf-accent);
 }
 
 .rf-peffle-desk-nav a:hover {
@@ -94,15 +94,15 @@
   min-height: var(--desk-control);
   width: auto;
   padding: 0 0.7rem;
-  border: 1px solid #1f2830;
-  background: #0e141a;
+  border: 1px solid var(--rf-line);
+  background: var(--rf-canvas);
   border-radius: 8px;
   color: inherit;
   white-space: nowrap;
 }
 
 .rf-peffle-demo-card[data-on="true"] {
-  border-color: color-mix(in oklab, var(--rf-success) 35%, #1f2830);
+  border-color: color-mix(in oklab, var(--rf-success) 35%, var(--rf-line));
 }
 
 .rf-peffle-demo-dot {
@@ -136,7 +136,8 @@
   width: 1.85rem;
   height: 1.85rem;
   border-radius: 999px;
-  background: #1a222b;
+  background: var(--rf-canvas-2);
+  color: var(--rf-ink-soft);
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -154,12 +155,19 @@
 .rf-peffle-desk-topbar {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   height: var(--desk-topbar);
   min-height: var(--desk-topbar);
-  padding: 0 1rem;
-  border-bottom: 1px solid #1a2028;
-  background: #090c10;
+  padding: 0 clamp(1rem, 3vw, 1.5rem);
+  border-bottom: 1px solid var(--rf-line);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--background) 92%, transparent) 0%,
+    color-mix(in oklab, var(--background) 70%, transparent) 72%,
+    var(--background) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.35);
+  -webkit-backdrop-filter: blur(20px) saturate(1.35);
 }
 
 .rf-peffle-command {
@@ -172,9 +180,9 @@
   height: var(--desk-control);
   max-width: 40rem;
   padding: 0 0.65rem 0 0.8rem;
-  border: 1px solid #242c35;
+  border: 1px solid color-mix(in oklab, var(--rf-control-border) 55%, var(--rf-line));
   border-radius: 8px;
-  background: #10161c;
+  background: var(--rf-canvas);
 }
 
 .rf-peffle-command input {
@@ -188,11 +196,16 @@
   outline: none;
 }
 
+.rf-peffle-command input::placeholder {
+  color: var(--rf-muted);
+  opacity: 1;
+}
+
 .rf-peffle-command kbd {
   font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
   font-size: 0.6875rem;
   color: var(--rf-muted);
-  border: 1px solid #2a333d;
+  border: 1px solid var(--rf-line-strong);
   border-radius: 5px;
   padding: 0.12rem 0.35rem;
 }
@@ -213,15 +226,28 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  height: var(--desk-control);
-  gap: 0.4rem;
+  min-height: var(--desk-control);
+  gap: 0.375rem;
+  margin-left: auto;
+}
+
+@media (min-width: 640px) {
+  .rf-peffle-top-actions {
+    gap: 0.75rem;
+  }
 }
 
 .rf-peffle-top-actions > .flex {
   display: flex;
   align-items: center;
-  height: var(--desk-control);
-  gap: 0.4rem;
+  min-height: var(--desk-control);
+  gap: 0.375rem;
+}
+
+@media (min-width: 640px) {
+  .rf-peffle-top-actions > .flex {
+    gap: 0.75rem;
+  }
 }
 
 .rf-peffle-merchant-chip {
@@ -232,9 +258,9 @@
   height: var(--desk-control);
   min-height: var(--desk-control);
   padding: 0 0.65rem;
-  border: 1px solid #242c35;
+  border: 1px solid color-mix(in oklab, var(--rf-control-border) 55%, var(--rf-line));
   border-radius: 8px;
-  background: #10161c;
+  background: var(--rf-canvas);
   font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1;
@@ -260,16 +286,16 @@
   flex: 0 0 auto;
   width: var(--desk-control);
   height: var(--desk-control);
-  border: 1px solid #242c35;
+  border: 1px solid color-mix(in oklab, var(--rf-control-border) 55%, var(--rf-line));
   border-radius: 8px;
-  background: #10161c;
-  color: #9aa3ad;
+  background: var(--rf-canvas);
+  color: var(--rf-muted);
 }
 
 .rf-peffle-icon-btn:hover,
 .rf-peffle-merchant-chip:hover,
 .rf-peffle-demo-card:hover {
-  border-color: #35404a;
+  border-color: var(--rf-line-strong);
   color: var(--rf-ink);
 }
 
@@ -280,12 +306,16 @@
 .rf-peffle-filters button:focus-visible,
 .rf-peffle-catalog-tools button:focus-visible,
 .rf-peffle-catalog-tools select:focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--rf-accent) 70%, white);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--rf-shadow-focus);
 }
 
-.rf-peffle-top-actions [aria-haspopup="dialog"],
-.rf-peffle-top-actions button[aria-label="Log in"] {
+.rf-peffle-top-actions .rf-desk-login-slot {
+  order: 99;
+  flex-shrink: 0;
+}
+
+.rf-peffle-top-actions [aria-haspopup="dialog"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -293,14 +323,56 @@
   height: var(--desk-control);
   min-height: var(--desk-control);
   padding: 0;
-  border: 1px solid #242c35;
+  border: 1px solid color-mix(in oklab, var(--rf-control-border) 55%, var(--rf-line));
   border-radius: 8px;
-  background: #10161c;
+  background: var(--rf-canvas);
 }
 
-.rf-peffle-top-actions [aria-haspopup="dialog"] span,
-.rf-peffle-top-actions button[aria-label="Log in"] span {
+.rf-peffle-top-actions [aria-haspopup="dialog"] span {
   display: none;
+}
+
+.rf-peffle-top-actions .rf-topbar-login {
+  flex-shrink: 0;
+}
+
+.rf-peffle-desk-topbar {
+  position: relative;
+}
+
+.rf-desk-guest-notice {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 1rem;
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--rf-radius-panel);
+  background: var(--card);
+  box-shadow: var(--rf-shadow-e2);
+}
+
+.rf-desk-guest-notice-dismiss {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.25rem -0.25rem 0;
+  border: 0;
+  border-radius: var(--rf-radius-control);
+  background: transparent;
+  color: var(--rf-muted);
+  cursor: pointer;
+}
+
+.rf-desk-guest-notice-dismiss:hover {
+  color: var(--rf-ink);
+  background: var(--rf-bg-secondary);
 }
 
 .rf-peffle-desk-body {
@@ -315,6 +387,7 @@
   min-width: 0;
   overflow: auto;
   padding: 0.9rem 1.15rem 1.75rem;
+  background: var(--rf-canvas-2);
 }
 
 .rf-peffle-desk-context {
@@ -324,8 +397,8 @@
   min-height: 0;
   height: 100%;
   overflow: hidden;
-  background: #0b1015;
-  border-left: 1px solid #1a2028;
+  background: var(--rf-surface);
+  border-left: 1px solid var(--rf-line);
 }
 
 .rf-peffle-desk .rf-peffle-hero,
@@ -339,9 +412,9 @@
   min-height: 12.25rem;
   max-height: 13.25rem;
   border-radius: 12px;
-  border: 1px solid #1c242d;
+  border: 1px solid var(--rf-line);
   padding: 1.15rem 1.35rem 1rem;
-  background: #0c1116;
+  background: var(--rf-bg-wash);
   grid-template-columns: none;
 }
 
@@ -362,8 +435,8 @@
   height: 100%;
   object-fit: cover;
   object-position: 78% 42%;
-  opacity: 0.58;
-  filter: saturate(0.82) contrast(1.08);
+  opacity: 0.92;
+  filter: saturate(1.02) contrast(1.02);
 }
 
 .rf-peffle-hero-media::after {
@@ -371,8 +444,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgb(7 9 12 / 0.9) 0%, rgb(7 9 12 / 0.58) 46%, rgb(7 9 12 / 0.18) 100%),
-    linear-gradient(180deg, rgb(7 9 12 / 0.08), rgb(7 9 12 / 0.42));
+    linear-gradient(90deg, rgb(255 255 255 / 0.94) 0%, rgb(255 255 255 / 0.72) 46%, rgb(255 255 255 / 0.12) 100%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.35));
 }
 
 .rf-peffle-hero-kicker {
@@ -380,7 +453,7 @@
   font-weight: 550;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #8b959f;
+  color: var(--rf-muted);
 }
 
 .rf-peffle-hero h1 {
@@ -391,6 +464,7 @@
   letter-spacing: -0.04em;
   line-height: 1.12;
   text-wrap: balance;
+  color: var(--rf-ink);
 }
 
 .rf-peffle-hero h1 span {
@@ -402,7 +476,7 @@
   max-width: 48ch;
   font-size: 0.8125rem;
   line-height: 1.4;
-  color: #a7b0b9;
+  color: var(--rf-ink-soft);
 }
 
 .rf-peffle-chips {
@@ -418,16 +492,16 @@
   gap: 0.35rem;
   min-height: 1.85rem;
   padding: 0 0.7rem;
-  border: 1px solid #2a333c;
+  border: 1px solid var(--rf-line-strong);
   border-radius: 999px;
-  background: rgb(12 16 21 / 0.78);
-  color: #d7dde3;
+  background: var(--rf-canvas);
+  color: var(--rf-ink-soft);
   font-size: 0.75rem;
   white-space: nowrap;
 }
 
 .rf-peffle-chips button:hover {
-  border-color: #3a4550;
+  border-color: var(--rf-control-border);
   color: var(--rf-ink);
 }
 
@@ -473,8 +547,10 @@
   place-items: center;
   width: 1.85rem;
   height: 1.85rem;
-  border: 1px solid #2a333c !important;
+  border: 1px solid var(--rf-line-strong) !important;
   border-radius: 999px !important;
+  background: var(--rf-canvas);
+  color: var(--rf-muted);
 }
 
 .rf-peffle-catalog-tools {
@@ -487,9 +563,9 @@
 
 .rf-peffle-catalog-tools select {
   height: 1.85rem;
-  border: 1px solid #2a333c;
+  border: 1px solid var(--rf-line-strong);
   border-radius: 999px;
-  background: #12181f;
+  background: var(--rf-canvas);
   color: var(--rf-ink);
   font-size: 0.75rem;
   padding: 0 0.75rem;
@@ -501,16 +577,16 @@
   width: 1.85rem;
   height: 1.85rem;
   padding: 0;
-  border: 1px solid #2a333c;
+  border: 1px solid var(--rf-line-strong);
   border-radius: 8px;
-  background: #12181f;
-  color: #8b959f;
+  background: var(--rf-canvas);
+  color: var(--rf-muted);
 }
 
 .rf-peffle-catalog-tools button[data-active="true"] {
-  border-color: #3a4550;
+  border-color: var(--rf-control-border);
   color: var(--rf-ink);
-  background: #171e27;
+  background: var(--rf-canvas-2);
 }
 
 .rf-peffle-filters button,
@@ -520,13 +596,13 @@
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
-  color: #8b959f;
+  color: var(--rf-muted);
   font-size: 0.75rem;
 }
 
 .rf-peffle-filters button[data-active="true"] {
-  border-color: #2a333c;
-  background: #12181f;
+  border-color: var(--rf-line-strong);
+  background: var(--rf-canvas);
   color: var(--rf-ink);
 }
 
@@ -554,20 +630,21 @@
 .rf-peffle-product-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid #1c242d;
+  border: 1px solid var(--rf-line);
   border-radius: 10px;
-  background: #10161c;
+  background: var(--rf-canvas);
   overflow: hidden;
+  box-shadow: var(--rf-shadow-e1);
 }
 
 .rf-peffle-product-card[data-primary="true"] {
-  border-color: color-mix(in oklab, var(--rf-accent) 28%, #1c242d);
+  border-color: color-mix(in oklab, var(--rf-accent) 28%, var(--rf-line));
 }
 
 .rf-peffle-product-media {
   position: relative;
   aspect-ratio: 1.05 / 1;
-  background: #0c1116;
+  background: var(--rf-bg-section);
 }
 
 .rf-peffle-product-media img {
@@ -585,10 +662,20 @@
   place-items: center;
   width: 1.7rem;
   height: 1.7rem;
-  border: 0;
+  border: 1px solid var(--rf-glass-border);
   border-radius: 999px;
-  background: rgb(8 11 15 / 0.62);
-  color: #c9d0d6;
+  background: var(--rf-glass);
+  backdrop-filter: blur(var(--rf-glass-blur)) saturate(var(--rf-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--rf-glass-blur)) saturate(var(--rf-glass-saturate));
+  color: var(--rf-ink);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .rf-peffle-bookmark {
+    background: var(--rf-canvas);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 .rf-peffle-product-body {
@@ -628,8 +715,8 @@
   padding: 0 0.7rem !important;
   border: 0 !important;
   border-radius: 7px !important;
-  background: #eceae4 !important;
-  color: #111418 !important;
+  background: var(--rf-ink) !important;
+  color: var(--rf-canvas) !important;
   font-size: 0.75rem !important;
   font-weight: 550;
   gap: 0 !important;
@@ -655,7 +742,7 @@
 .rf-peffle-rail-tabs {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid #1a2028;
+  border-bottom: 1px solid var(--rf-line);
   padding: 0 0.35rem;
 }
 
@@ -664,7 +751,7 @@
   border: 0;
   border-bottom: 2px solid transparent;
   background: transparent;
-  color: #8b959f;
+  color: var(--rf-muted);
   font-size: 0.8125rem;
   font-weight: 500;
 }
@@ -674,8 +761,8 @@
 }
 
 .rf-peffle-rail-tabs button[data-active="true"] {
-  color: var(--rf-ink);
-  border-bottom-color: var(--rf-ink);
+  color: var(--rf-accent);
+  border-bottom-color: var(--rf-accent);
 }
 
 .rf-peffle-rail-body {
@@ -705,15 +792,16 @@
 
 .rf-peffle-bubble[data-from="user"] {
   align-self: flex-end;
-  background: #151c24;
-  color: #dfe4e9;
+  background: var(--rf-canvas-2);
+  color: var(--rf-ink);
+  border: 1px solid var(--rf-line);
 }
 
 .rf-peffle-bubble[data-from="agent"] {
   align-self: stretch;
   background: transparent;
   padding: 0;
-  color: #c5ccd3;
+  color: var(--rf-ink-soft);
 }
 
 .rf-peffle-agent-head {
@@ -722,7 +810,7 @@
   gap: 0.45rem;
   margin-bottom: 0.4rem;
   font-size: 0.75rem;
-  color: #9aa3ad;
+  color: var(--rf-muted);
 }
 
 .rf-peffle-mini-recs {
@@ -745,11 +833,12 @@
   object-fit: contain;
   padding: 0.3rem;
   border-radius: 8px;
-  background: #0c1116;
+  background: var(--rf-bg-section);
+  border: 1px solid var(--rf-line);
 }
 
 .rf-peffle-disclosure {
-  border-top: 1px solid #1a2028;
+  border-top: 1px solid var(--rf-line);
 }
 
 .rf-peffle-disclosure summary {
@@ -760,7 +849,7 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.8125rem;
-  color: #c5ccd3;
+  color: var(--rf-ink-soft);
 }
 
 .rf-peffle-disclosure summary::-webkit-details-marker {
@@ -776,16 +865,16 @@
   gap: 0.45rem;
   margin-top: auto;
   padding-top: 0.85rem;
-  border-top: 1px solid #1a2028;
+  border-top: 1px solid var(--rf-line);
 }
 
 .rf-peffle-chat-composer input {
   flex: 1;
   min-height: 2.5rem;
   padding: 0 0.8rem;
-  border: 1px solid #242c35;
+  border: 1px solid color-mix(in oklab, var(--rf-control-border) 55%, var(--rf-line));
   border-radius: 8px;
-  background: #10161c;
+  background: var(--rf-canvas);
   color: var(--rf-ink);
   font-size: 0.8125rem;
 }
@@ -793,14 +882,15 @@
 .rf-peffle-guard {
   margin: 0;
   border: 0;
-  border-top: 1px solid #1a2028;
+  border-top: 1px solid var(--rf-line);
   border-radius: 0;
-  background: #0e141a;
+  background: var(--rf-canvas-2);
   padding: 0.9rem 1.15rem 1rem;
 }
 
 .rf-peffle-guard[data-blocked="true"] {
-  border-color: color-mix(in oklab, var(--rf-danger) 45%, #1c242d);
+  border-top-color: color-mix(in oklab, var(--rf-blocked) 45%, var(--rf-line));
+  background: color-mix(in oklab, var(--rf-blocked) 6%, var(--rf-canvas-2));
 }
 
 .rf-peffle-guard-head {
@@ -814,7 +904,7 @@
   height: 0.35rem;
   margin: 0.85rem 0 0.9rem;
   border-radius: 999px;
-  background: #1a222b;
+  background: var(--rf-line);
   overflow: hidden;
 }
 
@@ -838,7 +928,7 @@
 
 .rf-peffle-guard-cap {
   font-size: 0.75rem;
-  color: #c5ccd3;
+  color: var(--rf-ink-soft);
   white-space: nowrap;
 }
 
@@ -857,13 +947,15 @@
   margin-top: 0.15rem;
   font-size: 0.8125rem;
   font-weight: 550;
+  color: var(--rf-ink);
 }
 
 .rf-peffle-stop {
   margin-bottom: 0.75rem;
   padding: 0.7rem 0.75rem;
   border-radius: 8px;
-  background: color-mix(in oklab, var(--rf-danger) 12%, #10161c);
+  background: color-mix(in oklab, var(--rf-danger) 12%, var(--rf-canvas));
+  border: 1px solid color-mix(in oklab, var(--rf-danger) 25%, var(--rf-line));
 }
 
 @media (max-width: 1180px) {
@@ -931,6 +1023,28 @@
 
   .rf-peffle-desk-canvas {
     padding: 1rem 0.9rem 1.75rem;
+  }
+
+  .rf-peffle-command kbd {
+    display: none;
+  }
+
+  .rf-peffle-desk-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--rf-canvas);
+  }
+
+  .rf-desk-transact-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background: var(--rf-surface);
+    border-top: 1px solid var(--rf-line);
   }
 }
 

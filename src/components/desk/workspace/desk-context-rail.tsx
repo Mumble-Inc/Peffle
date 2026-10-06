@@ -48,6 +48,7 @@ export function DeskContextRail({
   result,
   cart,
   cartLoading,
+  cartError = null,
   sessionId,
   phase,
   policies,
@@ -76,6 +77,7 @@ export function DeskContextRail({
   result: AgentResult | null;
   cart: CartState;
   cartLoading: boolean;
+  cartError?: string | null;
   sessionId: string | null;
   phase: Phase;
   policies: MerchantPolicies | null;
@@ -209,10 +211,11 @@ export function DeskContextRail({
           </div>
         ) : null}
 
-        <div className={tab === "cart" ? "flex flex-1 flex-col" : undefined} hidden={tab === "policy" || tab === "trace"}>
+        <div className={tab === "cart" ? "flex flex-1 flex-col" : undefined} hidden={tab !== "cart"}>
           <TransactionCart
             cart={cart}
             loading={cartLoading}
+            error={cartError}
             readOnly={phase === "captured"}
             onUpdateQuantity={onUpdateQuantity}
             onRemoveLine={onRemoveLine}
@@ -231,6 +234,9 @@ export function DeskContextRail({
         </div>
 
         {tab === "policy" ? (
+          policyCopy.length === 0 && !(result?.policies.length) ? (
+            <p className="text-sm text-muted">Merchant policy loads with the desk.</p>
+          ) : (
           <ul className="space-y-3 text-sm">
             {policyCopy.map((item) => (
               <li key={item.id} className="border-b border-line/40 pb-3 last:border-0">
@@ -248,6 +254,7 @@ export function DeskContextRail({
               </li>
             ))}
           </ul>
+          )
         ) : null}
 
         {tab === "trace" && !(demoModeAvailable && demoModeOn) ? (
@@ -257,7 +264,7 @@ export function DeskContextRail({
             </p>
         ) : null}
 
-        {demoModeAvailable && demoModeOn ? (
+        {tab === "trace" && demoModeAvailable && demoModeOn ? (
             <PeffleGuardTrace
               sessionId={sessionId}
               on={demoModeOn}
@@ -292,15 +299,17 @@ export function DeskContextRail({
                   "Authorize"
                 )}
               </button>
-              <button
-                type="button"
-                data-testid="simulate-decline"
-                disabled={result?.status !== "ready" || cart.itemCount === 0 || busy || transactionLocked}
-                onClick={onSimulateDecline}
-                className="mt-2 flex min-h-11 w-full items-center justify-center rounded-[8px] border border-line text-sm text-ink-soft hover:text-ink disabled:opacity-50"
-              >
-                Simulate decline
-              </button>
+              {demoModeAvailable && demoModeOn ? (
+                <button
+                  type="button"
+                  data-testid="simulate-decline"
+                  disabled={result?.status !== "ready" || cart.itemCount === 0 || busy || transactionLocked}
+                  onClick={onSimulateDecline}
+                  className="mt-2 flex min-h-11 w-full items-center justify-center rounded-[8px] border border-line text-sm text-ink-soft hover:text-ink disabled:opacity-50"
+                >
+                  Simulate decline
+                </button>
+              ) : null}
             </>
           )}
         </div>

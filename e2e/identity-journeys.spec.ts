@@ -10,6 +10,7 @@ import {
   STAFF_EMAIL,
   TEST_PASSWORD,
 } from "./helpers/baseline";
+import { installRazorpayDismissMock } from "./helpers/desk-payment";
 
 test.describe("Phase 11 account journeys", () => {
   test.beforeEach(async ({ page }) => {
@@ -19,17 +20,18 @@ test.describe("Phase 11 account journeys", () => {
   test("desk recommend → authorize → account auth → checkout continues", async ({ page }) => {
     test.skip(!isRazorpayConfigured(), "Requires Razorpay test keys for checkout order creation");
 
+    await installRazorpayDismissMock(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("product-name")).toHaveText("Northline Halo ANC", {
       timeout: 15_000,
     });
     await expect(page.getByTestId("authorize")).toBeEnabled({ timeout: 15_000 });
 
-    await page.getByTestId("simulate-decline").click();
+    await page.getByTestId("authorize").click();
     await completeDeskAccountAuthUi(page, `e2e-buyer-${Date.now()}@example.com`);
 
-    await expect(page.getByTestId("payment-failed")).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByTestId("retry-payment")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("payment-not-completed")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId("try-payment-again")).toBeVisible({ timeout: 15_000 });
   });
 
   test("verified buyer does not see Admin and cannot open admin portal", async ({ page }) => {

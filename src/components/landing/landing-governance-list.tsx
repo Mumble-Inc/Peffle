@@ -10,7 +10,10 @@ export function LandingGovernanceList({ items }: LandingGovernanceListProps) {
       {items.map((item) => (
         <div key={item.id} className="rf-guardrail-row">
           <dt>{item.title}</dt>
-          <dd>{item.rule}</dd>
+          <dd>
+            <p>{item.rule}</p>
+            <p className="mt-1 text-muted">{item.why}</p>
+          </dd>
         </div>
       ))}
     </dl>

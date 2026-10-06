@@ -1,16 +1,14 @@
 import { createHash, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { Prisma, type BuyerAccount } from "@prisma/client";
 import { getSessionSecret } from "@/lib/auth/secret";
-import {
-  resolveAccountCapability,
-  type BuyerCapability,
-} from "@/lib/auth/capability";
+import { type BuyerCapability } from "@/lib/auth/capability";
 import { hashPassword, validatePasswordStrength, verifyPassword } from "@/lib/auth/password";
 import { sendPasswordResetEmail, sendVerificationCodeEmail } from "@/lib/email/provider";
 import { db } from "@/lib/db";
 import {
   getIdentityForSession,
   normalizeEmail,
+  resolveAccountCapability,
   type BuyerIdentityView,
 } from "@/lib/services/buyer-identity";
 

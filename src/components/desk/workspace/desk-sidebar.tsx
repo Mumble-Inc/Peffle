@@ -11,7 +11,7 @@ import {
   SlidersHorizontal,
 } from "@phosphor-icons/react";
 import { Mark } from "@/components/mark";
-import { capabilityLabel, type BuyerCapability } from "@/lib/auth/capability";
+import { capabilityLabel, isStaffOrAdmin, type BuyerCapability } from "@/lib/auth/capability";
 
 const NAV = [
   { href: "/desk", label: "Desk", icon: House, exact: true },
@@ -22,12 +22,14 @@ const NAV = [
   { href: "/admin/insights", label: "Analytics", icon: ChartLineUp },
 ] as const;
 
+const STAFF_NAV = new Set(["/admin/orders", "/admin/policies", "/admin", "/admin/insights"]);
+
 function initialsFromEmail(email: string | null) {
-  if (!email) return "NA";
+  if (!email) return "—";
   const local = email.split("@")[0] ?? "";
   const parts = local.split(/[._-]/).filter(Boolean);
   if (parts.length >= 2) return `${parts[0]![0] ?? ""}${parts[1]![0] ?? ""}`.toUpperCase();
-  return local.slice(0, 2).toUpperCase() || "NA";
+  return local.slice(0, 2).toUpperCase() || "—";
 }
 
 export function DeskModeCard({
@@ -90,6 +92,8 @@ export function DeskSidebar({
 }) {
   const pathname = usePathname();
   const identityEmail = email ?? "Guest";
+  const staff = isStaffOrAdmin(capability);
+  const nav = NAV.filter((item) => staff || !STAFF_NAV.has(item.href));
 
   return (
     <aside className="rf-peffle-desk-sidebar">
@@ -102,7 +106,7 @@ export function DeskSidebar({
       </Link>
 
       <nav className="rf-peffle-desk-nav" aria-label="Desk">
-        {NAV.map((item) => {
+        {nav.map((item) => {
           const Icon = item.icon;
           const active =
             item.label === "Desk"

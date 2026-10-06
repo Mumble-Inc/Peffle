@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { Gauge, ShieldCheck, Storefront } from "@phosphor-icons/react";
+import { useState, type ReactNode } from "react";
+import { List, ShieldCheck, Storefront, X } from "@phosphor-icons/react";
 import { AccountTopBarActions } from "@/components/auth/account-top-bar-actions";
 import { useAuthSession } from "@/components/auth/use-auth-session";
 import { Mark } from "@/components/mark";
+import { ButtonLink } from "@/components/ui/design-system";
 import { PUBLIC_NAV } from "@/components/shell/nav-config";
 import { useScrollCollapse } from "@/components/shell/use-scroll-collapse";
 import { isStaffOrAdmin } from "@/lib/auth/capability";
@@ -26,6 +27,48 @@ function isPublicNavActive(pathname: string, href: string, exact?: boolean) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function PublicMobileNav({ pathname }: { pathname: string }) {
+  const [open, setOpen] = useState(false);
+  const guardrailsHref = pathname === "/" ? "#guardrails-heading" : "/#guardrails-heading";
+
+  return (
+    <div className="relative sm:hidden">
+      <button
+        type="button"
+        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[8px] text-ink-soft hover:text-ink"
+        aria-expanded={open}
+        aria-controls="public-mobile-nav"
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpen((current) => !current)}
+      >
+        {open ? <X className="size-5" aria-hidden /> : <List className="size-5" aria-hidden />}
+      </button>
+      {open ? (
+        <nav
+          id="public-mobile-nav"
+          aria-label="Primary"
+          className="rf-elevated absolute right-0 top-full z-50 mt-2 w-52 p-2"
+        >
+          <Link
+            href="/desk"
+            className="flex min-h-11 items-center rounded-[8px] px-3 text-sm text-ink hover:bg-canvas-2"
+            onClick={() => setOpen(false)}
+          >
+            Desk
+          </Link>
+          <a
+            href={guardrailsHref}
+            className="flex min-h-11 items-center rounded-[8px] px-3 text-sm text-ink hover:bg-canvas-2"
+            onClick={() => setOpen(false)}
+          >
+            Guardrails
+          </a>
+        </nav>
+      ) : null}
+    </div>
+  );
+}
+
 export function AppTopBar({
   variant,
   merchantName,
@@ -40,6 +83,11 @@ export function AppTopBar({
   const auth = useAuthSession();
   const showStaffPoliciesLink =
     !auth.loading && auth.authenticated && isStaffOrAdmin(auth.capability);
+  const isLanding = variant === "public" && pathname === "/";
+  const guardrailsHref = isLanding ? "#guardrails-heading" : "/#guardrails-heading";
+  const publicNav = isLanding
+    ? PUBLIC_NAV.filter((link) => link.href === "/desk")
+    : PUBLIC_NAV.filter((link) => link.href !== "/admin");
 
   return (
     <header className="rf-app-topbar" data-collapsed={collapsed ? "true" : "false"}>
@@ -74,9 +122,10 @@ export function AppTopBar({
             </div>
 
             {variant === "public" ? (
-              <div className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+              <div className="flex min-w-0 items-center gap-1.5 sm:gap-3 shrink-0">
+                <PublicMobileNav pathname={pathname} />
                 <nav aria-label="Primary" className="hidden min-w-0 items-center gap-0.5 sm:flex sm:gap-1">
-                  {PUBLIC_NAV.filter((link) => link.href !== "/admin").map((link) => {
+                  {publicNav.map((link) => {
                     const active = isPublicNavActive(pathname, link.href, link.exact);
                     return (
                       <Link
@@ -90,7 +139,20 @@ export function AppTopBar({
                       </Link>
                     );
                   })}
+                  {isLanding ? (
+                    <a
+                      href={guardrailsHref}
+                      className="rf-nav-item rf-motion-colors rounded-[6px] px-2.5 py-1.5 text-sm text-ink-soft hover:text-ink sm:px-3"
+                    >
+                      Guardrails
+                    </a>
+                  ) : null}
                 </nav>
+                {isLanding ? (
+                  <ButtonLink href="/desk" className="hidden min-h-11 sm:inline-flex">
+                    Open the desk
+                  </ButtonLink>
+                ) : null}
                 <AccountTopBarActions sessionId={sessionId} />
               </div>
             ) : (

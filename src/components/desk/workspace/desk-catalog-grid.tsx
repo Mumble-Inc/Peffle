@@ -149,6 +149,11 @@ export function DeskCatalogGrid({
           className="mb-3 h-9 w-full max-w-sm rounded-[8px] border border-line bg-canvas-2 px-3 text-sm"
         />
       ) : null}
+      {products.length === 0 ? (
+        <p className="py-8 text-sm text-muted" role="status">
+          No products match this filter.
+        </p>
+      ) : null}
       <div className="rf-peffle-product-grid" data-layout={layout}>
         {products.map((product) => {
           const primary = highlightedSku === product.sku;
@@ -203,7 +208,7 @@ export function DeskCatalogGrid({
                       label="Add"
                       inCart={inCart}
                       onAdded={onCartChange}
-                      className="rf-peffle-product-add border-0 bg-[#eceae4] px-2 text-[#111418] hover:border-0 hover:text-[#111418]"
+                      className="rf-peffle-product-add"
                     />
                   )}
                 </div>

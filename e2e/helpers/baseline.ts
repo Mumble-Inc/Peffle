@@ -127,6 +127,21 @@ export async function authenticateStaff(request: APIRequestContext) {
   await ensureVerifiedAccountViaApi(request, STAFF_EMAIL, sessionId);
 }
 
+/**
+ * Staff session with Demo Mode on, so the desk can show Simulate decline.
+ * Call this before the desk navigation that should render the control.
+ */
+export async function armSimulateDecline(page: Page) {
+  await page.addInitScript(() => {
+    try {
+      sessionStorage.setItem("razorflow-demo-mode", "1");
+    } catch {
+      // Session storage can be unavailable in hardened contexts.
+    }
+  });
+  await authenticateStaffOnPage(page);
+}
+
 /** Ensures staff auth on the active desk page session (for UI assertions). */
 export async function authenticateStaffOnPage(page: Page) {
   await page.goto("/desk");

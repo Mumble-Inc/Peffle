@@ -1,6 +1,7 @@
 "use client";
 
 import type { HTMLAttributes, ReactNode } from "react";
+import Link from "next/link";
 import { CircleNotch } from "@phosphor-icons/react";
 import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
 
@@ -8,13 +9,16 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
 const buttonClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent text-white hover:bg-accent-hover enabled:active:scale-[0.98] disabled:opacity-50",
+    "bg-accent text-white shadow-[var(--rf-shadow-e1)] hover:bg-accent-hover enabled:active:scale-[0.98] enabled:active:bg-[var(--rf-accent-active)] disabled:opacity-50 disabled:shadow-none",
   secondary:
-    "border border-line bg-surface text-ink-soft hover:border-line hover:text-ink hover:bg-canvas-2/80 disabled:opacity-50",
+    "border border-[color-mix(in_oklab,var(--rf-control-border)_70%,var(--rf-line))] bg-[var(--rf-bg-primary)] text-ink hover:border-line-strong hover:text-ink hover:bg-canvas-2/60 disabled:opacity-50",
   ghost: "text-ink-soft hover:bg-canvas-2 hover:text-ink disabled:opacity-50",
   danger:
     "bg-[color-mix(in_oklab,var(--rf-danger)_12%,transparent)] text-danger hover:bg-[color-mix(in_oklab,var(--rf-danger)_18%,transparent)] disabled:opacity-50",
 };
+
+const buttonLayout =
+  "rf-btn rf-motion-colors inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] px-4 text-sm font-medium";
 
 export function Button({
   variant = "primary",
@@ -30,13 +34,29 @@ export function Button({
   return (
     <button
       type={type}
-      className={`rf-btn rf-motion-colors inline-flex min-h-11 items-center justify-center gap-2 rounded-[8px] px-4 text-sm font-medium ${buttonClasses[variant]} ${className}`}
+      className={`${buttonLayout} ${buttonClasses[variant]} ${className}`}
       disabled={loading || props.disabled}
       {...props}
     >
       {loading ? <CircleNotch className="size-4 animate-spin" aria-hidden /> : null}
       {children}
     </button>
+  );
+}
+
+export function ButtonLink({
+  href,
+  variant = "primary",
+  className = "",
+  children,
+  ...props
+}: React.ComponentProps<typeof Link> & {
+  variant?: ButtonVariant;
+}) {
+  return (
+    <Link href={href} className={`${buttonLayout} ${buttonClasses[variant]} ${className}`} {...props}>
+      {children}
+    </Link>
   );
 }
 
@@ -132,14 +152,16 @@ export function Select({
   );
 }
 
-export type BadgeTone = "neutral" | "success" | "warning" | "danger" | "accent";
+export type BadgeTone = "neutral" | "success" | "warning" | "danger" | "blocked" | "info" | "accent";
 
 const badgeToneClasses: Record<BadgeTone, string> = {
   neutral: "bg-canvas-2 text-muted",
   success: "bg-[color-mix(in_oklab,var(--rf-success)_12%,transparent)] text-success",
   warning: "bg-[color-mix(in_oklab,var(--rf-warning)_12%,transparent)] text-warning",
   danger: "bg-[color-mix(in_oklab,var(--rf-danger)_12%,transparent)] text-danger",
-  accent: "bg-accent-soft text-ink",
+  blocked: "bg-[color-mix(in_oklab,var(--rf-blocked)_12%,transparent)] text-blocked",
+  info: "bg-[color-mix(in_oklab,var(--rf-info)_12%,transparent)] text-[var(--rf-info)]",
+  accent: "bg-accent-soft text-accent",
 };
 
 export function Badge({
@@ -151,7 +173,7 @@ export function Badge({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeToneClasses[tone]}`}
+      className={`inline-flex items-center rounded-[var(--rf-radius-pill)] px-2.5 py-0.5 text-[var(--rf-type-meta)] font-medium ${badgeToneClasses[tone]}`}
     >
       {children}
     </span>
@@ -488,7 +510,9 @@ export function Dialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="rf-dialog-title"
-        className={`rf-dialog ${size === "large" ? "rf-dialog-lg" : ""}`}
+        className={`rf-dialog rf-glass-l3 ${size === "large" ? "rf-dialog-lg" : ""}`}
+        data-rf-glass-level="3"
+        data-rf-glass-purpose="dialog"
         onClick={(event) => event.stopPropagation()}
         {...(testId ? { "data-testid": testId } : {})}
       >
@@ -586,3 +610,146 @@ export function Panel({
     </section>
   );
 }
+
+export type AlertTone = "info" | "success" | "warning" | "danger" | "blocked";
+
+const alertToneClasses: Record<AlertTone, string> = {
+  info: "border-[color-mix(in_oklab,var(--rf-info)_35%,var(--rf-line))] bg-[color-mix(in_oklab,var(--rf-info)_8%,var(--rf-surface))] text-ink",
+  success:
+    "border-[color-mix(in_oklab,var(--rf-success)_35%,var(--rf-line))] bg-[color-mix(in_oklab,var(--rf-success)_8%,var(--rf-surface))] text-ink",
+  warning:
+    "border-[color-mix(in_oklab,var(--rf-warning)_35%,var(--rf-line))] bg-[color-mix(in_oklab,var(--rf-warning)_8%,var(--rf-surface))] text-ink",
+  danger:
+    "border-[color-mix(in_oklab,var(--rf-danger)_35%,var(--rf-line))] bg-[color-mix(in_oklab,var(--rf-danger)_8%,var(--rf-surface))] text-ink",
+  blocked:
+    "border-[color-mix(in_oklab,var(--rf-blocked)_35%,var(--rf-line))] bg-[color-mix(in_oklab,var(--rf-blocked)_8%,var(--rf-surface))] text-ink",
+};
+
+export function Alert({
+  tone = "info",
+  title,
+  children,
+  className = "",
+}: {
+  tone?: AlertTone;
+  title: string;
+  children?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      role="alert"
+      className={`rounded-[var(--rf-radius-panel)] border p-4 ${alertToneClasses[tone]} ${className}`}
+    >
+      <p className="rf-type-ui font-semibold">{title}</p>
+      {children ? <div className="mt-1 rf-type-body text-ink-soft">{children}</div> : null}
+    </div>
+  );
+}
+
+export function Tabs({
+  tabs,
+  activeId,
+  onChange,
+  label = "Sections",
+}: {
+  tabs: Array<{ id: string; label: string }>;
+  activeId: string;
+  onChange: (id: string) => void;
+  label?: string;
+}) {
+  return (
+    <div role="tablist" aria-label={label} className="flex flex-wrap gap-1 rounded-[var(--rf-radius-control)] bg-canvas-2 p-1">
+      {tabs.map((tab) => {
+        const selected = tab.id === activeId;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={selected}
+            id={`rf-tab-${tab.id}`}
+            aria-controls={`rf-tabpanel-${tab.id}`}
+            onClick={() => onChange(tab.id)}
+            className={`rf-motion-colors min-h-11 rounded-[var(--rf-radius-control)] px-4 rf-type-ui ${
+              selected
+                ? "bg-[var(--rf-bg-primary)] text-ink shadow-[var(--rf-shadow-e1)] ring-1 ring-line"
+                : "text-muted hover:text-ink"
+            }`}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function TabPanel({
+  id,
+  labelledBy,
+  children,
+  hidden,
+}: {
+  id: string;
+  labelledBy: string;
+  children: ReactNode;
+  hidden?: boolean;
+}) {
+  return (
+    <div
+      role="tabpanel"
+      id={`rf-tabpanel-${id}`}
+      aria-labelledby={labelledBy}
+      hidden={hidden}
+      className="pt-4"
+    >
+      {hidden ? null : children}
+    </div>
+  );
+}
+
+export function Tooltip({
+  content,
+  children,
+}: {
+  content: string;
+  children: ReactNode;
+}) {
+  return (
+    <span className="group relative inline-flex">
+      {children}
+      <span
+        role="tooltip"
+        data-rf-glass-level="2"
+        data-rf-glass-purpose="tooltip"
+        className="rf-glass-l2 pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 w-max max-w-[16rem] -translate-x-1/2 px-2.5 py-1.5 text-[var(--rf-type-meta)] text-ink opacity-0 transition-opacity duration-[var(--rf-duration-micro)] group-hover:opacity-100 group-focus-within:opacity-100"
+      >
+        {content}
+      </span>
+    </span>
+  );
+}
+
+export function Toast({
+  title,
+  detail,
+  tone = "info",
+}: {
+  title: string;
+  detail?: string;
+  tone?: AlertTone;
+}) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`rf-surface-canvas w-full max-w-sm rounded-[var(--rf-radius-panel)] border p-4 shadow-[var(--rf-shadow-e2)] ${alertToneClasses[tone]}`}
+    >
+      <p className="rf-type-ui font-semibold">{title}</p>
+      {detail ? <p className="mt-0.5 rf-type-meta text-ink-soft">{detail}</p> : null}
+    </div>
+  );
+}
+
+export { SettlementLine, SettlementGate } from "@/components/ui/settlement-primitives";

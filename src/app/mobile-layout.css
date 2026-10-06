@@ -136,18 +136,8 @@ body.rf-scroll-lock .rf-app-topbar {
     min-height: auto;
   }
 
-  .rf-vp-headline {
-    font-size: clamp(1.75rem, 8vw, 2.25rem);
-    line-height: 1.08;
-  }
-
   .rf-vp-lede {
-    font-size: 0.9375rem;
     max-width: none;
-  }
-
-  .rf-vp-hero-preview {
-    min-height: min(42vh, 360px);
   }
 
   .rf-vp-actions {
@@ -155,7 +145,7 @@ body.rf-scroll-lock .rf-app-topbar {
     align-items: stretch;
   }
 
-  .rf-vp-actions .rf-btn-primary {
+  .rf-vp-actions .rf-btn {
     width: 100%;
     justify-content: center;
   }
@@ -172,30 +162,14 @@ body.rf-scroll-lock .rf-app-topbar {
     font-size: clamp(1.25rem, 5vw, 1.75rem);
   }
 
-  .rf-land-cta-inner {
-    padding: 1.25rem 1rem;
+  .rf-trace-panel {
+    min-height: 14rem;
+    padding: 1rem 1rem 1.125rem;
   }
 
-  .rf-workflow-rail {
-    display: flex;
-    gap: 0.625rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0.25rem;
-    padding-bottom: 0.375rem;
-    margin-inline: -0.25rem;
-    padding-inline: 0.25rem;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .rf-workflow-stage {
-    flex: 0 0 min(78vw, 17.5rem);
-    scroll-snap-align: start;
-    border: 1px solid var(--rf-line);
-    border-radius: var(--rf-radius-panel);
-    padding: 0.875rem 1rem;
-    background: var(--rf-surface);
+  .rf-trace-product img {
+    width: 5rem;
+    height: 5rem;
   }
 }
 

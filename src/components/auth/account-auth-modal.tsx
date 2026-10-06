@@ -24,6 +24,7 @@ type AccountAuthModalProps = {
   open: boolean;
   initialMode?: AccountAuthMode;
   sessionId?: string | null;
+  merchantName?: string;
   onClose: () => void;
   onAuthenticated?: () => void;
   onAuthStateChange?: () => void;
@@ -33,6 +34,7 @@ export function AccountAuthModal({
   open,
   initialMode = "login",
   sessionId,
+  merchantName,
   onClose,
   onAuthenticated,
   onAuthStateChange,
@@ -299,7 +301,9 @@ export function AccountAuthModal({
           <motion.div
             ref={dialogRef}
             tabIndex={-1}
-            className="rf-auth-modal rf-glass relative z-10 w-full max-w-md border border-line/70 p-0 shadow-xl"
+            className="rf-auth-modal rf-glass-l3 relative z-10 w-full max-w-md p-0"
+            data-rf-glass-level="3"
+            data-rf-glass-purpose="auth-modal"
             initial={reduce ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduce ? undefined : { opacity: 0, y: 8 }}
@@ -328,7 +332,9 @@ export function AccountAuthModal({
                       ? "We've sent a 6-digit verification code to your email. Enter it below to continue."
                       : "Enter the 6-digit code from your email, or request a new one below."
                     : mode === "register"
-                      ? "Create a persistent buyer account for Northline Audio."
+                      ? merchantName
+                        ? `Create a persistent buyer account for ${merchantName}.`
+                        : "Create a persistent buyer account."
                       : mode === "login"
                         ? "Sign in to authorize checkout."
                         : mode === "forgot-password"

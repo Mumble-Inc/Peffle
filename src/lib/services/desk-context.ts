@@ -53,7 +53,9 @@ export async function getDeskContext(options?: {
       name: merchant.name,
     },
     demoPrompts: buildDemoPrompts(catalog, { maxDiscountPct: agentPolicies.maxDiscountPct }),
-    intentPlaceholder: `Describe what you need, your budget, and any discount request. Example: ${categoryHint} under ₹${sampleBudget.toLocaleString("en-IN")}…`,
+    intentPlaceholder: primary
+      ? `${primary.name} under ₹${sampleBudget.toLocaleString("en-IN")}`
+      : `Describe what you need, your budget, and any discount request. Example: ${categoryHint} under ₹${sampleBudget.toLocaleString("en-IN")}…`,
     catalog: catalog.map(toPublicProduct),
     policies: agentPolicies,
     auth: {
@@ -83,6 +85,7 @@ export type LandingShowcase = {
   } | null;
   policyCopy: PolicyCopyItem[];
   guardrailSummary: string;
+  discountCeilingPct: number;
 };
 
 export async function getLandingShowcase(): Promise<LandingShowcase> {
@@ -119,5 +122,6 @@ export async function getLandingShowcase(): Promise<LandingShowcase> {
       : null,
     policyCopy,
     guardrailSummary: `The agent can recommend and bundle. It cannot break your discount ceiling (${policies.maxDiscountPct}%), margin floor (${policies.minMarginPct}%), or budget fit rules.`,
+    discountCeilingPct: policies.maxDiscountPct,
   };
 }

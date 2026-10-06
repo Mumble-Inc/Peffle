@@ -5,6 +5,7 @@ import {
   ensureVerifiedBuyerForCheckout,
   expectAdminNavLinkVisible,
   prepareE2EBaseline,
+  armSimulateDecline,
   runDeskAgentWithIntent,
 } from "./helpers/baseline";
 
@@ -17,24 +18,25 @@ test.describe("Peffle journeys", () => {
     const isMobile = test.info().project.use.isMobile;
     await page.goto("/");
     await expect(page.getByRole("heading", { name: /AI commerce without giving AI a blank cheque/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open the desk" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Agent decision" })).toBeVisible();
-    await expect(page.getByText("Recommended")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open the desk" }).first()).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Intent" })).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Settlement" })).toBeVisible();
+    await expect(page.getByText("Recommended")).toHaveCount(0);
+    await expect(page.getByText("Stopped at the gate").first()).toBeVisible();
     if (!isMobile) {
-      await expect(page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Ledger" })).toHaveCount(0);
-      await expect(page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Desk" })).toBeVisible();
-      await expect(page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Policies" })).toHaveCount(0);
-      await expect(page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Admin" })).toHaveCount(0);
+      await expect(page.getByRole("banner").getByRole("link", { name: "Learn more" })).toBeVisible();
+      await expect(page.getByRole("navigation", { name: "Primary" })).toHaveCount(0);
     }
     await expect(page.getByRole("banner").getByRole("button", { name: "Log in" })).toBeVisible();
     await expect(page.getByRole("banner").getByRole("button", { name: "Create account" })).toHaveCount(0);
     await expect(page.locator("#content").getByRole("button", { name: "Create account" })).toHaveCount(0);
-    await page.getByRole("link", { name: "Open the desk" }).click();
+    await page.getByRole("link", { name: "Open the desk" }).first().click();
     await page.waitForURL(/\/desk/, { timeout: 10_000 });
     await expect(page).toHaveURL(/\/desk/);
   });
 
   test("desk recommends Halo and reaches checkout boundary", async ({ page }) => {
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("product-name")).toHaveText("Northline Halo ANC", {
       timeout: 15_000,
@@ -72,6 +74,7 @@ test.describe("Peffle journeys", () => {
   test("failed payment can be retried", async ({ page }) => {
     test.skip(!isRazorpayConfigured(), "Requires Razorpay test keys for checkout order creation");
 
+    await armSimulateDecline(page);
     await runDeskAgentWithIntent(page);
     await expect(page.getByTestId("authorize")).toBeEnabled({ timeout: 15_000 });
     await ensureVerifiedBuyerForCheckout(page);

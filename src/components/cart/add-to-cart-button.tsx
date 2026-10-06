@@ -22,10 +22,12 @@ export function AddToCartButton({
   onAdded,
 }: AddToCartButtonProps) {
   const [state, setState] = useState<"idle" | "loading" | "added">("idle");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
     if (!sessionId || state === "loading" || inCart) return;
     setState("loading");
+    setError(null);
     try {
       const response = await fetch("/api/cart", {
         method: "POST",
@@ -35,6 +37,7 @@ export function AddToCartButton({
       });
       if (!response.ok) {
         setState("idle");
+        setError("Could not add to cart.");
         return;
       }
       setState("added");
@@ -43,6 +46,7 @@ export function AddToCartButton({
       window.setTimeout(() => setState("idle"), 2000);
     } catch {
       setState("idle");
+      setError("Could not add to cart.");
     }
   }
 
@@ -55,13 +59,15 @@ export function AddToCartButton({
       data-testid={`add-to-cart-${sku}`}
       disabled={disabled}
       onClick={() => void handleClick()}
-      className={`rf-btn rf-motion-colors inline-flex min-h-10 items-center justify-center gap-2 rounded-[8px] border border-line bg-surface px-3 text-sm font-medium text-ink hover:border-accent hover:text-accent disabled:opacity-50 ${className}`}
+      className={`rf-btn rf-motion-colors inline-flex min-h-10 items-center justify-center gap-2 rounded-[8px] border border-line bg-surface px-3 text-sm font-medium text-ink hover:border-accent hover:text-accent disabled:opacity-50 ${error ? "border-danger text-danger" : ""} ${className}`}
     >
       {showAdded ? (
         <>
           <Check className="size-4 text-success" aria-hidden />
           Added to cart
         </>
+      ) : error ? (
+        <span role="alert">{error}</span>
       ) : (
         <>
           <ShoppingCartSimple className="size-4" aria-hidden />

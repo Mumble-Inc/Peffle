@@ -1,0 +1,412 @@
+/* Peffle tokens — Google Remix light (default) + Remix dark via data-theme / .dark */
+
+:root {
+  color-scheme: light;
+
+  /* —— Google Remix light (source of truth) —— */
+  --card: #ffffff;
+  --ring: transparent;
+  --input: #ffffff;
+  --muted: transparent;
+  --accent: rgba(0, 0, 0, 0);
+  --border: #bfc1c5;
+  --radius: 0.75rem;
+
+  --chart-1: #114fb4;
+  --chart-2: #34a853;
+  --chart-3: #fbbc05;
+  --chart-4: #ea4335;
+  --chart-5: #a142f4;
+
+  --popover: #ffffff;
+  --primary: #0c4186;
+  --sidebar: #f8f9fa;
+  --spacing: 0.25rem;
+
+  --secondary: #f8f9fa;
+  --background: #ffffff;
+
+  --foreground: #1f1f1f;
+  --destructive: #d93025;
+
+  --shadow-blur: 15px;
+  --shadow-color: #3c4043;
+  --sidebar-ring: #1a73e8;
+  --shadow-spread: 0px;
+  --letter-spacing: 0.01em;
+  --shadow-opacity: 0.18;
+
+  --sidebar-accent: #e8f0fe;
+  --sidebar-border: #dadce0;
+
+  --card-foreground: #1f1f1f;
+
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 2px;
+
+  --sidebar-primary: #1a73e8;
+
+  --muted-foreground: #5f6368;
+
+  --accent-foreground: transparent;
+
+  --popover-foreground: #1f1f1f;
+
+  --primary-foreground: #ffffff;
+
+  --sidebar-foreground: #3c4043;
+
+  --secondary-foreground: #3c4043;
+
+  --destructive-foreground: #ffffff;
+
+  --sidebar-accent-foreground: #1967d2;
+
+  --sidebar-primary-foreground: #ffffff;
+
+  /* —— Peffle semantic map (do not use CSS --accent for visuals) —— */
+  --rf-bg-primary: var(--background);
+  --rf-bg-secondary: var(--secondary);
+  --rf-bg-section: var(--secondary);
+  --rf-bg-elevated: var(--card);
+  --rf-bg-wash: var(--sidebar-accent);
+
+  --rf-canvas: var(--rf-bg-primary);
+  --rf-canvas-2: var(--rf-bg-secondary);
+  --rf-surface: var(--rf-bg-elevated);
+  --rf-elevated: var(--rf-bg-elevated);
+
+  --rf-ink: var(--foreground);
+  --rf-ink-soft: var(--secondary-foreground);
+  --rf-muted: var(--muted-foreground);
+  --rf-ink-disabled: #9aa0a6;
+
+  /* Primary actions → Remix --primary (#0c4186), not CSS --accent */
+  --rf-accent: var(--primary);
+  --rf-accent-hover: #0a3970;
+  --rf-accent-active: #083058;
+  --rf-accent-soft: var(--sidebar-accent);
+  --rf-accent-border: var(--sidebar-border);
+  --rf-on-accent: var(--primary-foreground);
+
+  --rf-success: var(--chart-2);
+  --rf-warning: var(--chart-3);
+  --rf-danger: var(--destructive);
+  --rf-info: var(--chart-1);
+  --rf-blocked: var(--destructive);
+
+  --rf-line: var(--sidebar-border);
+  --rf-line-strong: var(--border);
+  --rf-control-border: #80868b;
+
+  --rf-chart-1: var(--chart-1);
+  --rf-chart-2: var(--chart-2);
+  --rf-chart-3: var(--chart-3);
+  --rf-chart-4: var(--chart-4);
+  --rf-chart-5: var(--chart-5);
+
+  /* Glass L1–L3 material */
+  --rf-glass-ambient: rgb(255 255 255 / 0.4);
+  --rf-glass: rgb(255 255 255 / 0.62);
+  --rf-glass-elevated: rgb(255 255 255 / 0.78);
+  --rf-glass-border: rgb(60 64 67 / 0.08);
+  --rf-glass-border-strong: rgb(60 64 67 / 0.12);
+  --rf-glass-highlight: rgb(255 255 255 / 0.85);
+  --rf-glass-highlight-elevated: rgb(255 255 255 / 0.9);
+  --rf-glass-blur-ambient: 40px;
+  --rf-glass-blur: 20px;
+  --rf-glass-blur-elevated: 28px;
+  --rf-glass-saturate-ambient: 1.2;
+  --rf-glass-saturate: 1.35;
+  --rf-glass-saturate-elevated: 1.4;
+
+  --rf-glass-shadow-l2:
+    inset 0 1px 0 rgb(255 255 255 / 0.85),
+    0 1px 2px rgb(60 64 67 / 0.06),
+    0 8px 24px rgb(60 64 67 / 0.07);
+  --rf-glass-shadow-l3:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    0 2px 4px rgb(60 64 67 / 0.05),
+    0 20px 48px rgb(60 64 67 / 0.1);
+
+  --rf-overlay-scrim: rgb(60 64 67 / 0.42);
+
+  --rf-shadow: 60 64 67;
+  --rf-shadow-e0: none;
+  --rf-shadow-e1: 0 1px 2px rgb(60 64 67 / 0.06);
+  --rf-shadow-e2:
+    0 1px 2px rgb(60 64 67 / 0.06),
+    0 8px 24px rgb(60 64 67 / 0.07);
+  --rf-shadow-e3:
+    0 2px 4px rgb(60 64 67 / 0.05),
+    0 20px 48px rgb(60 64 67 / 0.1);
+  --rf-shadow-focus:
+    0 0 0 2px #ffffff,
+    0 0 0 4px var(--primary);
+
+  --rf-radius-chip: 6px;
+  --rf-radius-control: 8px;
+  --rf-radius-panel: 12px;
+  --rf-radius-glass: 16px;
+  --rf-radius-hero: 24px;
+  --rf-radius-pill: 999px;
+
+  --rf-space-1: 4px;
+  --rf-space-2: 8px;
+  --rf-space-3: 12px;
+  --rf-space-4: 16px;
+  --rf-space-6: 24px;
+  --rf-space-8: 32px;
+  --rf-space-12: 48px;
+  --rf-space-16: 64px;
+  --rf-space-24: 96px;
+  --rf-space-32: 128px;
+  --rf-space-40: 160px;
+
+  --rf-gutter-mobile: 24px;
+  --rf-gutter-desktop: 48px;
+  --rf-measure-prose: 680px;
+  --rf-measure-content: 1200px;
+  --rf-measure-wide: 1360px;
+  --rf-space-section-desktop: clamp(7rem, 10vw, 10rem);
+  --rf-space-section-mobile: clamp(4rem, 12vw, 5rem);
+
+  --rf-duration-micro: 120ms;
+  --rf-duration-ui: 200ms;
+  --rf-duration-panel: 320ms;
+  --rf-duration-settlement: 520ms;
+  --rf-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --rf-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  --rf-type-display-xl: clamp(3.25rem, 8vw, 7.5rem);
+  --rf-type-display: clamp(2.5rem, 5.5vw, 4.5rem);
+  --rf-type-h1: clamp(2.25rem, 4vw, 3.5rem);
+  --rf-type-h2: clamp(1.75rem, 3vw, 2.5rem);
+  --rf-type-h3: clamp(1.375rem, 2.2vw, 1.75rem);
+  --rf-type-h4: clamp(1.125rem, 1.5vw, 1.25rem);
+  --rf-type-body-lg: 1.1875rem;
+  --rf-type-body: 1rem;
+  --rf-type-ui: 0.875rem;
+  --rf-type-meta: 0.8125rem;
+
+  --rf-leading-display-xl: 0.94;
+  --rf-leading-display: 1;
+  --rf-leading-h1: 1.05;
+  --rf-leading-h2: 1.1;
+  --rf-leading-h3: 1.2;
+  --rf-leading-body: 1.55;
+
+  --rf-tracking-display-xl: -0.045em;
+
+  --rf-type-title: var(--rf-type-h2);
+  --rf-leading-title: var(--rf-leading-h2);
+  --rf-space-section: var(--rf-space-section-mobile);
+  --rf-landing-copy: 36rem;
+  --rf-landing-measure: 42rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --rf-space-section: var(--rf-space-section-desktop);
+  }
+}
+
+html.dark,
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --card: #1e1f20;
+  --ring: #a8c7fa;
+  --input: #1e1f20;
+  --muted: #2d2f31;
+  --accent: #394457;
+  --border: #444746;
+  --radius: 0.75rem;
+
+  --chart-1: #8ab4f8;
+  --chart-2: #81c995;
+  --chart-3: #fde293;
+  --chart-4: #f28b82;
+  --chart-5: #d7aefb;
+
+  --popover: #1e1f20;
+  --primary: #a8c7fa;
+  --sidebar: #1e1f20;
+  --spacing: 0.25rem;
+
+  --secondary: #282a2d;
+  --background: #131314;
+
+  --foreground: #e3e3e3;
+  --destructive: #f28b82;
+
+  --shadow-blur: 12px;
+  --shadow-color: #000000;
+
+  --sidebar-ring: #a8c7fa;
+
+  --shadow-spread: 0px;
+  --letter-spacing: 0.01em;
+  --shadow-opacity: 0.3;
+
+  --sidebar-accent: #394457;
+  --sidebar-border: #444746;
+
+  --card-foreground: #e3e3e3;
+
+  --shadow-offset-x: 0px;
+  --shadow-offset-y: 4px;
+
+  --sidebar-primary: #a8c7fa;
+
+  --muted-foreground: #9aa0a6;
+
+  --accent-foreground: #d2e3fc;
+
+  --popover-foreground: #e3e3e3;
+
+  --primary-foreground: #062e6f;
+
+  --sidebar-foreground: #e3e3e3;
+
+  --secondary-foreground: #e3e3e3;
+
+  --destructive-foreground: #601410;
+
+  --sidebar-accent-foreground: #d2e3fc;
+
+  --sidebar-primary-foreground: #062e6f;
+
+  --rf-bg-primary: var(--background);
+  --rf-bg-secondary: var(--secondary);
+  --rf-bg-section: var(--secondary);
+  --rf-bg-elevated: var(--card);
+  --rf-bg-wash: var(--sidebar-accent);
+
+  --rf-canvas: var(--background);
+  --rf-canvas-2: var(--secondary);
+  --rf-surface: var(--card);
+  --rf-elevated: var(--card);
+
+  --rf-ink: var(--foreground);
+  --rf-ink-soft: var(--secondary-foreground);
+  --rf-muted: var(--muted-foreground);
+  --rf-ink-disabled: var(--muted-foreground);
+
+  --rf-accent: var(--primary);
+  --rf-accent-hover: #c5d9fc;
+  --rf-accent-active: #93b8f7;
+  --rf-accent-soft: var(--sidebar-accent);
+  --rf-accent-border: var(--sidebar-border);
+  --rf-on-accent: var(--primary-foreground);
+
+  --rf-success: var(--chart-2);
+  --rf-warning: var(--chart-3);
+  --rf-danger: var(--destructive);
+  --rf-info: var(--chart-1);
+  --rf-blocked: var(--destructive);
+
+  --rf-line: var(--sidebar-border);
+  --rf-line-strong: var(--border);
+  --rf-control-border: var(--border);
+
+  --rf-glass-ambient: rgb(30 31 32 / 0.55);
+  --rf-glass: rgb(30 31 32 / 0.72);
+  --rf-glass-elevated: rgb(30 31 32 / 0.85);
+  --rf-glass-border: rgb(255 255 255 / 0.08);
+  --rf-glass-border-strong: rgb(255 255 255 / 0.12);
+  --rf-glass-highlight: rgb(255 255 255 / 0.06);
+  --rf-glass-highlight-elevated: rgb(255 255 255 / 0.08);
+
+  --rf-overlay-scrim: rgb(0 0 0 / 0.72);
+
+  --rf-shadow-e1: 0 1px 2px rgb(0 0 0 / 0.24);
+  --rf-shadow-e2:
+    0 1px 2px rgb(0 0 0 / 0.2),
+    0 8px 24px rgb(0 0 0 / 0.35);
+  --rf-shadow-e3:
+    0 2px 4px rgb(0 0 0 / 0.25),
+    0 24px 56px rgb(0 0 0 / 0.45);
+  --rf-shadow-focus:
+    0 0 0 2px var(--background),
+    0 0 0 4px var(--primary);
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --rf-glass-border: rgb(60 64 67 / 0.18);
+    --rf-glass-border-strong: rgb(60 64 67 / 0.28);
+    --rf-line: var(--border);
+  }
+
+  html.dark,
+  html[data-theme="dark"] {
+    --rf-glass-border: rgb(255 255 255 / 0.22);
+    --rf-glass-border-strong: rgb(255 255 255 / 0.32);
+  }
+}
+
+/* Typography utilities */
+.rf-type-display-xl {
+  font-size: var(--rf-type-display-xl);
+  font-weight: 500;
+  line-height: var(--rf-leading-display-xl);
+  letter-spacing: var(--rf-tracking-display-xl);
+}
+
+.rf-type-display {
+  font-size: var(--rf-type-display);
+  font-weight: 500;
+  line-height: var(--rf-leading-display);
+}
+
+.rf-type-h1 {
+  font-size: var(--rf-type-h1);
+  font-weight: 600;
+  line-height: var(--rf-leading-h1);
+}
+
+.rf-type-h2 {
+  font-size: var(--rf-type-h2);
+  font-weight: 600;
+  line-height: var(--rf-leading-h2);
+}
+
+.rf-type-h3 {
+  font-size: var(--rf-type-h3);
+  font-weight: 600;
+  line-height: var(--rf-leading-h3);
+}
+
+.rf-type-h4 {
+  font-size: var(--rf-type-h4);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.rf-type-body-lg {
+  font-size: var(--rf-type-body-lg);
+  line-height: var(--rf-leading-body);
+}
+
+.rf-type-body {
+  font-size: var(--rf-type-body);
+  line-height: var(--rf-leading-body);
+}
+
+.rf-type-ui {
+  font-size: var(--rf-type-ui);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.rf-type-meta {
+  font-size: var(--rf-type-meta);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.rf-mono-value {
+  font-family: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}

@@ -2,12 +2,22 @@
 
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { CaretDown, GearSix, Headphones, MagnifyingGlass, Warning, XCircle } from "@phosphor-icons/react";
+import {
+  CaretDown,
+  GearSix,
+  Headphones,
+  MagnifyingGlass,
+  SignIn,
+  Warning,
+  X,
+  XCircle,
+} from "@phosphor-icons/react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AccountAuthModal, type AccountAuthMode } from "@/components/auth/account-auth-modal";
 import { AccountTopBarActions } from "@/components/auth/account-top-bar-actions";
 import { useAuthSession } from "@/components/auth/use-auth-session";
+import { isStaffOrAdmin } from "@/lib/auth/capability";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import {
   isSequentialBrowseMode,
@@ -81,7 +91,12 @@ export function DeskApp() {
   const [intent, setIntent] = useState("");
   const [merchantName, setMerchantName] = useState("Merchant");
   const [demoPrompts, setDemoPrompts] = useState<DemoPrompt[]>([]);
+  const [intentPlaceholder, setIntentPlaceholder] = useState(
+    "Search products, compare, or ask Peffle…",
+  );
+  const [guestLoginNoticeOpen, setGuestLoginNoticeOpen] = useState(false);
   const [contextReady, setContextReady] = useState(false);
+  const [contextError, setContextError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [decisionId, setDecisionId] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -106,7 +121,7 @@ export function DeskApp() {
   const intentRef = useRef<HTMLInputElement>(null);
   const auth = useAuthSession();
 
-  const { cart, loading: cartLoading, refresh: refreshCart, updateQuantity, removeLine } = useCart(sessionId);
+  const { cart, loading: cartLoading, error: cartError, refresh: refreshCart, updateQuantity, removeLine } = useCart(sessionId);
   const demoTrace = useDemoTrace(demoModeAvailable && demoModeOn, sessionId, demoRefreshNonce);
 
   const refreshAuthState = useCallback(() => {
@@ -132,12 +147,15 @@ export function DeskApp() {
   const agentBusy = agentProcessing.isPresenting;
   const busy = agentBusy || phase === "processing";
 
-  useEffect(() => {
-    async function loadContext() {
-      try {
-        const response = await fetch("/api/desk/context");
-        if (!response.ok) return;
-        const payload = (await response.json()) as {
+  const loadContext = useCallback(async () => {
+    setContextError(null);
+    try {
+      const response = await fetch("/api/desk/context");
+      if (!response.ok) {
+        setContextError("Could not load the desk. Check the connection and try again.");
+        return;
+      }
+      const payload = (await response.json()) as {
           merchant: { name: string };
           demoPrompts: DemoPrompt[];
           intentPlaceholder: string;
@@ -155,6 +173,11 @@ export function DeskApp() {
         };
         setMerchantName(payload.merchant.name);
         setDemoPrompts(payload.demoPrompts);
+        if (payload.intentPlaceholder?.trim()) {
+          setIntentPlaceholder(payload.intentPlaceholder);
+        } else if (payload.demoPrompts[0]?.text) {
+          setIntentPlaceholder(payload.demoPrompts[0].text);
+        }
         setCatalog(payload.catalog ?? []);
         setPolicies(payload.policies ?? null);
         setDemoModeAvailable(payload.demoModeAvailable === true);
@@ -168,15 +191,26 @@ export function DeskApp() {
           setResult(mapApiResponseToAgentResult(active.agent));
           setCapturedPayment(active.capturedPayment);
           setPhase("captured");
-        } else if (payload.demoPrompts[0]?.text) {
-          setIntent(payload.demoPrompts[0].text);
         }
-      } finally {
-        setContextReady(true);
-      }
+    } catch {
+      setContextError("Could not load the desk. Check the connection and try again.");
+    } finally {
+      setContextReady(true);
     }
-    void loadContext();
   }, []);
+
+  useEffect(() => {
+    void loadContext();
+  }, [loadContext]);
+
+  useEffect(() => {
+    if (contextReady && !auth.loading && !auth.authenticated) {
+      setGuestLoginNoticeOpen(true);
+    }
+    if (auth.authenticated) {
+      setGuestLoginNoticeOpen(false);
+    }
+  }, [auth.authenticated, auth.loading, contextReady]);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -538,7 +572,7 @@ export function DeskApp() {
   }
 
   return (
-    <div className="rf-peffle-desk">
+    <div className="rf-peffle-desk rf-desk-page">
       <DeskSidebar
         merchantName={merchantName}
         email={auth.email}
@@ -560,7 +594,7 @@ export function DeskApp() {
               onChange={(event) => setIntent(event.target.value)}
               spellCheck={false}
               autoComplete="off"
-              placeholder="Search products, compare, or ask Peffle..."
+              placeholder={intentPlaceholder}
               disabled={!contextReady}
             />
             <kbd>⌘ K</kbd>
@@ -574,29 +608,78 @@ export function DeskApp() {
             </button>
           </form>
           <div className="rf-peffle-top-actions">
+            <nav aria-label="Primary" className="rf-desk-top-nav hidden min-w-0 items-center gap-0.5 md:flex md:gap-1">
+              <Link
+                href="/desk"
+                aria-current="page"
+                className="rf-nav-item rf-motion-colors rounded-[6px] px-2.5 py-1.5 text-sm text-ink sm:px-3"
+                data-active="true"
+              >
+                Desk
+              </Link>
+              <a
+                href="/#guardrails-heading"
+                className="rf-nav-item rf-motion-colors rounded-[6px] px-2.5 py-1.5 text-sm text-ink-soft hover:text-ink sm:px-3"
+              >
+                Guardrails
+              </a>
+            </nav>
             <button type="button" className="rf-peffle-merchant-chip" translate="no">
               <Headphones className="size-4 shrink-0 text-muted" aria-hidden />
               <span className="rf-peffle-merchant-name">{merchantName}</span>
               <CaretDown className="size-3.5 shrink-0 text-muted" aria-hidden />
             </button>
-            <Link href="/admin/policies" className="rf-peffle-icon-btn" aria-label="Settings">
-              <GearSix className="size-4" />
-            </Link>
-            <AccountTopBarActions sessionId={sessionId} />
+            {isStaffOrAdmin(auth.capability) ? (
+              <Link href="/admin/policies" className="rf-peffle-icon-btn" aria-label="Settings">
+                <GearSix className="size-4" />
+              </Link>
+            ) : null}
             <DeskModeCard
               merchantName={merchantName}
               demoAvailable={demoModeAvailable}
               demoOn={demoModeOn}
               onDemoChange={setDemoModeOn}
             />
+            <AccountTopBarActions
+              sessionId={sessionId}
+              merchantName={merchantName}
+              className="rf-desk-login-slot shrink-0"
+              showGuestAttentionDot={!auth.loading && !auth.authenticated}
+            />
           </div>
+          {guestLoginNoticeOpen && !auth.loading && !auth.authenticated ? (
+            <div className="rf-desk-guest-notice" role="status" data-testid="desk-login-notice">
+              <SignIn className="size-4 shrink-0 text-accent" weight="regular" aria-hidden />
+              <p className="min-w-0 flex-1 text-sm leading-snug text-ink-soft">
+                <span className="font-medium text-ink">Log in</span> to authorize checkout and
+                complete purchases on this desk.
+              </p>
+              <button
+                type="button"
+                className="rf-desk-guest-notice-dismiss"
+                aria-label="Dismiss login reminder"
+                onClick={() => setGuestLoginNoticeOpen(false)}
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </div>
+          ) : null}
         </header>
 
         <div className="rf-peffle-desk-body">
           <div className="rf-peffle-desk-canvas">
+            {contextError ? (
+              <div className="mb-4 rounded-[12px] border border-danger/40 bg-surface p-4" role="alert">
+                <p className="text-sm text-danger">{contextError}</p>
+                <Button type="button" variant="secondary" className="mt-3" onClick={() => void loadContext()}>
+                  Try again
+                </Button>
+              </div>
+            ) : null}
+
             <DeskHero
               heroImage={hero?.image ?? null}
-              heroAlt={hero?.imageAlt ?? "Northline Audio catalog"}
+              heroAlt={hero?.imageAlt ?? `${merchantName} catalog`}
               merchantName={merchantName}
               demoPrompts={demoPrompts}
               onChip={(text) => setIntent(text)}
@@ -689,6 +772,7 @@ export function DeskApp() {
               result={result}
               cart={cart}
               cartLoading={cartLoading}
+              cartError={cartError}
               sessionId={sessionId}
               phase={phase}
               policies={policies}
@@ -757,6 +841,7 @@ export function DeskApp() {
         open={accountModalOpen}
         initialMode={accountModalMode}
         sessionId={sessionId}
+        merchantName={merchantName}
         onClose={() => setAccountModalOpen(false)}
         onAuthenticated={() => void continueAfterAccountAuth()}
         onAuthStateChange={() => refreshAuthState()}

@@ -15,15 +15,15 @@ import {
 const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, "public/products");
 
-const CANVAS = "#E8EEF2";
-const INK = "#101820";
-const MUTED = "#5C6873";
-const ACCENT = "#0B5F5A";
+const CANVAS = "#E8F0FE";
+const INK = "#1F1F1F";
+const MUTED = "#5F6368";
+const ACCENT = "#0C4186";
 
 function skuAccent(sku: string): string {
   let hash = 0;
   for (const char of sku) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  const hues = ["#0B5F5A", "#0E6B65", "#124E78", "#1F5C4D", "#2A4A52", "#3D6B62"];
+  const hues = ["#0C4186", "#114FB4", "#1967D2", "#1557A0", "#1A73E8", "#0A3970"];
   return hues[hash % hues.length]!;
 }
 

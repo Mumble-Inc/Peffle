@@ -28,9 +28,9 @@ export function DeskHero({
       <div className="rf-peffle-hero-copy">
         <p className="rf-peffle-hero-kicker">{merchantName}</p>
         <h1>
-          Find the right audio.
+          Shop {merchantName}.
           <br />
-          <span>Within your policy.</span>
+          <span>Within policy.</span>
         </h1>
         <p className="rf-peffle-hero-lead">
           Search the catalog, compare options, and check policy before checkout.
@@ -42,10 +42,10 @@ export function DeskHero({
           </button>
           <button
             type="button"
-            onClick={() => onChip("Compare Northline Halo ANC and Transit Max ANC for travel")}
+            onClick={() => onChip("Compare the best over-ear headphones for travel")}
           >
             <ArrowsLeftRight className="size-3.5" aria-hidden />
-            Compare Halo vs Transit
+            Compare travel options
           </button>
           <button type="button" onClick={() => onChip("Show the best headphones and earbuds in the catalog")}>
             <ChartLineUp className="size-3.5" aria-hidden />

@@ -1,8 +1,11 @@
-import Link from "next/link";
 import { Money } from "@/components/money";
+import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingGovernanceList } from "@/components/landing/landing-governance-list";
-import { LandingHeroDemo } from "@/components/landing/landing-hero-demo";
-import { LandingWorkflowRail } from "@/components/landing/landing-workflow-rail";
+import { LandingHowItWorks } from "@/components/landing/landing-how-it-works";
+import { LandingSettlementRail } from "@/components/landing/landing-settlement-rail";
+import { LandingMarketingHero } from "@/components/landing/landing-marketing-hero";
+import { ButtonLink } from "@/components/ui/design-system";
+import { SettlementGate } from "@/components/ui/settlement-primitives";
 import type { LandingShowcase } from "@/lib/services/desk-context";
 
 type LandingMetrics = {
@@ -23,72 +26,96 @@ export function LandingPageContent({
   metrics,
   policyBlockLabel,
 }: LandingPageContentProps) {
-  return (
-    <main id="content" className="rf-landing bg-canvas">
-      <section className="rf-vp-hero" aria-labelledby="hero-heading">
-        <div className="rf-vp-hero-inner">
-          <div className="rf-vp-hero-copy">
-            <p className="rf-vp-kicker">Execution control for AI commerce</p>
-            <p className="rf-vp-eyebrow" translate="no">
-              {showcase.merchant.name}
-            </p>
-            <h1 id="hero-heading" className="rf-vp-headline">
-              AI commerce without giving AI a blank cheque.
-            </h1>
-            <p className="rf-vp-lede">
-              Peffle recommends from your catalog and enforces merchant policy, then authorizes
-              execution — spend caps, kill switch, and an audit ledger — before Razorpay ever sees an
-              order.
-            </p>
-            <div className="rf-vp-actions">
-              <Link href="/desk" className="rf-btn rf-btn-primary rf-motion-colors inline-flex min-h-11 items-center rounded-[8px] px-5 text-sm font-medium text-white">
-                Open the desk
-              </Link>
-              <a href="#guardrails-heading" className="rf-motion-colors text-sm font-medium text-ink-soft hover:text-ink">
-                View guardrails
-              </a>
-            </div>
-          </div>
-          <div className="rf-vp-hero-preview">
-            <LandingHeroDemo showcase={showcase} />
-          </div>
-        </div>
-      </section>
+  const featured = showcase.featured;
+  const discount = showcase.policyCopy.find((item) => item.id === "discount");
 
-      <section className="rf-land-section" aria-labelledby="workflow-heading">
+  return (
+    <main id="content" className="m-main rf-landing bg-canvas">
+      <LandingMarketingHero showcase={showcase} />
+
+      <section
+        className="rf-land-section rf-surface-section-alt"
+        aria-labelledby="how-heading"
+        id="how-it-works"
+      >
         <div className="rf-land-section-inner">
-          <h2 id="workflow-heading" className="rf-land-section-title">
-            Commerce, then execution control
+          <p className="rf-section-label">How Peffle works</p>
+          <h2 id="how-heading" className="rf-land-section-title">
+            One request, one settlement line
           </h2>
           <p className="rf-land-section-lede">
-            Peffle runs discovery and merchant policy, then decides whether the agent may execute.
-            Razorpay only receives an order after both layers pass.
+            Intent moves down the line. Policy and approval decide whether commerce and settlement
+            may continue.
           </p>
-          <LandingWorkflowRail />
+          <LandingHowItWorks />
         </div>
       </section>
 
-      <section className="rf-land-section bg-canvas-2/40" aria-labelledby="guardrails-heading">
+      {featured && discount ? (
+        <section className="rf-land-section" aria-labelledby="gate-heading" id="the-gate">
+          <div className="rf-land-section-inner">
+            <p className="rf-section-label">The gate</p>
+            <h2 id="gate-heading" className="rf-land-section-title">
+              Same product. This request stops.
+            </h2>
+            <p className="rf-land-section-lede">
+              The trace above stays inside policy. This request crosses the discount ceiling, so
+              Razorpay never sees an order.
+            </p>
+            <div className="rf-gate-demo">
+              <div className="rf-gate-demo-rail">
+                <LandingSettlementRail
+                  activeStepId="policy"
+                  mode="blocked"
+                  blockedAt="policy"
+                />
+              </div>
+              <div className="rf-gate-demo-detail">
+                <div className="rf-refusal-request rf-land-card">
+                  <p className="rf-trace-meta">Buyer request</p>
+                  <p className="rf-trace-statement" translate="no">
+                    {featured.name}, more than {showcase.discountCeilingPct}% off list.
+                  </p>
+                  <p className="rf-trace-note">
+                    List price <Money value={featured.price} />. The agent can recommend it. It
+                    cannot discount past the ceiling.
+                  </p>
+                </div>
+                <SettlementGate
+                  elevated
+                  title="Stopped at the gate"
+                  reason={`${discount.title}. ${discount.rule} Peffle blocked checkout before Razorpay.`}
+                  className="rf-gate-card"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="rf-land-section rf-surface-section" aria-labelledby="guardrails-heading">
         <div className="rf-land-section-inner">
+          <p className="rf-section-label">Rules</p>
           <h2 id="guardrails-heading" className="rf-land-section-title">
-            Two policy layers. One payment rail.
+            The rules behind that block
           </h2>
           <p className="rf-land-section-lede">{showcase.guardrailSummary}</p>
           <LandingGovernanceList items={showcase.policyCopy} />
         </div>
       </section>
 
-      <section className="rf-land-section" aria-labelledby="metrics-heading">
+      <section className="rf-land-section" aria-labelledby="metrics-heading" id="ledger">
         <div className="rf-land-section-inner">
+          <p className="rf-section-label">Ledger</p>
           <h2 id="metrics-heading" className="rf-land-section-title">
-            Verified commerce signals
+            What the ledger has verified
           </h2>
           <p className="rf-land-section-lede">
-            Real metrics from captured payments and policy evaluations. Zero when your store has not
-            processed activity yet.
+            Captured payments and policy evaluations only. Figures stay at zero until the store has
+            processed activity.
           </p>
-          <div className="rf-metrics-band">
-            <figure className="rf-metrics-band-cell rf-metrics-band-cell-primary">
+          <div className="rf-metrics-band" data-testid="landing-ledger">
+            <figure className="rf-metrics-band-cell">
               <figcaption className="rf-metrics-band-label">GMV this week</figcaption>
               <p className="rf-metrics-band-value">
                 <Money value={metrics.weekGmv} />
@@ -113,18 +140,27 @@ export function LandingPageContent({
         </div>
       </section>
 
-      <section className="rf-land-cta">
+      <section className="rf-land-section rf-surface-section-alt" aria-labelledby="faq-heading">
+        <div className="rf-land-section-inner">
+          <h2 id="faq-heading" className="rf-land-section-title">
+            Before you open the desk
+          </h2>
+          <LandingFaq />
+        </div>
+      </section>
+
+      <section className="rf-land-cta rf-env-atmosphere">
         <div className="rf-land-cta-inner">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight">See Peffle stop a blank cheque</h2>
-            <p className="mt-1.5 max-w-[42ch] text-sm text-muted">
-              Run the desk. Merchant policy still prices the offer. Peffle decides whether checkout
-              may execute before Razorpay.
+            <h2 className="rf-land-cta-title">See the block on a live catalog</h2>
+            <p className="mt-2 max-w-[42ch] text-sm leading-relaxed text-muted">
+              Merchant policy still prices the offer. Peffle decides whether checkout may execute
+              before Razorpay.
             </p>
           </div>
-          <Link href="/desk" className="rf-btn rf-btn-primary inline-flex min-h-11 shrink-0 items-center rounded-[8px] px-5 text-sm font-medium text-white">
+          <ButtonLink href="/desk" className="shrink-0">
             Start on the desk
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     </main>

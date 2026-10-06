@@ -1,10 +1,13 @@
 import { createHash, randomInt } from "node:crypto";
 import { getSessionSecret } from "@/lib/auth/secret";
 import {
-  resolveAccountCapability,
+  getInitialAdminEmail,
+  normalizeEmail,
   type BuyerCapability,
 } from "@/lib/auth/capability";
 import { db } from "@/lib/db";
+
+export { normalizeEmail };
 
 export type { BuyerCapability };
 
@@ -30,10 +33,6 @@ export class IdentityError extends Error {
   }
 }
 
-export function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
-}
-
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -50,6 +49,21 @@ function generateVerificationCode(): string {
 
 export function exposeDevVerificationCode(): boolean {
   return process.env.NODE_ENV !== "production";
+}
+
+export async function resolveAccountCapability(
+  merchantId: string,
+  account: { emailNormalized: string; emailVerifiedAt: Date | null },
+): Promise<BuyerCapability> {
+  if (!account.emailVerifiedAt) return "anonymous";
+
+  const adminEmail = getInitialAdminEmail();
+  if (adminEmail && account.emailNormalized === adminEmail) {
+    return "admin";
+  }
+
+  const staff = await isStaffEmail(merchantId, account.emailNormalized);
+  return staff ? "staff" : "buyer";
 }
 
 export async function isStaffEmail(merchantId: string, email: string): Promise<boolean> {
