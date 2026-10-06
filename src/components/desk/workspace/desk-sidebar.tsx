@@ -25,8 +25,6 @@ const STAFF_NAV = [
   { href: "/admin/insights", label: "Analytics", icon: ChartLineUp },
 ] as const;
 
-const STAFF_NAV = new Set(["/admin/orders", "/admin/policies", "/admin", "/admin/insights"]);
-
 function initialsFromEmail(email: string | null) {
   if (!email) return "—";
   const local = email.split("@")[0] ?? "";
@@ -77,15 +75,17 @@ export function DeskSidebar({
   merchantName,
   email,
   capability,
+  authenticated,
 }: {
   merchantName: string;
   email: string | null;
   capability: BuyerCapability;
+  authenticated: boolean;
 }) {
   const pathname = usePathname();
-  const identityEmail = email ?? "Guest";
-  const staff = isStaffOrAdmin(capability);
-  const nav = NAV.filter((item) => staff || !STAFF_NAV.has(item.href));
+  const showStaffNav = authenticated && isStaffOrAdmin(capability);
+  const identityEmail = authenticated ? (email ?? "Account") : "Guest";
+  const nav = showStaffNav ? [...BUYER_NAV, ...STAFF_NAV] : [...BUYER_NAV];
 
   return (
     <aside className="rf-peffle-desk-sidebar">
@@ -123,7 +123,7 @@ export function DeskSidebar({
           <span className="min-w-0">
             <span className="block truncate text-[0.75rem] font-medium">{identityEmail}</span>
             <span className="block truncate text-[0.6875rem] text-muted">
-              {capabilityLabel(capability)} · {merchantName}
+              {authenticated ? capabilityLabel(capability) : "Guest"} · {merchantName}
             </span>
           </span>
         </div>

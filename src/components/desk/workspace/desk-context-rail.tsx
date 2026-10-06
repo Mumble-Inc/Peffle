@@ -12,6 +12,7 @@ import { Money } from "@/components/money";
 import { buildPolicyCopy } from "@/lib/policy/copy";
 import type { AgentResult, MerchantPolicies, Product } from "@/lib/agent/types";
 import type { CartState } from "@/hooks/use-cart";
+import { cartDiscountPct, cartHasSessionDiscount } from "@/lib/cart-discount";
 import type { CapturedPaymentView } from "@/lib/desk/payment-display";
 import type { PeffleCheckoutBlock } from "@/lib/peffle/types";
 import type { Phase } from "@/components/desk/desk-types";
@@ -98,7 +99,7 @@ export function DeskContextRail({
   onStartNewSale: () => void;
   onTryAgain: () => void;
   onDismissBlock: () => void;
-  onChatTurn: (turn: { planner: "gemini" | "groq" | "deterministic" }) => void;
+  onChatTurn: (turn: { planner: "gemini" | "groq" | "deterministic"; discountApplied?: boolean }) => void;
   onEnsureDeskSession: (seed?: string) => Promise<string | null>;
   children?: ReactNode;
 }) {
@@ -182,8 +183,12 @@ export function DeskContextRail({
           />
           {cart.lines.length > 0 ? (
             <div className="mt-4 border-t border-line/60 pt-4">
-              {result && result.discountPct > 0 ? (
-                <p className="text-sm text-success">Discount −{result.discountPct}%</p>
+              {cartHasSessionDiscount(cart.lines) ? (
+                <p className="text-sm text-success" data-testid="cart-discount-summary">
+                  Session discount −{cartDiscountPct(cart.lines).toFixed(1)}%
+                </p>
+              ) : result && result.discountPct > 0 ? (
+                <p className="text-sm text-success">Offer discount −{result.discountPct}%</p>
               ) : null}
               <p className="mt-2 text-xs font-medium uppercase tracking-wide text-muted">Total</p>
               <p className="mt-1 text-2xl font-semibold tracking-tight tabular" data-testid="checkout-total">

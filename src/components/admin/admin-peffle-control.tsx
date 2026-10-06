@@ -73,6 +73,12 @@ export function AdminPeffleControl({
     void boot();
   }, [load]);
 
+  useEffect(() => {
+    const handler = () => void load();
+    window.addEventListener("razorflow:admin-guardrails-updated", handler);
+    return () => window.removeEventListener("razorflow:admin-guardrails-updated", handler);
+  }, [load]);
+
   async function postJson(url: string, body: unknown) {
     setBusy(true);
     setError(null);
@@ -170,7 +176,7 @@ export function AdminPeffleControl({
         </p>
       ) : null}
 
-      <div className="rf-peffle-hero">
+      <div className="rf-peffle-control-grid">
         <section
           className="rf-peffle-card rf-peffle-card-status"
           data-state={protectedNow ? "protected" : "disabled"}

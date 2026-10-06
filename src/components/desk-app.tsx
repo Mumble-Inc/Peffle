@@ -632,6 +632,7 @@ export function DeskApp() {
         merchantName={merchantName}
         email={auth.email}
         capability={auth.capability}
+        authenticated={auth.authenticated}
       />
       <div className="rf-peffle-desk-frame">
         <header className="rf-peffle-desk-topbar">
@@ -684,7 +685,7 @@ export function DeskApp() {
               <span className="rf-peffle-merchant-name">{merchantName}</span>
               <CaretDown className="size-3.5 shrink-0 text-muted" aria-hidden />
             </button>
-            {isStaffOrAdmin(auth.capability) ? (
+            {auth.authenticated && isStaffOrAdmin(auth.capability) ? (
               <Link href="/admin/policies" className="rf-peffle-icon-btn" aria-label="Settings">
                 <GearSix className="size-4" />
               </Link>
@@ -858,6 +859,9 @@ export function DeskApp() {
               onChatTurn={(turn) => {
                 setLastPlanner(turn.planner);
                 setDemoRefreshNonce((n) => n + 1);
+                if (turn.discountApplied) {
+                  setRailTab("cart");
+                }
               }}
               onEnsureDeskSession={ensureDeskSession}
             />
@@ -868,7 +872,7 @@ export function DeskApp() {
               trace={demoTrace}
               blocked={result?.status === "blocked" || Boolean(peffleBlock)}
               blockedReason={result?.blockedReason ?? error}
-              showStaffPolicyLink={isStaffOrAdmin(auth.capability)}
+              showStaffPolicyLink={auth.authenticated && isStaffOrAdmin(auth.capability)}
             />
           </div>
         </div>

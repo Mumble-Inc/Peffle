@@ -23,27 +23,34 @@ export function AdminPoliciesDashboard() {
   const [saving, setSaving] = useState(false);
   const [peffle, setPeffle] = useState<PeffleControlState | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [policyRes, peffleRes] = await Promise.all([
-          fetch("/api/admin/policies", { credentials: "include" }),
-          fetch("/api/admin/peffle", { credentials: "include" }),
-        ]);
-        if (!policyRes.ok) throw new Error("Could not load policies.");
-        const payload = (await policyRes.json()) as { policies: PoliciesFormValues };
-        setPolicies(payload.policies);
-        if (peffleRes.ok) {
-          setPeffle((await peffleRes.json()) as PeffleControlState);
-        }
-      } catch (cause) {
-        setError(cause instanceof Error ? cause.message : "Could not load policies.");
-      } finally {
-        setLoading(false);
+  const load = useCallback(async () => {
+    try {
+      const [policyRes, peffleRes] = await Promise.all([
+        fetch("/api/admin/policies", { credentials: "include" }),
+        fetch("/api/admin/peffle", { credentials: "include" }),
+      ]);
+      if (!policyRes.ok) throw new Error("Could not load policies.");
+      const payload = (await policyRes.json()) as { policies: PoliciesFormValues };
+      setPolicies(payload.policies);
+      if (peffleRes.ok) {
+        setPeffle((await peffleRes.json()) as PeffleControlState);
       }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not load policies.");
+    } finally {
+      setLoading(false);
     }
-    void load();
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  useEffect(() => {
+    const handler = () => void load();
+    window.addEventListener("razorflow:admin-guardrails-updated", handler);
+    return () => window.removeEventListener("razorflow:admin-guardrails-updated", handler);
+  }, [load]);
 
   const persist = useCallback(async (next: PoliciesFormValues) => {
     setSaving(true);

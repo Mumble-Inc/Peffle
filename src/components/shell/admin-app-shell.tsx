@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CaretDoubleLeft, CaretDoubleRight, List, X } from "@phosphor-icons/react";
+import { CaretDoubleLeft, CaretDoubleRight, ChatCircle, List, X } from "@phosphor-icons/react";
+import { AdminGuardrailsChatPanel } from "@/components/admin/admin-guardrails-chat-panel";
 import { Mark } from "@/components/mark";
 import { AppTopBar } from "@/components/shell/app-top-bar";
 import { ADMIN_NAV_GROUPS, titleForPath } from "@/components/shell/nav-config";
@@ -20,6 +21,7 @@ export function AdminAppShell({ merchantName, children }: AdminAppShellProps) {
   const pageTitle = titleForPath(pathname);
   const { collapsed, toggle, ready } = useSidebarCollapse();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [guardrailsChatOpen, setGuardrailsChatOpen] = useState(false);
   const merchantInitial = merchantName.trim().charAt(0).toUpperCase() || "M";
 
   useBodyScrollLock(mobileNavOpen);
@@ -143,6 +145,15 @@ export function AdminAppShell({ merchantName, children }: AdminAppShellProps) {
               {mobileNavOpen ? <X className="size-5" aria-hidden /> : <List className="size-5" aria-hidden />}
             </button>
             <p className="rf-admin-mobile-current truncate">{pageTitle}</p>
+            <button
+              type="button"
+              className="rf-admin-mobile-menu-btn rf-motion-colors"
+              aria-expanded={guardrailsChatOpen}
+              aria-label={guardrailsChatOpen ? "Close guardrails assistant" : "Open guardrails assistant"}
+              onClick={() => setGuardrailsChatOpen((open) => !open)}
+            >
+              <ChatCircle className="size-5" aria-hidden />
+            </button>
           </div>
 
           {mobileNavOpen ? (
@@ -209,9 +220,18 @@ export function AdminAppShell({ merchantName, children }: AdminAppShellProps) {
             </>
           ) : null}
 
-          <main id="content" className="rf-page-content flex-1 px-4 py-5 md:px-6 md:py-7 lg:px-8">
-            {children}
-          </main>
+          <div className="rf-admin-workspace flex min-h-0 flex-1 overflow-hidden">
+            <main
+              id="content"
+              className="rf-page-content min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-7 lg:px-8"
+            >
+              {children}
+            </main>
+            <AdminGuardrailsChatPanel
+              mobileOpen={guardrailsChatOpen}
+              onMobileClose={() => setGuardrailsChatOpen(false)}
+            />
+          </div>
         </div>
       </div>
     </div>

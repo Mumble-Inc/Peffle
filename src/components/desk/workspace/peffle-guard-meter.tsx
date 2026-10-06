@@ -5,6 +5,7 @@ import { Money } from "@/components/money";
 import type { AgentResult, MerchantPolicies } from "@/lib/agent/types";
 import type { DemoTracePayload } from "@/lib/peffle/demo-trace";
 import type { CartState } from "@/hooks/use-cart";
+import { cartDiscountPct } from "@/lib/cart-discount";
 
 export function PeffleGuardMeter({
   policies,
@@ -26,7 +27,8 @@ export function PeffleGuardMeter({
   const maxOrder = policies?.maxOrderInr ?? 0;
   const orderValue = cart.itemCount > 0 ? cart.subtotal : (result?.subtotal ?? 0);
   const orderPct = maxOrder > 0 ? Math.min(100, Math.round((orderValue / maxOrder) * 100)) : 0;
-  const discountUsed = result?.discountPct ?? 0;
+  const cartDiscount = cart.itemCount > 0 ? cartDiscountPct(cart.lines) : 0;
+  const discountUsed = cartDiscount > 0 ? cartDiscount : (result?.discountPct ?? 0);
   const discountMax = policies?.maxDiscountPct ?? 0;
   const margin = result?.marginPct ?? null;
   const marginFloor = policies?.minMarginPct ?? 0;

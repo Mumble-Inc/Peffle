@@ -17,6 +17,11 @@ export type CartLineView = {
   imageAlt: string;
   unitPrice: number;
   unitPricePaise: number;
+  /** Catalog list price before session discounts (per unit). */
+  listUnitPrice: number;
+  listUnitPricePaise: number;
+  discountPerUnit: number;
+  discountPerUnitPaise: number;
   quantity: number;
   lineTotal: number;
   lineTotalPaise: number;
@@ -44,6 +49,10 @@ function mapLine(line: CartLine & { product: DbProduct }): CartLineView {
     imageAlt: line.product.imageAlt,
     unitPrice: unitPricePaise / 100,
     unitPricePaise,
+    listUnitPrice: unitPricePaise / 100,
+    listUnitPricePaise: unitPricePaise,
+    discountPerUnit: 0,
+    discountPerUnitPaise: 0,
     quantity: line.quantity,
     lineTotal: lineTotalPaise / 100,
     lineTotalPaise,
@@ -64,13 +73,18 @@ export async function getCartForSession(sessionId: string): Promise<CartView> {
 
   const mapped = lines.map((line) => {
     const view = mapLine(line);
+    const listUnitPricePaise = view.listUnitPricePaise;
     const discountPaise = discountByProduct.get(line.productId) ?? 0;
-    const unitPricePaise = Math.max(0, view.unitPricePaise - discountPaise);
+    const unitPricePaise = Math.max(0, listUnitPricePaise - discountPaise);
     const lineTotalPaise = unitPricePaise * view.quantity;
     return {
       ...view,
       unitPricePaise,
       unitPrice: unitPricePaise / 100,
+      listUnitPrice: listUnitPricePaise / 100,
+      listUnitPricePaise,
+      discountPerUnit: discountPaise / 100,
+      discountPerUnitPaise: discountPaise,
       lineTotalPaise,
       lineTotal: lineTotalPaise / 100,
     };

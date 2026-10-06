@@ -78,6 +78,20 @@ describe("user-controlled cart", () => {
     expect(cart.itemCount).toBe(1);
   });
 
+  it("applies session discount to cart line totals", async () => {
+    const { sessionId } = await createBuyerSession("Need earbuds under ₹5000");
+    const cartBefore = await addToCart(sessionId, "drift-buds");
+    const productId = cartBefore.lines[0]!.productId;
+    const listPaise = cartBefore.lines[0]!.listUnitPricePaise;
+    await db.sessionDiscount.create({
+      data: { sessionId, productId, amountPaise: 50000 },
+    });
+    const cart = await getCartForSession(sessionId);
+    expect(cart.lines[0]?.discountPerUnitPaise).toBe(50000);
+    expect(cart.lines[0]?.unitPricePaise).toBe(listPaise - 50000);
+    expect(cart.subtotalPaise).toBe(listPaise - 50000);
+  });
+
   it("removes items from cart", async () => {
     const { sessionId } = await createBuyerSession("Need earbuds");
     await addToCart(sessionId, "drift-buds");

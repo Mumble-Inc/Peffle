@@ -40,6 +40,8 @@ Local development and demos target **PostgreSQL on localhost**. Run as a **singl
 
 ## Quick start
 
+**Node 22** (see `.nvmrc`). `npm run dev` and other scripts use `scripts/with-supported-node.sh`, which prefers Homebrew `node@22` when installed (`brew install node@22`). On Apple Silicon, if `node -v` fails with a `simdjson` dylib error, run `brew reinstall simdjson` or use `node@22` only.
+
 ```bash
 npm install
 docker compose up -d

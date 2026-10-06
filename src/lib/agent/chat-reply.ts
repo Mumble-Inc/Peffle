@@ -34,13 +34,12 @@ function groqMessages(system: string, message: string, history: ChatHistoryTurn[
   ];
 }
 
-export async function generateAgentChatReply(
+export async function generateChatReplyWithSystem(
   message: string,
-  context: { merchantName: string; toolSummary: string },
+  system: string,
   history: ChatHistoryTurn[] = [],
+  deterministicFallback: (text: string) => string = guideReplyDeterministic,
 ): Promise<{ reply: string; planner: ChatReplyPlanner }> {
-  const system = `${BASE_SYSTEM}\nMerchant: ${context.merchantName}\n${context.toolSummary}`;
-
   if (getGeminiApiKey()) {
     try {
       const reply = await withGeminiRetry(async () => {
@@ -80,7 +79,16 @@ export async function generateAgentChatReply(
   }
 
   return {
-    reply: guideReplyDeterministic(message),
+    reply: deterministicFallback(message),
     planner: "deterministic",
   };
+}
+
+export async function generateAgentChatReply(
+  message: string,
+  context: { merchantName: string; toolSummary: string },
+  history: ChatHistoryTurn[] = [],
+): Promise<{ reply: string; planner: ChatReplyPlanner }> {
+  const system = `${BASE_SYSTEM}\nMerchant: ${context.merchantName}\n${context.toolSummary}`;
+  return generateChatReplyWithSystem(message, system, history, guideReplyDeterministic);
 }

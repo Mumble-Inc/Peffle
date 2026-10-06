@@ -6,10 +6,11 @@ import { resolveDemoMerchant } from "@/lib/services/merchant";
 export async function GET(request: Request) {
   try {
     const merchant = await resolveDemoMerchant();
-    const { sessionId, identity, account } = await getSessionAuthState(request);
+    const { sessionId, account } = await getSessionAuthState(request);
 
-    const capability = account?.capability ?? (sessionId ? (identity?.capability ?? "anonymous") : "anonymous");
-    const emailVerified = account?.emailVerified ?? identity?.emailVerified ?? false;
+    const authenticated = Boolean(account);
+    const capability = authenticated && account ? account.capability : "anonymous";
+    const emailVerified = authenticated && account ? account.emailVerified : false;
 
     return NextResponse.json({
       merchantId: merchant.id,
@@ -24,11 +25,11 @@ export async function GET(request: Request) {
             capability: account.capability,
           }
         : null,
-      email: account?.email ?? identity?.email ?? null,
+      email: authenticated && account ? account.email : null,
       emailVerified,
-      emailVerifiedAt: account?.emailVerifiedAt ?? identity?.emailVerifiedAt ?? null,
+      emailVerifiedAt: authenticated && account ? account.emailVerifiedAt : null,
       capability,
-      authenticated: Boolean(account),
+      authenticated,
     });
   } catch (error) {
     if (error instanceof AuthError) {

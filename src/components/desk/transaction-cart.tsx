@@ -60,10 +60,22 @@ export function TransactionCart({
                   <p className="min-w-0 text-sm font-medium leading-snug" translate="no">
                     {line.name}
                   </p>
-                  <p className="shrink-0 text-sm font-semibold tabular">
-                    <Money value={line.lineTotal} />
-                  </p>
+                  <div className="shrink-0 text-right">
+                    {(line.discountPerUnit ?? 0) > 0 && (line.listUnitPrice ?? 0) > line.unitPrice ? (
+                      <p className="text-xs text-muted line-through tabular">
+                        <Money value={(line.listUnitPrice ?? line.unitPrice) * line.quantity} />
+                      </p>
+                    ) : null}
+                    <p className="text-sm font-semibold tabular">
+                      <Money value={line.lineTotal} />
+                    </p>
+                  </div>
                 </div>
+                {(line.discountPerUnit ?? 0) > 0 ? (
+                  <p className="mt-1 text-xs text-success tabular" data-testid={`cart-discount-${line.sku}`}>
+                    Peffle discount −<Money value={line.discountPerUnit! * line.quantity} />
+                  </p>
+                ) : null}
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                   {readOnly ? (
                     <span

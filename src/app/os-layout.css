@@ -1195,6 +1195,8 @@ body {
 
 .rf-app-shell-main {
   min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Sidebar */
@@ -1735,6 +1737,113 @@ body {
 }
 
 /* ——— Peffle control plane ——— */
+.rf-admin-workspace {
+  min-height: 0;
+}
+
+.rf-admin-guardrails-rail {
+  flex: 0 0 auto;
+  width: min(22.5rem, 100vw);
+  min-height: 0;
+  flex-direction: column;
+  border-left: 1px solid var(--rf-line);
+  background: var(--rf-canvas-2);
+}
+
+.rf-admin-guardrails-rail-mobile {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  width: 100%;
+  max-width: none;
+  border-left: 0;
+  background: color-mix(in oklab, var(--rf-canvas) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.rf-admin-guardrails-chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  margin: 0.5rem;
+  border: 1px solid var(--rf-glass-border, var(--rf-line));
+  border-radius: 12px;
+  background: var(--rf-glass, var(--rf-surface));
+  backdrop-filter: blur(var(--rf-glass-blur)) saturate(var(--rf-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--rf-glass-blur)) saturate(var(--rf-glass-saturate));
+  overflow: hidden;
+}
+
+.rf-admin-guardrails-rail-mobile .rf-admin-guardrails-chat {
+  margin: 0.75rem;
+  max-height: calc(100dvh - 1.5rem);
+}
+
+.rf-admin-guardrails-chat-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--rf-line);
+}
+
+.rf-admin-guardrails-chat-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--rf-accent) 12%, var(--rf-canvas));
+  border: 1px solid color-mix(in oklab, var(--rf-accent) 35%, var(--rf-line));
+}
+
+.rf-admin-guardrails-chat-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.65rem 0.75rem;
+}
+
+.rf-admin-guardrails-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.rf-admin-guardrails-starters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rf-admin-guardrails-chat-footer {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.65rem 0.65rem;
+  border-top: 1px solid var(--rf-line);
+}
+
+.rf-admin-guardrails-chat-footer .rf-peffle-chat-composer {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (min-width: 1024px) {
+  .rf-admin-guardrails-rail {
+    height: calc(100dvh - var(--rf-topbar-height-expanded));
+    position: sticky;
+    top: var(--rf-topbar-height-expanded);
+    align-self: flex-start;
+  }
+}
+
 .rf-peffle-control {
   display: flex;
   flex-direction: column;
@@ -1750,14 +1859,18 @@ body {
   color: var(--rf-muted);
 }
 
-.rf-peffle-control .rf-peffle-hero {
+.rf-peffle-control-grid {
   display: grid;
   gap: 0.85rem;
+  overflow: visible;
+  max-height: none;
+  min-height: 0;
 }
 
 @media (min-width: 768px) {
-  .rf-peffle-control .rf-peffle-hero {
+  .rf-peffle-control-grid {
     grid-template-columns: 1.15fr 1fr;
+    align-items: stretch;
   }
 }
 
@@ -1766,6 +1879,8 @@ body {
   border-radius: 12px;
   background: var(--rf-surface);
   padding: 1.1rem 1.25rem;
+  overflow: visible;
+  min-height: 0;
 }
 
 .rf-peffle-card-status[data-state="protected"] {
@@ -1830,6 +1945,7 @@ body {
 
 .rf-peffle-cap {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.9rem;

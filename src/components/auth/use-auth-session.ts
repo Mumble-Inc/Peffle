@@ -39,13 +39,14 @@ export function useAuthSession() {
         capability?: BuyerCapability;
       };
 
+      const authenticated = Boolean(payload.authenticated);
       setState({
         loading: false,
-        authenticated: Boolean(payload.authenticated),
-        email: payload.account?.email ?? payload.email ?? null,
-        emailVerified: payload.account?.emailVerified ?? payload.emailVerified ?? false,
-        capability: payload.account?.capability ?? payload.capability ?? "anonymous",
-        accountId: payload.account?.id ?? null,
+        authenticated,
+        email: authenticated ? (payload.account?.email ?? null) : null,
+        emailVerified: authenticated ? (payload.account?.emailVerified ?? false) : false,
+        capability: authenticated ? (payload.account?.capability ?? "buyer") : "anonymous",
+        accountId: authenticated ? (payload.account?.id ?? null) : null,
       });
     } catch {
       setState({ ...defaultState, loading: false });

@@ -468,6 +468,41 @@ describe("Buyer accounts and persistent auth", () => {
     expect(logout.status).toBe(200);
   });
 
+  it("does not expose staff capability after account logout while buyer session remains", async () => {
+    const { sessionId, authSessionId } = await registerAndVerifyAccount({
+      email: ADMIN_EMAIL,
+      sessionId: (await createBuyerSession("logout identity leak")).sessionId,
+    });
+
+    const loggedIn = await authSessionRoute(
+      new Request("http://localhost/api/auth/session", {
+        headers: combinedAuthHeaders(sessionId!, authSessionId!),
+      }),
+    );
+    expect(((await loggedIn.json()) as { capability: string }).capability).toBe("admin");
+
+    await logoutRoute(
+      new Request("http://localhost/api/auth/logout", {
+        method: "POST",
+        headers: accountAuthHeaders(authSessionId!),
+      }),
+    );
+
+    const guest = await authSessionRoute(
+      new Request("http://localhost/api/auth/session", {
+        headers: buyerAuthHeaders(sessionId!),
+      }),
+    );
+    const payload = (await guest.json()) as {
+      authenticated: boolean;
+      capability: string;
+      email: string | null;
+    };
+    expect(payload.authenticated).toBe(false);
+    expect(payload.capability).toBe("anonymous");
+    expect(payload.email).toBeNull();
+  });
+
   it("rejects admin routes for verified buyers without staff capability", async () => {
     const { sessionId, authSessionId } = await registerAndVerifyAccount({
       email: "non-staff@example.com",

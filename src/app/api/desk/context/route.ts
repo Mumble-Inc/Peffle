@@ -4,12 +4,13 @@ import { getDeskContext } from "@/lib/services/desk-context";
 
 export async function GET(request: Request) {
   try {
-    const { sessionId, identity } = await getSessionAuthState(request);
+    const { sessionId, account } = await getSessionAuthState(request);
+    const authenticated = Boolean(account);
     const context = await getDeskContext({
       sessionId,
-      email: identity?.email ?? null,
-      emailVerified: identity?.emailVerified ?? false,
-      capability: identity?.capability ?? "anonymous",
+      email: authenticated && account ? account.email : null,
+      emailVerified: authenticated && account ? account.emailVerified : false,
+      capability: authenticated && account ? account.capability : "anonymous",
     });
     return NextResponse.json(context);
   } catch (error) {

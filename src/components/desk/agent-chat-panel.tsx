@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { PaperPlaneRight, ShieldCheck, Sparkle } from "@phosphor-icons/react";
 import { DESK_CHAT_PLACEHOLDER } from "@/lib/agent/desk-guide";
+import { dispatchCartUpdated } from "@/hooks/use-cart";
 
 type ChatPlanner = "gemini" | "groq" | "deterministic";
 
 type ChatPayload = {
   reply: string;
   planner: ChatPlanner;
-  tools: Array<{ ok: boolean; tool: string; reasonCode: string; message: string }>;
+  tools?: Array<{ ok: boolean; tool: string; reasonCode: string; message: string }>;
 };
 
 type ChatTurn = {
@@ -37,7 +38,7 @@ export function AgentChatPanel({
   chatLocked = false,
 }: {
   sessionId: string | null;
-  onTurn?: (turn: { planner: ChatPlanner }) => void;
+  onTurn?: (turn: { planner: ChatPlanner; discountApplied?: boolean }) => void;
   onEnsureSession?: (seed?: string) => Promise<string | null>;
   chatLocked?: boolean;
 }) {
@@ -101,8 +102,12 @@ export function AgentChatPanel({
           planner: payload.planner,
         },
       ]);
+      const discountApplied = payload.tools?.some((tool) => tool.ok && tool.tool === "apply_discount");
+      if (discountApplied) {
+        dispatchCartUpdated();
+      }
       if (payload.planner === "gemini" || payload.planner === "groq" || payload.planner === "deterministic") {
-        onTurn?.({ planner: payload.planner });
+        onTurn?.({ planner: payload.planner, discountApplied });
       }
     } finally {
       setBusy(false);

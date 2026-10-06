@@ -11,6 +11,8 @@ export type CartLine = {
   image: string;
   imageAlt: string;
   unitPrice: number;
+  listUnitPrice?: number;
+  discountPerUnit?: number;
   quantity: number;
   lineTotal: number;
   inventory: number;

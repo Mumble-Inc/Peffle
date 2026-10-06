@@ -45,7 +45,7 @@ export function AccountMenu({ onLogout }: AccountMenuProps) {
       </button>
       {open ? (
         <div
-          className="rf-surface-canvas absolute right-0 z-50 mt-2 w-72 rounded-[var(--rf-radius-panel)] border border-line p-4 shadow-[var(--rf-shadow-e2)]"
+          className="rf-surface-canvas absolute right-0 z-[60] mt-2 w-72 rounded-[var(--rf-radius-panel)] border border-line p-4 shadow-[var(--rf-shadow-e2)]"
           role="dialog"
           aria-label="Account details"
         >
