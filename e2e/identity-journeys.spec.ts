@@ -43,11 +43,16 @@ test.describe("Phase 11 account journeys", () => {
     await ensureVerifiedBuyerForCheckout(page, `verified-buyer-${Date.now()}@example.com`);
     await page.goto("/desk");
     await expect(page.getByRole("banner").getByRole("link", { name: "Admin" })).toHaveCount(0);
+    const deskNav = page.getByRole("navigation", { name: "Desk" });
+    await expect(deskNav.getByRole("link", { name: "Control" })).toHaveCount(0);
+    await expect(deskNav.getByRole("link", { name: "Orders" })).toHaveCount(0);
+    await expect(deskNav.getByRole("link", { name: "Analytics" })).toHaveCount(0);
+    await expect(deskNav.getByRole("link", { name: "Policies" })).toHaveCount(0);
+    await expect(page.getByRole("tab", { name: "Trace" })).toHaveCount(0);
 
     await page.goto("/admin");
-    await expect(page.getByRole("heading", { name: "Admin unavailable" })).toBeVisible({
-      timeout: 15_000,
-    });
+    await page.waitForURL(/\/desk/, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: "Admin unavailable" })).toHaveCount(0);
   });
 
   test("verified staff sees Admin and admin portal opens", async ({ page }) => {

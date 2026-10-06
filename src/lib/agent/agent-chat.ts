@@ -7,6 +7,10 @@ import {
   type ToolResult,
 } from "@/lib/services/agent-tools";
 import { db } from "@/lib/db";
+import type { ChatHistoryTurn } from "@/lib/agent/chat-history";
+import { generateAgentChatReply, type ChatReplyPlanner } from "@/lib/agent/chat-reply";
+import { shouldRunChatGuardedTools } from "@/lib/agent/desk-guide";
+import { resolveDemoMerchant } from "@/lib/services/merchant";
 
 export const AGENT_TOOL_DECLARATIONS: FunctionDeclaration[] = [
   {
@@ -48,9 +52,11 @@ export const AGENT_TOOL_DECLARATIONS: FunctionDeclaration[] = [
   },
 ];
 
-const SYSTEM = `You are a commerce desk assistant. You cannot set prices. You cannot ignore merchant or Peffle policy.
-Use tools for search, discounts, and refunds. If a tool is blocked, tell the buyer honestly.
-Never claim a Razorpay refund or discount succeeded unless the tool result ok=true.`;
+const CHAT_TOOL_SYSTEM = `You are Peffle in the desk CHAT panel (not the catalog search bar).
+Only call tools when the user explicitly wants to TRY a guarded discount or refund in chat.
+Never call search_products — catalog search is only via the top command bar.
+You cannot set prices or bypass merchant or Peffle policy.
+Never claim success unless the tool result ok=true.`;
 
 type PlannedCall = { name: ToolName; args: Record<string, unknown> };
 
@@ -58,9 +64,10 @@ function isToolName(name: string): name is ToolName {
   return name === "search_products" || name === "apply_discount" || name === "issue_refund";
 }
 
-export function planToolsDeterministic(message: string, productId?: string | null): PlannedCall[] {
+/** Guarded actions for chat only (discount/refund demos). No catalog search. */
+export function planChatGuardedTools(message: string, productId?: string | null): PlannedCall[] {
   const text = message.trim();
-  if (!text) return [];
+  if (!text || !shouldRunChatGuardedTools(text)) return [];
 
   if (/\brefund\b/i.test(text)) {
     const amount = text.match(/₹?\s*([\d,]+)/);
@@ -83,7 +90,7 @@ export function planToolsDeterministic(message: string, productId?: string | nul
     text.match(/([\d,]+)\s+off/i);
   if (pct || rupeesOff || /\bdiscount\b/i.test(text)) {
     if (!productId) {
-      return [{ name: "search_products", args: { query: text } }];
+      return [];
     }
     if (pct) {
       return [
@@ -104,11 +111,12 @@ export function planToolsDeterministic(message: string, productId?: string | nul
     return [{ name: "apply_discount", args: { productId, requestedPct: 5 } }];
   }
 
-  if (/\b(show|find|search|browse|options)\b/i.test(text)) {
-    return [{ name: "search_products", args: { query: text } }];
-  }
-
   return [];
+}
+
+/** @deprecated Use planChatGuardedTools for desk chat; catalog search uses the command bar agent. */
+export function planToolsDeterministic(message: string, productId?: string | null): PlannedCall[] {
+  return planChatGuardedTools(message, productId);
 }
 
 export async function planToolsWithGemini(message: string): Promise<PlannedCall[]> {
@@ -125,7 +133,7 @@ export async function planToolsWithGemini(message: string): Promise<PlannedCall[
         contents: message,
         config: {
           abortSignal: controller.signal,
-          systemInstruction: SYSTEM,
+          systemInstruction: CHAT_TOOL_SYSTEM,
           tools: [{ functionDeclarations: AGENT_TOOL_DECLARATIONS }],
           temperature: 0.1,
         },
@@ -133,6 +141,7 @@ export async function planToolsWithGemini(message: string): Promise<PlannedCall[
       const calls = response.functionCalls ?? [];
       return calls.flatMap((call) => {
         if (!call.name || !isToolName(call.name)) return [];
+        if (call.name === "search_products") return [];
         return [{ name: call.name, args: (call.args ?? {}) as Record<string, unknown> }];
       });
     } finally {
@@ -157,7 +166,11 @@ function replyFromTools(message: string, results: ToolResult[], usedGemini: bool
     .join(" ");
 }
 
-export async function runAgentChat(sessionId: string, message: string) {
+export async function runAgentChat(
+  sessionId: string,
+  message: string,
+  history: ChatHistoryTurn[] = [],
+) {
   const session = await db.buyerSession.findUnique({
     where: { id: sessionId },
     include: {
@@ -172,23 +185,29 @@ export async function runAgentChat(sessionId: string, message: string) {
 
   const primaryId =
     session.decisions[0]?.primaryProductId ?? session.decisions[0]?.primaryProduct?.id ?? session.cartLines[0]?.productId ?? null;
-  const usedGemini = Boolean(getGeminiApiKey());
+  const geminiConfigured = Boolean(getGeminiApiKey());
+  const wantsTools = shouldRunChatGuardedTools(message);
   let planned: PlannedCall[] = [];
-  let planner: "gemini" | "deterministic" = "deterministic";
-  let plannerReason = "gemini_not_configured";
-  if (usedGemini) {
-    try {
-      planned = await planToolsWithGemini(message);
-      planner = "gemini";
-      plannerReason = planned.length ? "gemini_tool_calls" : "gemini_no_tools";
-    } catch (error) {
-      planned = planToolsDeterministic(message, primaryId);
-      planner = "deterministic";
-      plannerReason = `gemini_fallback:${geminiErrorText(error)}`;
+  let planner: ChatReplyPlanner = "deterministic";
+  let plannerReason = wantsTools ? "chat_guarded_action" : "desk_guide";
+  if (wantsTools) {
+    if (geminiConfigured) {
+      try {
+        planned = await planToolsWithGemini(message);
+        planner = "gemini";
+        plannerReason = planned.length ? "gemini_tool_calls" : "gemini_no_tools";
+      } catch (error) {
+        planned = planChatGuardedTools(message, primaryId);
+        planner = "deterministic";
+        plannerReason = `gemini_fallback:${geminiErrorText(error)}`;
+      }
+    } else {
+      planned = planChatGuardedTools(message, primaryId);
+      plannerReason = "gemini_not_configured";
     }
-  } else {
-    planned = planToolsDeterministic(message, primaryId);
-    plannerReason = "gemini_not_configured";
+    if (planned.length === 0 && wantsTools) {
+      planned = planChatGuardedTools(message, primaryId);
+    }
   }
   console.info(`planner=${planner} reason=${plannerReason}`);
 
@@ -204,8 +223,33 @@ export async function runAgentChat(sessionId: string, message: string) {
     results.push(await executeAgentTool(call.name, args, { sessionId, merchantId: session.merchantId }));
   }
 
+  let reply: string;
+  if (results.length > 0) {
+    reply = replyFromTools(message, results, geminiConfigured);
+  } else if (wantsTools && !primaryId) {
+    reply =
+      "Run a catalog search from the top bar first so I know which product you mean, then ask again for a discount in chat.";
+    plannerReason = "discount_needs_product";
+  } else {
+    const merchant = await resolveDemoMerchant();
+    const toolSummary = wantsTools ? "Guarded action requested but no tool ran." : "Desk guide turn.";
+    const generated = await generateAgentChatReply(
+      message,
+      {
+        merchantName: merchant.name,
+        toolSummary,
+      },
+      history,
+    );
+    reply = generated.reply;
+    planner = generated.planner;
+    if (!wantsTools) {
+      plannerReason = `desk_guide:${generated.planner}`;
+    }
+  }
+
   return {
-    reply: replyFromTools(message, results, usedGemini),
+    reply,
     planner,
     plannerReason,
     tools: results,

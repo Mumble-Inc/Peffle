@@ -21,6 +21,10 @@ async function runAgentForHalo(page: import("@playwright/test").Page) {
   await expect(page.getByTestId("product-name")).toHaveText("Northline Halo ANC", { timeout: 15_000 });
 }
 
+async function openCartTab(page: import("@playwright/test").Page) {
+  await page.getByRole("tab", { name: /^Cart/ }).click();
+}
+
 test.describe("Desk transaction cart", () => {
   test.beforeEach(async ({ page }) => {
     await prepareE2EBaseline(page);
@@ -29,6 +33,7 @@ test.describe("Desk transaction cart", () => {
   test("cart lives in Transaction and /cart redirects to desk", async ({ page }) => {
     await page.goto("/desk");
     await expect(page.getByTestId("transaction-rail")).toBeVisible();
+    await openCartTab(page);
     await expect(page.getByTestId("transaction-cart")).toBeVisible();
     await expect(page.getByTestId("cart-empty-hint")).toHaveText("No items added yet.");
     await expect(page.getByTestId("authorize")).toBeDisabled();
@@ -45,9 +50,9 @@ test.describe("Desk transaction cart", () => {
       test.skip(true, "Agent returned a single recommendation for this intent");
       return;
     }
-    await expect(page.getByTestId("cart-empty-hint")).toBeVisible();
     await page.getByTestId("next-product").click();
     await expect(page.getByTestId("option-indicator")).toContainText("Option 2 of");
+    await openCartTab(page);
     await expect(page.getByTestId("cart-empty-hint")).toBeVisible();
   });
 
@@ -121,6 +126,7 @@ test.describe("Desk transaction cart", () => {
     await page.goto("/desk");
     await runAgentForHalo(page);
     await page.getByTestId("add-to-cart-halo-anc").click();
+    await openCartTab(page);
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
     expect(overflow).toBe(false);

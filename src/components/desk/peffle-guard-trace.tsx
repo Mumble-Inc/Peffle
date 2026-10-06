@@ -117,7 +117,7 @@ export function PeffleGuardTrace({
   sessionId: string | null;
   on: boolean;
   refreshNonce: number;
-  planner: "gemini" | "deterministic" | null;
+  planner: "gemini" | "groq" | "deterministic" | null;
 }) {
   const reduce = useReducedMotion();
   const payload = useDemoTrace(enabled, sessionId, refreshNonce);

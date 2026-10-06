@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
-import { armSimulateDecline, prepareE2EBaseline, runDeskAgentWithIntent, ensureVerifiedBuyerForCheckout } from "./helpers/baseline";
+import {
+  armSimulateDecline,
+  ensureVerifiedBuyerForCheckout,
+  openDeskCartTab,
+  prepareE2EBaseline,
+  runDeskAgentWithIntent,
+} from "./helpers/baseline";
 import { isRazorpayConfigured } from "./helpers/env";
 import {
   captureCurrentDeskSaleViaApi,
@@ -48,6 +54,7 @@ test.describe("Desk post-payment UX", () => {
 
     await page.getByTestId("start-new-sale").click();
     await expect(page.getByTestId("transaction-completed")).toHaveCount(0);
+    await openDeskCartTab(page);
     await expect(page.getByTestId("authorize")).toBeVisible();
     await expect(page.getByTestId("authorize")).toBeDisabled();
   });
@@ -78,6 +85,7 @@ test.describe("Desk post-payment UX", () => {
     await expect(page.getByTestId("payment-not-completed")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByTestId("transaction-completed")).toHaveCount(0);
     await page.getByTestId("try-payment-again").click();
+    await openDeskCartTab(page);
     await expect(page.getByTestId("authorize")).toBeEnabled();
   });
 

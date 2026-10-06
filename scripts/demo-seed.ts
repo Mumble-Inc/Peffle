@@ -89,6 +89,7 @@ async function main() {
 
   console.info("demo:seed discount-daily-cap=50000 paise, reset .peffle/ledger.db");
   console.info(`demo product ${halo.name} ${halo.pricePaise} paise`);
+  console.info("If npm run dev is already running, restart it so Peffle reloads the ledger file.");
   await prisma.$disconnect();
 }
 

@@ -412,7 +412,8 @@ Copy `.env.example` to `.env.local` (and `.env` for Prisma CLI). Never commit se
 | `RAZORPAY_KEY_SECRET` | For real checkout | Server only; never expose to client |
 | `RAZORPAY_WEBHOOK_SECRET` | For webhooks | Webhook HMAC verification |
 | `NEXT_PUBLIC_RAZORPAY_KEY_ID` | For Checkout.js | Public key only |
-| `GEMINI_API_KEY` | No | LLM intent extraction (server only) |
+| `GEMINI_API_KEY` | No | LLM intent extraction and agent chat (server only) |
+| `GROQ_API_KEY` | No | Optional agent chat replies when Gemini is unavailable (`GROQ_MODEL`, default `llama-3.3-70b-versatile`) |
 | `GEMINI_MODEL` | No | Default `gemini-3.6-flash` |
 | `RAZORFLOW_SESSION_SECRET` | Production | Signed auth / session tokens |
 | `SMTP_*`, `SMTP_FROM` | No | Real verification emails |

@@ -13,9 +13,12 @@ import {
 import { Mark } from "@/components/mark";
 import { capabilityLabel, isStaffOrAdmin, type BuyerCapability } from "@/lib/auth/capability";
 
-const NAV = [
+const BUYER_NAV = [
   { href: "/desk", label: "Desk", icon: House, exact: true },
   { href: "/desk#catalog", label: "Catalog", icon: Package },
+] as const;
+
+const STAFF_NAV = [
   { href: "/admin/orders", label: "Orders", icon: ClipboardText },
   { href: "/admin/policies", label: "Policies", icon: ShieldCheck },
   { href: "/admin", label: "Control", icon: SlidersHorizontal, exact: true },
@@ -43,41 +46,30 @@ export function DeskModeCard({
   demoOn: boolean;
   onDemoChange: (next: boolean) => void;
 }) {
-  if (demoAvailable) {
-    return (
-      <button
-        type="button"
-        role="switch"
-        aria-checked={demoOn}
-        aria-label={demoOn ? `Demo Mode, exploring as ${merchantName}` : `Live desk, ${merchantName}`}
-        data-testid="demo-mode-toggle"
-        className="rf-peffle-demo-card"
-        data-on={demoOn ? "true" : "false"}
-        onClick={() => {
-          const next = !demoOn;
-          try {
-            sessionStorage.setItem("razorflow-demo-mode", next ? "1" : "0");
-          } catch {
-            // session-only
-          }
-          onDemoChange(next);
-        }}
-      >
-        <span className="rf-peffle-demo-dot" aria-hidden />
-        <span className="rf-peffle-demo-label">{demoOn ? "Demo Mode" : "Live desk"}</span>
-      </button>
-    );
-  }
+  if (!demoAvailable) return null;
 
   return (
-    <div
+    <button
+      type="button"
+      role="switch"
+      aria-checked={demoOn}
+      aria-label={demoOn ? `Demo Mode, exploring as ${merchantName}` : `Live desk, ${merchantName}`}
+      data-testid="demo-mode-toggle"
       className="rf-peffle-demo-card"
-      data-on="false"
-      aria-label={`Live desk, ${merchantName}`}
+      data-on={demoOn ? "true" : "false"}
+      onClick={() => {
+        const next = !demoOn;
+        try {
+          sessionStorage.setItem("razorflow-demo-mode", next ? "1" : "0");
+        } catch {
+          // session-only
+        }
+        onDemoChange(next);
+      }}
     >
       <span className="rf-peffle-demo-dot" aria-hidden />
-      <span className="rf-peffle-demo-label">Live desk</span>
-    </div>
+      <span className="rf-peffle-demo-label">{demoOn ? "Demo Mode" : "Live desk"}</span>
+    </button>
   );
 }
 

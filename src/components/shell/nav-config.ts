@@ -3,7 +3,6 @@ import {
   ChartLineUp,
   ClipboardText,
   CreditCard,
-  Gauge,
   ListBullets,
   Package,
   ShieldCheck,
@@ -28,7 +27,6 @@ export type NavGroup = {
 
 export const PUBLIC_NAV: NavItem[] = [
   { href: "/desk", label: "Desk", icon: Storefront, exact: true },
-  { href: "/admin", label: "Admin", icon: Gauge, exact: true },
 ];
 
 export const ADMIN_NAV_GROUPS: NavGroup[] = [

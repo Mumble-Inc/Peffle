@@ -20,6 +20,13 @@ export type DeskActiveSessionState = {
   capturedPayment: CapturedPaymentView;
 };
 
+export type DeskResumeSessionState = {
+  sessionId: string;
+  decisionId: string;
+  intentQuery: string;
+  agent: ReturnType<typeof agentResultToApiResponse>;
+};
+
 function policiesFromDecision(policyAllowed: boolean): PolicyVerdict[] {
   const result = policyAllowed ? ("allowed" as const) : ("blocked" as const);
   const detail = policyAllowed ? "Passed" : "Blocked";
@@ -70,6 +77,38 @@ function agentResultFromDecision(
     ],
     policies: policiesFromDecision(decision.policyAllowed),
     blockedReason: decision.policyReason,
+  };
+}
+
+export async function getDeskResumeSessionState(
+  sessionId: string,
+): Promise<DeskResumeSessionState | null> {
+  const session = await db.buyerSession.findUnique({
+    where: { id: sessionId },
+    include: { intent: true },
+  });
+  if (!session || session.status === "PAYMENT_CAPTURED") {
+    return null;
+  }
+
+  const decision = await db.agentDecision.findFirst({
+    where: { sessionId, supersededAt: null },
+    orderBy: { createdAt: "desc" },
+    include: {
+      primaryProduct: true,
+      attachProduct: true,
+    },
+  });
+  if (!decision) {
+    return null;
+  }
+
+  const agentResult = agentResultFromDecision(session, decision);
+  return {
+    sessionId,
+    decisionId: decision.id,
+    intentQuery: session.rawRequest,
+    agent: agentResultToApiResponse(sessionId, decision.id, agentResult),
   };
 }
 

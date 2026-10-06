@@ -91,9 +91,6 @@ export function DeskApp() {
   const [intent, setIntent] = useState("");
   const [merchantName, setMerchantName] = useState("Merchant");
   const [demoPrompts, setDemoPrompts] = useState<DemoPrompt[]>([]);
-  const [intentPlaceholder, setIntentPlaceholder] = useState(
-    "Search products, compare, or ask Peffle…",
-  );
   const [guestLoginNoticeOpen, setGuestLoginNoticeOpen] = useState(false);
   const [contextReady, setContextReady] = useState(false);
   const [contextError, setContextError] = useState<string | null>(null);
@@ -114,11 +111,15 @@ export function DeskApp() {
   const [demoModeAvailable, setDemoModeAvailable] = useState(false);
   const [demoModeOn, setDemoModeOn] = useState(false);
   const [demoRefreshNonce, setDemoRefreshNonce] = useState(0);
-  const [lastPlanner, setLastPlanner] = useState<"gemini" | "deterministic" | null>(null);
+  const [lastPlanner, setLastPlanner] = useState<"gemini" | "groq" | "deterministic" | null>(null);
   const [catalog, setCatalog] = useState<PublicProduct[]>([]);
   const [policies, setPolicies] = useState<MerchantPolicies | null>(null);
   const [railTab, setRailTab] = useState<DeskRailTab>("chat");
+  const [catalogSearchPlaceholder, setCatalogSearchPlaceholder] = useState(
+    "Search catalog — product, budget, or use case…",
+  );
   const intentRef = useRef<HTMLInputElement>(null);
+  const hydrateDeskSessionRef = useRef(true);
   const auth = useAuthSession();
 
   const { cart, loading: cartLoading, error: cartError, refresh: refreshCart, updateQuantity, removeLine } = useCart(sessionId);
@@ -147,41 +148,78 @@ export function DeskApp() {
   const agentBusy = agentProcessing.isPresenting;
   const busy = agentBusy || phase === "processing";
 
+  useEffect(() => {
+    function applyRailHash() {
+      if (window.location.hash === "#cart") setRailTab("cart");
+    }
+    applyRailHash();
+    window.addEventListener("hashchange", applyRailHash);
+    return () => window.removeEventListener("hashchange", applyRailHash);
+  }, []);
+
+  const ensureDeskSession = useCallback(async (seed?: string): Promise<string | null> => {
+    if (sessionId) return sessionId;
+    const raw = (seed?.trim() || "Desk shopping help").slice(0, 500);
+    const sessionRes = await fetch("/api/sessions", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rawRequest: raw.length >= 4 ? raw : "Desk shopping help" }),
+    });
+    if (!sessionRes.ok) return null;
+    const { sessionId: createdSessionId } = (await sessionRes.json()) as { sessionId: string };
+    setSessionId(createdSessionId);
+    return createdSessionId;
+  }, [sessionId]);
+
   const loadContext = useCallback(async () => {
     setContextError(null);
     try {
-      const response = await fetch("/api/desk/context");
+      const response = await fetch("/api/desk/context", { credentials: "include" });
       if (!response.ok) {
         setContextError("Could not load the desk. Check the connection and try again.");
         return;
       }
       const payload = (await response.json()) as {
-          merchant: { name: string };
-          demoPrompts: DemoPrompt[];
-          intentPlaceholder: string;
-          catalog?: PublicProduct[];
-          policies?: MerchantPolicies;
-          demoModeAvailable?: boolean;
-          activeSession?: {
-            sessionId: string;
-            decisionId: string;
-            orderId: string;
-            intentQuery: string;
-            agent: AgentApiResponse;
-            capturedPayment: CapturedPaymentView;
-          } | null;
-        };
-        setMerchantName(payload.merchant.name);
-        setDemoPrompts(payload.demoPrompts);
-        if (payload.intentPlaceholder?.trim()) {
-          setIntentPlaceholder(payload.intentPlaceholder);
-        } else if (payload.demoPrompts[0]?.text) {
-          setIntentPlaceholder(payload.demoPrompts[0].text);
-        }
-        setCatalog(payload.catalog ?? []);
-        setPolicies(payload.policies ?? null);
-        setDemoModeAvailable(payload.demoModeAvailable === true);
-        setDemoModeOn(payload.demoModeAvailable === true && readDemoModeOn());
+        merchant: { name: string };
+        demoPrompts: DemoPrompt[];
+        intentPlaceholder: string;
+        catalog?: PublicProduct[];
+        policies?: MerchantPolicies;
+        demoModeAvailable?: boolean;
+        auth?: { sessionId?: string | null };
+        activeSession?: {
+          sessionId: string;
+          decisionId: string;
+          orderId: string;
+          intentQuery: string;
+          agent: AgentApiResponse;
+          capturedPayment: CapturedPaymentView;
+        } | null;
+        resumeSession?: {
+          sessionId: string;
+          decisionId: string;
+          intentQuery: string;
+          agent: AgentApiResponse;
+        } | null;
+      };
+      setMerchantName(payload.merchant.name);
+      setDemoPrompts(payload.demoPrompts);
+      setCatalog(payload.catalog ?? []);
+      setPolicies(payload.policies ?? null);
+      setDemoModeAvailable(payload.demoModeAvailable === true);
+      setDemoModeOn(payload.demoModeAvailable === true && readDemoModeOn());
+      if (payload.intentPlaceholder?.trim()) {
+        setCatalogSearchPlaceholder(payload.intentPlaceholder.trim());
+      }
+
+      const cookieSessionId = payload.auth?.sessionId?.trim() || null;
+      if (cookieSessionId) {
+        setSessionId((current) => current ?? cookieSessionId);
+      }
+
+      if (hydrateDeskSessionRef.current) {
+        hydrateDeskSessionRef.current = false;
         if (payload.activeSession) {
           const active = payload.activeSession;
           setSessionId(active.sessionId);
@@ -191,7 +229,18 @@ export function DeskApp() {
           setResult(mapApiResponseToAgentResult(active.agent));
           setCapturedPayment(active.capturedPayment);
           setPhase("captured");
+        } else if (payload.resumeSession) {
+          const resume = payload.resumeSession;
+          setSessionId(resume.sessionId);
+          setDecisionId(resume.decisionId);
+          setIntent(resume.intentQuery);
+          const agentResult = mapApiResponseToAgentResult(resume.agent);
+          setResult(agentResult);
+          setPhase(agentResult.status === "ready" ? "ready" : agentResult.status === "blocked" ? "idle" : "idle");
+        } else if (payload.demoPrompts[0]?.text) {
+          setIntent(payload.demoPrompts[0].text);
         }
+      }
     } catch {
       setContextError("Could not load the desk. Check the connection and try again.");
     } finally {
@@ -211,6 +260,11 @@ export function DeskApp() {
       setGuestLoginNoticeOpen(false);
     }
   }, [auth.authenticated, auth.loading, contextReady]);
+
+  useEffect(() => {
+    if (auth.loading) return;
+    void loadContext();
+  }, [auth.authenticated, auth.capability, auth.loading, loadContext]);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -569,6 +623,7 @@ export function DeskApp() {
 
   function handleCartChange() {
     void refreshCart();
+    setRailTab("cart");
   }
 
   return (
@@ -583,7 +638,7 @@ export function DeskApp() {
           <form id="desk-intent-form" className="rf-peffle-command" onSubmit={onSubmit}>
             <MagnifyingGlass className="size-4 shrink-0 text-muted" aria-hidden />
             <label htmlFor="intent" className="sr-only">
-              Search products, compare, or ask Peffle
+              Search catalog products
             </label>
             <input
               ref={intentRef}
@@ -594,7 +649,7 @@ export function DeskApp() {
               onChange={(event) => setIntent(event.target.value)}
               spellCheck={false}
               autoComplete="off"
-              placeholder={intentPlaceholder}
+              placeholder={catalogSearchPlaceholder}
               disabled={!contextReady}
             />
             <kbd>⌘ K</kbd>
@@ -604,7 +659,7 @@ export function DeskApp() {
               disabled={busy || intent.trim().length < 4}
               className="rf-peffle-run"
             >
-              {agentBusy ? "Running agent…" : "Run agent"}
+              {agentBusy ? "Searching…" : "Search"}
             </button>
           </form>
           <div className="rf-peffle-top-actions">
@@ -638,7 +693,10 @@ export function DeskApp() {
               merchantName={merchantName}
               demoAvailable={demoModeAvailable}
               demoOn={demoModeOn}
-              onDemoChange={setDemoModeOn}
+              onDemoChange={(next) => {
+                setDemoModeOn(next);
+                if (next) setRailTab("trace");
+              }}
             />
             <AccountTopBarActions
               sessionId={sessionId}
@@ -801,6 +859,7 @@ export function DeskApp() {
                 setLastPlanner(turn.planner);
                 setDemoRefreshNonce((n) => n + 1);
               }}
+              onEnsureDeskSession={ensureDeskSession}
             />
             <PeffleGuardMeter
               policies={policies}
@@ -809,6 +868,7 @@ export function DeskApp() {
               trace={demoTrace}
               blocked={result?.status === "blocked" || Boolean(peffleBlock)}
               blockedReason={result?.blockedReason ?? error}
+              showStaffPolicyLink={isStaffOrAdmin(auth.capability)}
             />
           </div>
         </div>

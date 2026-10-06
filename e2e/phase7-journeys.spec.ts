@@ -4,6 +4,7 @@ import {
   armSimulateDecline,
   authenticateMerchant,
   ensureVerifiedBuyerForCheckout,
+  openDeskCartTab,
   prepareE2EBaseline,
   runDeskAgentWithIntent,
   SEED_POLICIES,
@@ -41,6 +42,7 @@ test.describe("Phase 7 journey regression", () => {
     await expect(page.getByTestId("policy-result")).toContainText(/above the \d+% ceiling/i, {
       timeout: 15_000,
     });
+    await openDeskCartTab(page);
     await expect(page.getByTestId("authorize")).toBeDisabled();
   });
 
@@ -60,6 +62,7 @@ test.describe("Phase 7 journey regression", () => {
       await expect(page.getByTestId("policy-result")).toContainText(/above the 5% ceiling/i, {
         timeout: 15_000,
       });
+      await openDeskCartTab(page);
       await expect(page.getByTestId("authorize")).toBeDisabled();
     } finally {
       await page.request.put("/api/admin/policies", {
