@@ -79,7 +79,9 @@ export function AccountTopBarActions({
         sessionId={sessionId}
         merchantName={merchantName}
         onClose={() => setModalOpen(false)}
-        onAuthStateChange={() => void auth.refresh()}
+        onAuthStateChange={() => {
+          void auth.refresh();
+        }}
       />
     </>
   );

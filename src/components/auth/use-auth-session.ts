@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { BuyerCapability } from "@/lib/auth/capability";
+import { broadcastAuthChanged } from "@/lib/auth/broadcast";
 
 export type AuthSessionState = {
   loading: boolean;
@@ -68,6 +69,7 @@ export function useAuthSession() {
   const logout = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     await refresh();
+    broadcastAuthChanged();
   }, [refresh]);
 
   return { ...state, refresh, logout };

@@ -17,6 +17,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { AccountAuthModal, type AccountAuthMode } from "@/components/auth/account-auth-modal";
 import { AccountTopBarActions } from "@/components/auth/account-top-bar-actions";
 import { useAuthSession } from "@/components/auth/use-auth-session";
+import { broadcastAuthChanged } from "@/lib/auth/broadcast";
 import { isStaffOrAdmin } from "@/lib/auth/capability";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import {
@@ -126,7 +127,7 @@ export function DeskApp() {
   const demoTrace = useDemoTrace(demoModeAvailable && demoModeOn, sessionId, demoRefreshNonce);
 
   const refreshAuthState = useCallback(() => {
-    window.dispatchEvent(new Event("razorflow:auth-changed"));
+    broadcastAuthChanged();
   }, []);
 
   const handleAgentReveal = useCallback((agentResult: AgentResult) => {
@@ -908,7 +909,6 @@ export function DeskApp() {
         merchantName={merchantName}
         onClose={() => setAccountModalOpen(false)}
         onAuthenticated={() => void continueAfterAccountAuth()}
-        onAuthStateChange={() => refreshAuthState()}
       />
     </div>
   );

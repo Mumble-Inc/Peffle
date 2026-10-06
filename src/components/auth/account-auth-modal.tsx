@@ -7,6 +7,7 @@ import { CheckCircle, X } from "@phosphor-icons/react";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button, Input } from "@/components/ui/design-system";
 import { useBodyScrollLock } from "@/lib/hooks/use-body-scroll-lock";
+import { broadcastAuthChanged } from "@/lib/auth/broadcast";
 import {
   mapRegistrationError,
   type RegistrationErrorKind,
@@ -57,6 +58,11 @@ export function AccountAuthModal({
 
   useBodyScrollLock(open);
 
+  function notifyAuthChange() {
+    onAuthStateChange?.();
+    broadcastAuthChanged();
+  }
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -88,13 +94,13 @@ export function AccountAuthModal({
 
         setPendingEmail(payload.account?.email ?? payload.email ?? pendingEmail);
         setMode("verified");
-        onAuthStateChange?.();
+        notifyAuthChange();
         onAuthenticated?.();
       } catch {
         // Ignore session probe failures; user can still enter a code manually.
       }
     })();
-  }, [open, mode, onAuthStateChange, onAuthenticated]);
+  }, [open, mode, onAuthenticated]);
 
   useEffect(() => {
     if (!open) return;
@@ -151,7 +157,7 @@ export function AccountAuthModal({
       setVerificationCode("");
       setVerificationEmailSent(true);
       setMode("verify-code");
-      onAuthStateChange?.();
+      notifyAuthChange();
     } catch {
       setRegistrationErrorKind("server");
       setError("We couldn't create your account. Please try again.");
@@ -179,7 +185,7 @@ export function AccountAuthModal({
       if (!response.ok) {
         throw new Error(payload.error ?? "Could not sign in");
       }
-      onAuthStateChange?.();
+      notifyAuthChange();
       const verified =
         payload.account?.emailVerified === true || payload.identity?.emailVerified === true;
       if (!verified) {
@@ -236,7 +242,7 @@ export function AccountAuthModal({
       if (!response.ok) {
         throw new Error(payload.error ?? "Could not verify email");
       }
-      onAuthStateChange?.();
+      notifyAuthChange();
       setMode("verified");
       onAuthenticated?.();
     } catch (cause) {
@@ -265,7 +271,7 @@ export function AccountAuthModal({
       }
       if (payload.alreadyVerified) {
         setMode("verified");
-        onAuthStateChange?.();
+        notifyAuthChange();
         onAuthenticated?.();
         return;
       }
