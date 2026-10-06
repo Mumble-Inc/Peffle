@@ -14,6 +14,7 @@ import {
 } from "../src/lib/peffle/client";
 import { sessionAgentId } from "../src/lib/peffle/runtime";
 import { runAgentChat, planToolsWithGemini } from "../src/lib/agent/agent-chat";
+import type { ChatReplyPlanner } from "../src/lib/agent/chat-reply";
 import { getGeminiModel } from "../src/lib/gemini/config";
 import { geminiErrorText } from "../src/lib/gemini/retry";
 import { clearPendingApprovalsForTests, getPendingApproval } from "../src/lib/peffle/approvals";
@@ -28,12 +29,10 @@ process.env.PEFFLE_STORAGE = ":memory:";
 (process.env as { NODE_ENV?: string }).NODE_ENV = "test";
 
 type Layer = "commerce" | "peffle" | "planner";
-type Planner = "gemini" | "deterministic";
-
 type Row = {
   id: string;
   guarded: boolean;
-  planner: Planner;
+  planner: ChatReplyPlanner;
   plannerReason?: string;
   attempts: number;
   executed: number;
@@ -123,7 +122,7 @@ async function main() {
   });
   if (catalog.length === 0) throw new Error("redteam needs at least one in-stock product");
 
-  const planner: Planner = "deterministic";
+  const planner: ChatReplyPlanner = "deterministic";
   const rows: Row[] = [];
   const facts: Record<string, unknown> = {
     scripted: true,
@@ -171,7 +170,7 @@ async function main() {
   }
 
   function push(
-    row: Omit<Row, "layer" | "planner"> & { planner?: Planner; sentence: string },
+    row: Omit<Row, "layer" | "planner"> & { planner?: ChatReplyPlanner; sentence: string },
   ) {
     rows.push({
       planner: row.planner ?? planner,
