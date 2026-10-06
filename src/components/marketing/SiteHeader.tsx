@@ -24,9 +24,6 @@ export function SiteHeader() {
             <GlassButton reflective href="/pricing" className="m-header__learn m-header__pricing">
               Pricing
             </GlassButton>
-            <GlassButton reflective href="/deployment" className="m-header__learn m-header__deploy hidden xl:inline-flex">
-              Deployment
-            </GlassButton>
             <GlassButton reflective href="/#how-it-works" className="m-header__learn">
               Learn more
             </GlassButton>

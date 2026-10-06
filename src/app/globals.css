@@ -18,6 +18,8 @@
   --color-line-strong: var(--rf-line-strong);
   --color-surface: var(--rf-surface);
   --color-accent: var(--rf-accent);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-accent-hover: var(--rf-accent-hover);
   --color-accent-soft: var(--rf-accent-soft);
   --color-success: var(--rf-success);
