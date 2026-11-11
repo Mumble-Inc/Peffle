@@ -17,7 +17,7 @@
       "id": "discount-daily-cap",
       "scope": "global",
       "window": "daily",
-      "limit": 50000,
+      "limit": 11000000,
       "match": {
         "action": "apply_discount"
       }
